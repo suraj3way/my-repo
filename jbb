@@ -1,0 +1,63 @@
+const update = async (id, body) => {
+  var thisTrade = await TradesModel.findById(id);
+  console.log(thisTrade);
+  var isProfit = false;
+  if (body?.status == 'closed') {
+    if (body?.buy_rate && body?.sell_rate) {
+      if (thisTrade?.purchaseType == 'sell') {
+        console.log("1", body?.buy_rate, body?.sell_rate);
+        console.log("2 - profit", body?.sell_rate > body?.buy_rate);
+        console.log("2.1", body?.sell_rate - body?.buy_rate);
+        console.log("3 - loss", body?.sell_rate < body?.buy_rate);
+        console.log("3.1", body?.buy_rate - body?.sell_rate);
+        if (body?.sell_rate > body?.buy_rate) {
+          body.profit = body?.sell_rate - body?.buy_rate;
+          isProfit = true;
+        }
+        if (body?.sell_rate < body?.buy_rate) {
+          body.loss = body?.buy_rate - body?.sell_rate;
+        }
+      } else {
+        if (body?.sell_rate > body?.buy_rate) {
+          body.profit = body?.sell_rate - body?.buy_rate;
+          isProfit = true;
+        }
+        if (body?.sell_rate < body?.buy_rate) {
+          body.loss = body?.buy_rate - body?.sell_rate;
+        }
+      }
+    }
+  }
+  const trade = await TradesModel.findByIdAndUpdate(id, body, { new: true });
+  if (body?.status == 'closed') {
+    var user = await AuthBusiness.me(body?.user_id);
+    var brokerage = 0;
+    if (body?.segment == 'mcx') {
+      brokerage = user?.mcxBrokeragePerCrore;
+    }
+    if (body?.segment == 'eq') {
+      brokerage = user?.EQBrokragePerCrore;
+    }
+    var ledger = {
+      trade_id: id,
+      user_id: body?.user_id,
+      broker_id: user?.broker_id,
+      amount: body?.sell_rate,
+      brokerage: brokerage,
+      type: body?.purchaseType ? body?.purchaseType : 'buy',
+    };
+    var amount = body?.purchaseType == 'buy' ? body?.buy_rate : body?.sell_rate;
+    var remainingFund = user?.funds - (amount - brokerage);
+    if (isProfit) {
+      remainingFund = user?.funds + (body.profit - brokerage);
+    } else {
+      remainingFund = user?.funds - (body.loss - brokerage);
+    }
+    if (isNaN(remainingFund)) {
+      remainingFund = 0;
+    }
+    await AuthBusiness.updateFund(body?.user_id, remainingFund);
+    await LedgersModel.create({ ...ledger });
+  }
+  return trade;
+};
