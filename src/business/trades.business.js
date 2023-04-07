@@ -470,7 +470,7 @@ const update = async (id, body) => {
     var ledger = {
       trade_id: id,
       user_id: body?.user_id,
-      broker_id: user?.broker_id,
+      broker_id: body?.broker_id,
       amount: body?.sell_rate,
       brokerage: brokerage,
       type: body?.purchaseType ? body?.purchaseType : 'buy'
