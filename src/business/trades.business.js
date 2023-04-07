@@ -279,9 +279,9 @@ function getBrokarage(total, BrokeragePerCrore) {
 
 function checkBalanceInPercentage(fund, total) {
   if (fund >= 0.9 * total) {
-    return false;
-  } else {
     return true;
+  } else {
+    return false;
   }
 }
 
@@ -337,6 +337,9 @@ const create = async (body, res) => {
     user?.funds,
     total_traded_amaount
   );
+  console.log("375 --------- ",user?.funds,
+  total_traded_amaount);
+
   if (current_percentage_funds) {
     var brokerage = 0;
     var amount = body?.purchaseType == 'buy' ? body?.buy_rate : body?.sell_rate;
@@ -364,16 +367,15 @@ const create = async (body, res) => {
           'You are not connected with any broker, please ask Admin to update your profile.'
       };
     }
-    console.log("---------",brokerage,amount,user?.mcxBrokeragePerCrore)
 
     if (user?.funds && user?.funds > amount) {
       if (body?.isDirect) {
         body.status = 'active';
       }
+      
       const trade = await TradesModel.create({
         ...body
       }); //.select({user_id:1,buy_rate:1});
-      // console.log(user?.funds - amount - brokerage);
       var remainingFund = user?.funds - amount;
       await AuthBusiness.updateFund(body?.user_id, remainingFund);
       //console.log("user",user)
@@ -402,6 +404,10 @@ const create = async (body, res) => {
     }
   }else{
     await closeAllTrades(body.user_id)
+    return {
+      message:
+        '90% of Your Fund is Used '
+    };
   }
 };
 
@@ -439,7 +445,8 @@ const update = async (id, body) => {
   if (body?.status == 'closed') {
     var user = await AuthBusiness.me(body?.user_id);
     // console.log("user",user);
-    var brokerage = thisTrade?.brokerage;
+    var brokerage = thisTrade?.brokerage ? thisTrade?.brokerage : 0;
+    console.log("brok",brokerage)
     if (body?.segment == 'mcx') {
       if(body.lots){
         amount = body?.lots * amount;
