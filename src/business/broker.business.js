@@ -90,12 +90,12 @@ const buybroker = async (brokerageId) => {
 
   const mcxtradeIds = data.map(ledger => ledger.trade_id);
   const mcxtrades = await TradesModel.find({ _id: { $in: mcxtradeIds },segment:'mcx'});
-  const mcxbuyRates = mcxtrades.map(trade => trade.buy_rate);
+  const mcxbuyRates = mcxtrades.map(trade => trade.buy_rate || 0);
   const mcxsumBuyRates = mcxbuyRates.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
 
   const eqtradeIds = data.map(ledger => ledger.trade_id);
   const eqtrades = await TradesModel.find({ _id: { $in: eqtradeIds },segment:'eq'});
-  const eqbuyRates = eqtrades.map(trade => trade.buy_rate);
+  const eqbuyRates = eqtrades.map(trade => trade.buy_rate || 0);
   const eqsumBuyRates = eqbuyRates.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
 
   return {
@@ -111,12 +111,12 @@ const sellbroker = async (brokerageId) => {
 
   const mcxtradeIds = data.map(ledger => ledger.trade_id);
   const mcxtrades = await TradesModel.find({ _id: { $in: mcxtradeIds },segment:'mcx'});
-  const mcxbuyRates = mcxtrades.map(trade => trade.sell_rate);
+  const mcxbuyRates = mcxtrades.map(trade => trade.sell_rate || 0);
   const mcxsumBuyRates = mcxbuyRates.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
 
   const eqtradeIds = data.map(ledger => ledger.trade_id);
   const eqtrades = await TradesModel.find({ _id: { $in: eqtradeIds },segment:'eq'});
-  const eqbuyRates = eqtrades.map(trade => trade.sell_rate);
+  const eqbuyRates = eqtrades.map(trade => trade.sell_rate || 0);
   const eqsumBuyRates = eqbuyRates.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
 
   return {
@@ -134,22 +134,22 @@ const totalbroker = async (brokerageId) => {
 
   const mcxbuytradeIds = data.map(ledger => ledger.trade_id);
   const mcxbuytrades = await TradesModel.find({ _id: { $in: mcxbuytradeIds },segment:'mcx'});
-  const mcxbuyRates = mcxbuytrades.map(trade => trade.buy_rate);
+  const mcxbuyRates = mcxbuytrades.map(trade => trade.buy_rate || 0);
   const mcxsumBuyRates = mcxbuyRates.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
 
   const mcxselltradeIds = data.map(ledger => ledger.trade_id);
   const mcxselltrades = await TradesModel.find({ _id: { $in: mcxselltradeIds },segment:'mcx'});
-  const mcxsellRates = mcxselltrades.map(trade => trade.sell_rate);
+  const mcxsellRates = mcxselltrades.map(trade => trade.sell_rate || 0);
   const mcxsumsellRates = mcxsellRates.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
 
   const eqselltradeIds = data.map(ledger => ledger.trade_id);
   const eqselltrades = await TradesModel.find({ _id: { $in: eqselltradeIds },segment:'eq'});
-  const eqbuyRates = eqselltrades.map(trade => trade.buy_rate);
+  const eqbuyRates = eqselltrades.map(trade => trade.buy_rate || 0);
   const eqsumBuyRates = eqbuyRates.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
 
   const eqtradeIds = data.map(ledger => ledger.trade_id);
   const eqtrades = await TradesModel.find({ _id: { $in: eqtradeIds },segment:'eq'});
-  const eqsellRates = eqtrades.map(trade => trade.sell_rate);
+  const eqsellRates = eqtrades.map(trade => trade.sell_rate || 0);
   const eqsumsellRates = eqsellRates.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
 
   return {
@@ -186,10 +186,10 @@ const profitlossbroker = async (brokerageId) => {
   const mcxtradeIds = data.map(ledger => ledger.trade_id);
   const mcxtrades = await TradesModel.find({ _id: { $in: mcxtradeIds },segment:'mcx'});
 
-  const mcxprofit = mcxtrades.map(trades=>trades.profit);
+  const mcxprofit = mcxtrades.map(trades=>trades.profit  || 0);
   const mcxallprofit = mcxprofit.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
   
-  const mcxloss = mcxtrades.map(trades=>trades.loss);
+  const mcxloss = mcxtrades.map(trades=>trades.loss || 0);
   const mcxallloss = mcxloss.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
 
   let mcxprofitloss=mcxallprofit-mcxallloss
@@ -197,10 +197,10 @@ const profitlossbroker = async (brokerageId) => {
   const eqtradeIds = data.map(ledger => ledger.trade_id);
   const eqtrades = await TradesModel.find({ _id: { $in: eqtradeIds },segment:'eq'});
   
-  const eqprofit = eqtrades.map(trades=>trades.profit);
+  const eqprofit = eqtrades.map(trades=>trades.profit || 0);
   const eqallprofit = eqprofit.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
   
-  const eqloss = eqtrades.map(trades=>trades.loss);
+  const eqloss = eqtrades.map(trades=>trades.loss || 0);
   const eqallloss = eqloss.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
 
   let eqprofitloss=eqallprofit-eqallloss
@@ -220,12 +220,12 @@ const activebuybroker = async (brokerageId) => {
 
   const mcxtradeIds = data.map(ledger => ledger.trade_id);
   const mcxtrades = await TradesModel.find({ _id: { $in: mcxtradeIds },status:'active',purchaseType: 'buy',segment:'mcx'});
-  const mcxbuyRates = mcxtrades.map(trade => trade.buy_rate);
+  const mcxbuyRates = mcxtrades.map(trade => trade.buy_rate || 0);
   const mcxsumBuyRates = mcxbuyRates.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
 
   const eqtradeIds = data.map(ledger => ledger.trade_id);
   const eqtrades = await TradesModel.find({ _id: { $in: eqtradeIds },status:'active',purchaseType: 'buy',segment:'eq'});
-  const eqbuyRates = eqtrades.map(trade => trade.buy_rate);
+  const eqbuyRates = eqtrades.map(trade => trade.buy_rate || 0);
   const eqsumBuyRates = eqbuyRates.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
 
   return {
@@ -244,12 +244,12 @@ const activesellbroker = async (brokerageId) => {
 
   const mcxtradeIds = data.map(ledger => ledger.trade_id);
   const mcxtrades = await TradesModel.find({ _id: { $in: mcxtradeIds },status:'active',purchaseType: 'sell',segment:'mcx'});
-  const mcxsellRates = mcxtrades.map(trade => trade.sell_rate);
+  const mcxsellRates = mcxtrades.map(trade => trade.sell_rate || 0);
   const mcxsumsellRates = mcxsellRates.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
 
   const eqtradeIds = data.map(ledger => ledger.trade_id);
   const eqtrades = await TradesModel.find({ _id: { $in: eqtradeIds },status:'active',purchaseType: 'sell',segment:'eq'});
-  const eqsellRates = eqtrades.map(trade => trade.sell_rate);
+  const eqsellRates = eqtrades.map(trade => trade.sell_rate || 0);
   const eqsumsellRates = eqsellRates.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
 
   return {

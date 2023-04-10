@@ -161,17 +161,28 @@ const updateBroker = async (req, res) => {
 
 const buybroker = async (req, res) => {
   try {
-    const broker = req.params.id;
-    // Validate data format
-    if (!validator.isMongoId(broker)) {
+    const broker_id = req.user.id;
+
+    if (validator.isEmpty(broker_id)) {
       throw {
-        code: 'ERROR_AUTH_4',
-        message: 'Invalid auth User id...'
+        code: 'ERROR_AUTH_3',
+        message: 'The broker id cannot be empty'
       };
     }
-      const data =  await BrokersBusiness.buybroker(broker);
-     // console.log(data,"data");
-     success(res, 201,  data );
+ 
+    if (!validator.isMongoId(broker_id)) {
+      throw {
+        code: 'ERROR_AUTH_4',
+        message: 'Invalid auth broker id...'
+      };
+    }
+
+    if (broker_id) {
+      let data = await BrokersBusiness.buybroker(broker_id);
+      return data ? success(res, data) : unauthorized(res);
+    } else {
+      return unauthorized(res);
+    }
   } catch (err) {
     error(res, err);
   }
@@ -181,17 +192,29 @@ const buybroker = async (req, res) => {
 
 const sellbroker = async (req, res) => {
   try {
-    const broker = req.params.id;
-    // Validate data format
-    if (!validator.isMongoId(broker)) {
+    const broker_id = req.user.id;
+    // console.log(req.user);
+    if (validator.isEmpty(broker_id)) {
       throw {
-        code: 'ERROR_AUTH_4',
-        message: 'Invalid auth User id...'
+        code: 'ERROR_AUTH_3',
+        message: 'The broker id cannot be empty'
       };
     }
-      const data =  await BrokersBusiness.sellbroker(broker);
-     // console.log(data,"data");
-     success(res, 201,  data );
+ 
+    if (!validator.isMongoId(broker_id)) {
+      throw {
+        code: 'ERROR_AUTH_4',
+        message: 'Invalid auth broker id...'
+      };
+    }
+    // console.log(broker_id);
+    if (broker_id) {
+      let data = await BrokersBusiness.sellbroker(broker_id);
+      // console.log(data);
+      return data ? success(res, data) : unauthorized(res);
+    } else {
+      return unauthorized(res);
+    }
   } catch (err) {
     error(res, err);
   }
@@ -201,17 +224,29 @@ const sellbroker = async (req, res) => {
 
 const totalbroker = async (req, res) => {
   try {
-    const broker = req.params.id;
-    // Validate data format
-    if (!validator.isMongoId(broker)) {
+    const broker_id = req.user.id;
+    // console.log(req.user);
+    if (validator.isEmpty(broker_id)) {
       throw {
-        code: 'ERROR_AUTH_4',
-        message: 'Invalid auth User id...'
+        code: 'ERROR_AUTH_3',
+        message: 'The broker id cannot be empty'
       };
     }
-      const data =  await BrokersBusiness.totalbroker(broker);
-     // console.log(data,"data");
-     success(res, 201,  data );
+ 
+    if (!validator.isMongoId(broker_id)) {
+      throw {
+        code: 'ERROR_AUTH_4',
+        message: 'Invalid auth broker id...'
+      };
+    }
+    // console.log(broker_id);
+    if (broker_id) {
+      let data = await BrokersBusiness.totalbroker(broker_id);
+      // console.log(data);
+      return data ? success(res, data) : unauthorized(res);
+    } else {
+      return unauthorized(res);
+    }
   } catch (err) {
     error(res, err);
   }
@@ -221,17 +256,28 @@ const totalbroker = async (req, res) => {
 
 const activebroker = async (req, res) => {
   try {
-    const broker = req.params.id;
-    // Validate data format
-    if (!validator.isMongoId(broker)) {
+    const broker_id = req.user.id;
+
+    if (validator.isEmpty(broker_id)) {
       throw {
-        code: 'ERROR_AUTH_4',
-        message: 'Invalid auth User id...'
+        code: 'ERROR_AUTH_3',
+        message: 'The broker id cannot be empty'
       };
     }
-      const data =  await BrokersBusiness.activebroker(broker);
-     // console.log(data,"data");
-     success(res, 201,  data );
+ 
+    if (!validator.isMongoId(broker_id)) {
+      throw {
+        code: 'ERROR_AUTH_4',
+        message: 'Invalid auth broker id...'
+      };
+    }
+
+    if (broker_id) {
+      let data = await BrokersBusiness.activebroker(broker_id);
+      return data ? success(res, data) : unauthorized(res);
+    } else {
+      return unauthorized(res);
+    }
   } catch (err) {
     error(res, err);
   }
@@ -242,17 +288,28 @@ const activebroker = async (req, res) => {
 
 const profitlossbroker = async (req, res) => {
   try {
-    const broker = req.params.id;
-    // Validate data format
-    if (!validator.isMongoId(broker)) {
+    const broker_id = req.user.id;
+
+    if (validator.isEmpty(broker_id)) {
       throw {
-        code: 'ERROR_AUTH_4',
-        message: 'Invalid auth User id...'
+        code: 'ERROR_AUTH_3',
+        message: 'The broker id cannot be empty'
       };
     }
-      const data =  await BrokersBusiness.profitlossbroker(broker);
-     // console.log(data,"data");
-     success(res, 201,  data );
+ 
+    if (!validator.isMongoId(broker_id)) {
+      throw {
+        code: 'ERROR_AUTH_4',
+        message: 'Invalid auth broker id...'
+      };
+    }
+
+    if (broker_id) {
+      let data = await BrokersBusiness.profitlossbroker(broker_id);
+      return data ? success(res, data) : unauthorized(res);
+    } else {
+      return unauthorized(res);
+    }
   } catch (err) {
     error(res, err);
   }
@@ -263,17 +320,28 @@ const profitlossbroker = async (req, res) => {
 
 const activebuybroker = async (req, res) => {
   try {
-    const broker = req.params.id;
-    // Validate data format
-    if (!validator.isMongoId(broker)) {
+    const broker_id = req.user.id;
+
+    if (validator.isEmpty(broker_id)) {
       throw {
-        code: 'ERROR_AUTH_4',
-        message: 'Invalid auth User id...'
+        code: 'ERROR_AUTH_3',
+        message: 'The broker id cannot be empty'
       };
     }
-      const data =  await BrokersBusiness.activebuybroker(broker);
-     // console.log(data,"data");
-     success(res, 201,  data );
+ 
+    if (!validator.isMongoId(broker_id)) {
+      throw {
+        code: 'ERROR_AUTH_4',
+        message: 'Invalid auth broker id...'
+      };
+    }
+
+    if (broker_id) {
+      let data = await BrokersBusiness.activebuybroker(broker_id);
+      return data ? success(res, data) : unauthorized(res);
+    } else {
+      return unauthorized(res);
+    }
   } catch (err) {
     error(res, err);
   }
@@ -284,17 +352,28 @@ const activebuybroker = async (req, res) => {
 
 const activesellbroker = async (req, res) => {
   try {
-    const broker = req.params.id;
-    // Validate data format
-    if (!validator.isMongoId(broker)) {
+    const broker_id = req.user.id;
+
+    if (validator.isEmpty(broker_id)) {
       throw {
-        code: 'ERROR_AUTH_4',
-        message: 'Invalid auth User id...'
+        code: 'ERROR_AUTH_3',
+        message: 'The broker id cannot be empty'
       };
     }
-      const data =  await BrokersBusiness.activesellbroker(broker);
-     // console.log(data,"data");
-     success(res, 201,  data );
+ 
+    if (!validator.isMongoId(broker_id)) {
+      throw {
+        code: 'ERROR_AUTH_4',
+        message: 'Invalid auth broker id...'
+      };
+    }
+
+    if (broker_id) {
+      let data = await BrokersBusiness.activesellbroker(broker_id);
+      return data ? success(res, data) : unauthorized(res);
+    } else {
+      return unauthorized(res);
+    }
   } catch (err) {
     error(res, err);
   }
@@ -304,17 +383,28 @@ const activesellbroker = async (req, res) => {
 
 const Brokerage = async (req, res) => {
   try {
-    const broker = req.params.id;
-    // Validate data format
-    if (!validator.isMongoId(broker)) {
+    const broker_id = req.user.id;
+
+    if (validator.isEmpty(broker_id)) {
       throw {
-        code: 'ERROR_AUTH_4',
-        message: 'Invalid auth User id...'
+        code: 'ERROR_AUTH_3',
+        message: 'The broker id cannot be empty'
       };
     }
-      const data =  await BrokersBusiness.Brokerage(broker);
-     // console.log(data,"data");
-     success(res, 201,  data );
+ 
+    if (!validator.isMongoId(broker_id)) {
+      throw {
+        code: 'ERROR_AUTH_4',
+        message: 'Invalid auth broker id...'
+      };
+    }
+
+    if (broker_id) {
+      let data = await BrokersBusiness.Brokerage(broker_id);
+      return data ? success(res, data) : unauthorized(res);
+    } else {
+      return unauthorized(res);
+    }
   } catch (err) {
     error(res, err);
   }
@@ -323,26 +413,36 @@ const Brokerage = async (req, res) => {
 
 
 const getbrokerageByStatus = async (req, res) => {
-  try {
-    const broker = req.params.id;
-    // Validate data format
-    if (!validator.isMongoId(broker)) {
-      throw {
-        code: 'ERROR_AUTH_4',
-        message: 'Invalid auth User id...'
-      };
+    try {
+      const broker_id = req.user.id;
+
+      const status = req.params.status;
+      if (!['active', 'pending', 'closed'].includes(status)) {
+        return res.status(400).send('Invalid status');
+      }
+      if (validator.isEmpty(broker_id)) {
+        throw {
+          code: 'ERROR_AUTH_3',
+          message: 'The broker id cannot be empty'
+        };
+      }
+   
+      if (!validator.isMongoId(broker_id)) {
+        throw {
+          code: 'ERROR_AUTH_4',
+          message: 'Invalid auth broker id...'
+        };
+      }
+  
+      if (broker_id) {
+        let data = await BrokersBusiness.getbrokerageByStatus(broker_id,status);
+        return data ? success(res, data) : unauthorized(res);
+      } else {
+        return unauthorized(res);
+      }
+    } catch (err) {
+      error(res, err);
     }
-    const status = req.params.status;
-    // Validate status parameter
-    if (!['active', 'pending', 'closed'].includes(status)) {
-      return res.status(400).send('Invalid status');
-    }
-      const data =  await BrokersBusiness.getbrokerageByStatus(broker,status);
-     // console.log(data,"data");
-     success(res, 201,  data );
-  } catch (err) {
-    error(res, err);
-  }
 };
 
 

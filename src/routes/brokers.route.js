@@ -15,16 +15,15 @@ router.get('/api/brokers/all/:status', mw(['admin']), BrokersController.getAllBy
 router.get('/api/brokers/:status', mw(['user']), BrokersController.getTradeByStatus);
 router.post('/api/brokers/login', BrokersController.login);
 
-router.get('/api/buybroker/:id',mw(['broker']), BrokersController.buybroker);
-router.get('/api/sellbroker/:id',mw(['broker']), BrokersController.sellbroker);
-router.get('/api/totalbroker/:id',mw(['broker']), BrokersController.totalbroker);
-router.get('/api/activebroker/:id',mw(['broker']), BrokersController.activebroker);
-router.get('/api/profitlossbroker/:id',mw(['broker']), BrokersController.profitlossbroker);
-router.get('/api/activebuybroker/:id',mw(['broker']), BrokersController.activebuybroker);
-router.get('/api/activesellbroker/:id',mw(['broker']), BrokersController.activesellbroker);
-router.get('/api/Brokerage/:id',mw(['broker']), BrokersController.Brokerage);
-// router.get('/api/broker/:id/status/:status',mw(['broker']), BrokersController.getbrokerageByStatus);
-router.get('/api/brokers/:id/:status',mw(['broker']), BrokersController.getbrokerageByStatus);
+router.get('/api/buybroker',mw(['broker']), BrokersController.buybroker);
+router.get('/api/sellbroker',mw(['broker']), BrokersController.sellbroker);
+router.get('/api/totalbroker',mw(['broker']), BrokersController.totalbroker);
+router.get('/api/activebroker',mw(['broker']), BrokersController.activebroker);
+router.get('/api/profitlossbroker',mw(['broker']), BrokersController.profitlossbroker);
+router.get('/api/activebuybroker',mw(['broker']), BrokersController.activebuybroker);
+router.get('/api/activesellbroker',mw(['broker']), BrokersController.activesellbroker);
+router.get('/api/Brokerage',mw(['broker']), BrokersController.Brokerage);
+router.get('/api/brokersId/:status',mw(['broker']), BrokersController.getbrokerageByStatus);
 
 export default router;
 
