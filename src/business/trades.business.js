@@ -406,7 +406,7 @@ const create = async (body, res) => {
     await closeAllTrades(body.user_id)
     return {
       message:
-        '90% of Your Fund is Used '
+        '90% of Your Fund is Used'
     };
   }
 };
