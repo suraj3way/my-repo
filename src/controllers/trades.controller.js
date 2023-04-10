@@ -203,6 +203,7 @@ const createTrade = async (req, res) => {
     req.body.user_id = req.user.id;
     if(req.body?.purchaseType == 'buy' && req.body?.buy_rate || req.body?.purchaseType == 'sell' && req.body?.sell_rate){
     const data = await TradesBusiness.create(req.body);
+    console.log(data,'data');
     if(data?.message){
       return success(res, data);
     }
