@@ -209,6 +209,8 @@ const createTrade = async (req, res) => {
     }
     // let created = '_id' in data || 'n' in data;
     // return success(res, 201, { created });
+    
+    //send notification from here from firebase
     return res.send({ msg:"Successfully trade create" , data})
   }else{
     return success(res, {"message":"You need to provide the Buy or Sell rate"});

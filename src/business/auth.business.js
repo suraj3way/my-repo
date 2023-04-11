@@ -345,6 +345,7 @@ const loginAdmin = async (username, password) => {
         code: 'ERROR_LOGIN_3',
         message: `Incorrect password`
       };
+      //create entry for new model of fcm token
     return userAdmin;
   } else {
     throw {
