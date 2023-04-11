@@ -478,10 +478,17 @@ const update = async (id, body) => {
     
     var remainingFund = user?.funds - amount - brokerage;
     console.log("funds",user?.funds , amount , brokerage)
-    if (isProfit) {
+    if (isProfit && body.buy_rate < body.sell_rate) {
       remainingFund = user?.funds + (amount - brokerage);
-    } else {
+      console.log('profit');
+    } 
+    else if(isProfit && body.buy_rate > body.sell_rate){
       remainingFund = user?.funds - (amount - brokerage);
+      console.log('loss');
+    }
+    else{
+      remainingFund = user?.funds + body.buy_rate - brokerage;
+      console.log("no profit/loss");
     }
     
     await AuthBusiness.updateFund(body?.user_id, remainingFund);
