@@ -52,6 +52,11 @@ const tradesSchema = new Schema({
       enum: ['buy', 'sell'],
       required: true
     },
+    // orderType: {
+    //   type: String,
+    //   enum: ['buy', 'sell'],
+    //   required: false
+    // },
     isDirect: {
       type: Boolean,
       require: true

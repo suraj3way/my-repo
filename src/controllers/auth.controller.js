@@ -4,7 +4,6 @@ import AuthBusiness from '@/business/auth.business';
 // Utils
 import { session } from '@/utils/auth.util';
 import { success, error, unauthorized } from '@/utils/helper.util';
-
 /**
  * login
  *
@@ -215,6 +214,64 @@ const registerAdmin = async (req, res) => {
  * @param {*} res
  * @returns
  */
+
+// const loginAdmin = async (req, res) => {
+//   try {
+//     const { username, password } = req.body;
+
+//     const payload = {
+//       notification: {
+//         title: 'New Message',
+//         body: 'You have a new message from John'
+//       }
+//     };
+
+//     const options = {
+//       priority: 'high',
+//       timeToLive: 60 * 60 * 24 // 1 day
+//     };
+
+//     admin
+//       .messaging()
+//       .sendToDevice(
+//         'cUE6jHHizMYLFeaOpLThIR:APA91bFWfQZBtHYWBZlhEkvsiKMhOCqCzefoCXuOa7bR44EffVfq1lvYxPWjPlF9I-Bx1RRB3ssFLnrqHHhG859jl0zG1NPf0IWyby3Jz1aObH6HMYSCH-896g6_DRCcTfgoyxa-LUBr',
+//         payload,
+//         options
+//       )
+//       .then((response) => {
+//         console.log('Notification sent successfully:', response);
+//       })
+//       .catch((error) => {
+//         console.log('Error sending notification:', error);
+//       });
+
+//     if (validator.isEmpty(username)) {
+//       throw {
+//         code: 'ERROR_AUTH_1',
+//         message: 'The username cannot be empty'
+//       };
+//     }
+
+//     if (validator.isEmpty(password)) {
+//       throw {
+//         code: 'ERROR_AUTH_2',
+//         message: 'The password cannot be empty'
+//       };
+//     }
+
+//     const user = await AuthBusiness.loginAdmin(username, password);
+//     if (user) {
+//       const { _id, permissions } = user;
+//       const token = await session(_id, { permissions });
+//       return success(res, { token });
+//     } else {
+//       return unauthorized(res);
+//     }
+//   } catch (err) {
+//     error(res, err);
+//   }
+// };
+
 const loginAdmin = async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -236,6 +293,9 @@ const loginAdmin = async (req, res) => {
     const user = await AuthBusiness.loginAdmin(username, password);
     if (user) {
       const { _id, permissions } = user;
+
+      // send notification here
+
       const token = await session(_id, { permissions });
       return success(res, { token });
     } else {
@@ -261,26 +321,38 @@ const getAllUser = async (req, res) => {
 const updateUser = async (req, res) => {
   try {
     req.body.updated_by = req.user.id;
-    const data = await AuthBusiness.update(req.params.id,req.body);
+    const data = await AuthBusiness.update(req.params.id, req.body);
     // let updated = '_id' in data || 'n' in data;
     // return success(res, 201, { updated });
-    return res.send({ msg:"Successfully update funds..." , data})
+    return res.send({ msg: 'Successfully update funds...', data });
   } catch (err) {
     error(res, err);
   }
 };
-
 
 const updateFund = async (req, res) => {
   try {
     req.body.updated_by = req.user.id;
     const user = await AuthBusiness.updateFund(req.params.id, req.body.funds);
-    return success(res, 201, { msg:"Successfully update funds...", name: user.name, funds: user.funds });
+    return success(res, 201, {
+      msg: 'Successfully update funds...',
+      name: user.name,
+      funds: user.funds
+    });
   } catch (err) {
     error(res, err);
   }
 };
 
-
-
-export default { login, register, recover, me, verify, registerAdmin, loginAdmin, getAllUser,updateUser,updateFund };
+export default {
+  login,
+  register,
+  recover,
+  me,
+  verify,
+  registerAdmin,
+  loginAdmin,
+  getAllUser,
+  updateUser,
+  updateFund
+};

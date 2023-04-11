@@ -337,8 +337,8 @@ const create = async (body, res) => {
     user?.funds,
     total_traded_amaount
   );
-  console.log("375 --------- ",user?.funds,
-  total_traded_amaount);
+  // console.log("375 --------- ",user?.funds,
+  // total_traded_amaount);
 
   if (current_percentage_funds) {
     var brokerage = 0;

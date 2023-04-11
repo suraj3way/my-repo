@@ -3,7 +3,7 @@ import TradesBusiness from '@/business/trades.business';
 import { success, error } from '@/utils/helper.util';
 // Libs
 import validator from 'validator';
-
+import admin from '@/firebase/firebase';
 
 const getAllBuyRates = async (req, res) => {
   try {
@@ -23,8 +23,6 @@ const getAllsellRates = async (req, res) => {
   }
 };
 
-
-
 const getAllternover = async (req, res) => {
   try {
     const data = await TradesBusiness.getAllternover();
@@ -33,7 +31,6 @@ const getAllternover = async (req, res) => {
     error(res, err);
   }
 };
-
 
 const getactivetrade = async (req, res) => {
   try {
@@ -47,9 +44,6 @@ const getactivetrade = async (req, res) => {
   }
 };
 
-
-
-
 const getAllProfitandloss = async (req, res) => {
   try {
     // Business logic
@@ -62,7 +56,6 @@ const getAllProfitandloss = async (req, res) => {
   }
 };
 
-
 const getAllactive_buy = async (req, res) => {
   try {
     // Business logic
@@ -74,7 +67,6 @@ const getAllactive_buy = async (req, res) => {
     error(res, err);
   }
 };
-
 
 const getAllactive_sell = async (req, res) => {
   try {
@@ -96,12 +88,6 @@ const Brokerege = async (req, res) => {
     error(res, err);
   }
 };
-
-
-
-
-
-
 
 const getAll = async (req, res) => {
   try {
@@ -130,12 +116,12 @@ const getAllLedgers = async (req, res) => {
 const getAllByStatus = async (req, res) => {
   try {
     // Business logic
-   
+
     const status = req.params.status;
     if (!['active', 'pending', 'closed'].includes(status)) {
       return res.status(400).send('Invalid status');
     }
-    
+
     const data = await TradesBusiness.getAllByStatus(status);
     // Return success
     success(res, data);
@@ -182,7 +168,7 @@ const getTradeByStatus = async (req, res) => {
       };
     }
     // Business logic
-    const data = await TradesBusiness.getByStatus(user_id,status);
+    const data = await TradesBusiness.getByStatus(user_id, status);
     // Return success
     success(res, data);
   } catch (err) {
@@ -201,20 +187,50 @@ const getTradeByStatus = async (req, res) => {
 const createTrade = async (req, res) => {
   try {
     req.body.user_id = req.user.id;
-    if(req.body?.purchaseType == 'buy' && req.body?.buy_rate || req.body?.purchaseType == 'sell' && req.body?.sell_rate){
-    const data = await TradesBusiness.create(req.body);
-    console.log(data,'data');
-    if(data?.message){
-      return success(res, data);
+    if (
+      (req.body?.purchaseType == 'buy' && req.body?.buy_rate) ||
+      (req.body?.purchaseType == 'sell' && req.body?.sell_rate)
+    ) {
+      const payload = {
+        notification: {
+          title: 'New Notification',
+          body: `Trade of ${req.body.purchaseType} with the rate of ${req.body.buy_rate} is Entry by STOPLOSS(762)`
+        }
+      };
+
+      const data = await TradesBusiness.create(req.body);
+      console.log(data, data);
+      if (data?.message) {
+        return success(res, data);
+      }
+      // let created = '_id' in data || 'n' in data;
+      // return success(res, 201, { created });
+      //send notification from here from firebase
+
+      const multicastMessage = {
+        tokens: [
+          'cUE6jHHizMYLFeaOpLThIR:APA91bFWfQZBtHYWBZlhEkvsiKMhOCqCzefoCXuOa7bR44EffVfq1lvYxPWjPlF9I-Bx1RRB3ssFLnrqHHhG859jl0zG1NPf0IWyby3Jz1aObH6HMYSCH-896g6_DRCcTfgoyxa-LUBr'
+        ],
+        webpush: {
+          notification: payload.notification
+        }
+      };
+      admin
+        .messaging()
+        .sendMulticast(multicastMessage)
+        .then((response) => {
+          console.log('Notification sent successfully:', response);
+        })
+        .catch((error) => {
+          console.log('Error sending notification:', error);
+        });
+
+      return res.send({ msg: 'Successfully trade create', data });
+    } else {
+      return success(res, {
+        message: 'You need to provide the Buy or Sell rate'
+      });
     }
-    // let created = '_id' in data || 'n' in data;
-    // return success(res, 201, { created });
-    
-    //send notification from here from firebase
-    return res.send({ msg:"Successfully trade create" , data})
-  }else{
-    return success(res, {"message":"You need to provide the Buy or Sell rate"});
-  }
   } catch (err) {
     error(res, err);
   }
@@ -231,11 +247,11 @@ const updateTrade = async (req, res) => {
   try {
     // console.log(req.user, "suraj");
     req.body.user_id = req.user.id;
-   
-      const data =  await TradesBusiness.update(req.params.id,req.body);
-     // console.log(data,"data");
-      let updated = '_id' in data || 'n' in data;
-      return success(res, 201, { data });
+
+    const data = await TradesBusiness.update(req.params.id, req.body);
+    // console.log(data,"data");
+    let updated = '_id' in data || 'n' in data;
+    return success(res, 201, { data });
   } catch (err) {
     error(res, err);
   }
@@ -251,32 +267,29 @@ const ledgerbalance = async (req, res) => {
         message: 'Invalid auth User id...'
       };
     }
-      const data =  await TradesBusiness.ledgerbalance(broker);
-     // console.log(data,"data");
-     success(res, 201, { data });
+    const data = await TradesBusiness.ledgerbalance(broker);
+    // console.log(data,"data");
+    success(res, 201, { data });
   } catch (err) {
     error(res, err);
   }
 };
 
-
-
-
 export default {
-    getAll,
-    getAllLogged, 
-    createTrade, 
-    updateTrade, 
-    getAllByStatus,
-    getTradeByStatus, 
-    getAllLedgers,
-    getAllBuyRates,
-    getAllsellRates,
-    getAllternover,
-    getactivetrade,
-    getAllProfitandloss,
-    getAllactive_buy,
-    getAllactive_sell,
-    Brokerege,
-    ledgerbalance
+  getAll,
+  getAllLogged,
+  createTrade,
+  updateTrade,
+  getAllByStatus,
+  getTradeByStatus,
+  getAllLedgers,
+  getAllBuyRates,
+  getAllsellRates,
+  getAllternover,
+  getactivetrade,
+  getAllProfitandloss,
+  getAllactive_buy,
+  getAllactive_sell,
+  Brokerege,
+  ledgerbalance
 };

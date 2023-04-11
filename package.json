@@ -46,9 +46,12 @@
     "express-handlebars": "^5.3.3",
     "express-jsdoc-swagger": "^1.6.4",
     "express-rate-limit": "^5.3.0",
+    "firebase": "^9.19.1",
+    "firebase-admin": "^11.6.0",
     "helmet": "^4.6.0",
     "ioredis": "^4.27.8",
     "jsonwebtoken": "^8.5.1",
+    "messaging": "^0.0.2",
     "method-override": "^3.0.0",
     "moment": "^2.29.1",
     "mongoose": "^5.13.7",
@@ -148,6 +151,5 @@
       "no-var": "warn",
       "no-unused-vars": "warn"
     }
-    
   }
 }
