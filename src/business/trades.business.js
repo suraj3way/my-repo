@@ -142,7 +142,7 @@ const getAllactive_buy = async () => {
     purchaseType: 'buy',
     segment: 'mcx'
   });
-  const mcxbuyRates = mcxtrades.map((trade) => trade.buy_rate);
+  const mcxbuyRates = mcxtrades.map((trade) => trade.buy_rate || 0 );
   const mcxsumBuyRates = mcxbuyRates.reduce(
     (accumulator, currentValue) => accumulator + currentValue,
     0
@@ -153,7 +153,7 @@ const getAllactive_buy = async () => {
     purchaseType: 'buy',
     segment: 'eq'
   });
-  const eqbuyRates = eqtrades.map((trade) => trade.buy_rate);
+  const eqbuyRates = eqtrades.map((trade) => trade.buy_rate || 0 );
   const eqsumBuyRates = eqbuyRates.reduce(
     (accumulator, currentValue) => accumulator + currentValue,
     0
@@ -172,7 +172,7 @@ const getAllactive_sell = async () => {
     purchaseType: 'sell',
     segment: 'mcx'
   });
-  const mcxsellRates = mcxtrades.map((trade) => trade.sell_rate);
+  const mcxsellRates = mcxtrades.map((trade) => trade.sell_rate || 0 );
   const mcxsumsellRates = mcxsellRates.reduce(
     (accumulator, currentValue) => accumulator + currentValue,
     0
@@ -183,7 +183,7 @@ const getAllactive_sell = async () => {
     purchaseType: 'sell',
     segment: 'eq'
   });
-  const eqsellRates = eqtrades.map((trade) => trade.sell_rate);
+  const eqsellRates = eqtrades.map((trade) => trade.sell_rate || 0 );
   const eqsumsellRates = eqsellRates.reduce(
     (accumulator, currentValue) => accumulator + currentValue,
     0
