@@ -5,14 +5,14 @@ import AuthBusiness from '@/business/auth.business';
 
 const getAllBuyRates = async () => {
   const mcxtrades = await TradesModel.find({ segment: 'mcx' });
-  const mcxbuyRates = mcxtrades.map((trade) => trade.buy_rate);
+  const mcxbuyRates = mcxtrades.map((trade) => trade.buy_rate || 0);
   const mcxsumBuyRates = mcxbuyRates.reduce(
     (accumulator, currentValue) => accumulator + currentValue,
     0
   );
 
   const eqtrades = await TradesModel.find({ segment: 'eq' });
-  const eqbuyRates = eqtrades.map((trade) => trade.buy_rate);
+  const eqbuyRates = eqtrades.map((trade) => trade.buy_rate || 0);
   const eqsumBuyRates = eqbuyRates.reduce(
     (accumulator, currentValue) => accumulator + currentValue,
     0
@@ -26,14 +26,14 @@ const getAllBuyRates = async () => {
 
 const getAllsellRates = async () => {
   const mcxtrades = await TradesModel.find({ segment: 'mcx' });
-  const mcxsellRates = mcxtrades.map((trade) => trade.sell_rate);
+  const mcxsellRates = mcxtrades.map((trade) => trade.sell_rate || 0);
   const mcxsumsellRates = mcxsellRates.reduce(
     (accumulator, currentValue) => accumulator + currentValue,
     0
   );
 
   const eqtrades = await TradesModel.find({ segment: 'eq' });
-  const eqsellRates = eqtrades.map((trade) => trade.sell_rate);
+  const eqsellRates = eqtrades.map((trade) => trade.sell_rate || 0);
   const eqsumsellRates = eqsellRates.reduce(
     (accumulator, currentValue) => accumulator + currentValue,
     0
@@ -48,8 +48,8 @@ const getAllsellRates = async () => {
 const getAllternover = async () => {
   const mcxtrades = await TradesModel.find({ segment: 'mcx' });
   const eqtrades = await TradesModel.find({ segment: 'eq' });
-  const mcxbuyRates = mcxtrades.map((trade) => trade.buy_rate);
-  const mcxsellRates = mcxtrades.map((trade) => trade.sell_rate);
+  const mcxbuyRates = mcxtrades.map((trade) => trade.buy_rate || 0);
+  const mcxsellRates = mcxtrades.map((trade) => trade.sell_rate || 0);
   const mcxsumBuyRates = mcxbuyRates.reduce(
     (accumulator, currentValue) => accumulator + currentValue,
     0
@@ -59,8 +59,8 @@ const getAllternover = async () => {
     0
   );
 
-  const eqbuyRates = eqtrades.map((trade) => trade.buy_rate);
-  const eqsellRates = eqtrades.map((trade) => trade.sell_rate);
+  const eqbuyRates = eqtrades.map((trade) => trade.buy_rate || 0);
+  const eqsellRates = eqtrades.map((trade) => trade.sell_rate || 0);
   const eqsumBuyRates = eqbuyRates.reduce(
     (accumulator, currentValue) => accumulator + currentValue,
     0
@@ -98,13 +98,13 @@ const getAllProfitandloss = async () => {
   const mcxtrades = await TradesModel.find({ segment: 'mcx' });
 
   // Calculate profit and loss for each trade
-  const mcxprofit = mcxtrades.map((trades) => trades.profit);
+  const mcxprofit = mcxtrades.map((trades) => trades.profit || 0);
   const mcxallprofit = mcxprofit.reduce(
     (accumulator, currentValue) => accumulator + currentValue,
     0
   );
 
-  const mcxloss = mcxtrades.map((trades) => trades.loss);
+  const mcxloss = mcxtrades.map((trades) => trades.loss || 0);
   const mcxallloss = mcxloss.reduce(
     (accumulator, currentValue) => accumulator + currentValue,
     0
@@ -115,13 +115,13 @@ const getAllProfitandloss = async () => {
   const eqtrades = await TradesModel.find({ segment: 'eq' });
 
   // Calculate profit and loss for each trade
-  const eqprofit = eqtrades.map((trades) => trades.profit);
+  const eqprofit = eqtrades.map((trades) => trades.profit || 0);
   const eqallprofit = eqprofit.reduce(
     (accumulator, currentValue) => accumulator + currentValue,
     0
   );
 
-  const eqloss = eqtrades.map((trades) => trades.loss);
+  const eqloss = eqtrades.map((trades) => trades.loss || 0);
   const eqallloss = eqloss.reduce(
     (accumulator, currentValue) => accumulator + currentValue,
     0
@@ -142,7 +142,7 @@ const getAllactive_buy = async () => {
     purchaseType: 'buy',
     segment: 'mcx'
   });
-  const mcxbuyRates = mcxtrades.map((trade) => trade.buy_rate || 0 );
+  const mcxbuyRates = mcxtrades.map((trade) => trade.buy_rate || 0);
   const mcxsumBuyRates = mcxbuyRates.reduce(
     (accumulator, currentValue) => accumulator + currentValue,
     0
@@ -153,7 +153,7 @@ const getAllactive_buy = async () => {
     purchaseType: 'buy',
     segment: 'eq'
   });
-  const eqbuyRates = eqtrades.map((trade) => trade.buy_rate || 0 );
+  const eqbuyRates = eqtrades.map((trade) => trade.buy_rate || 0);
   const eqsumBuyRates = eqbuyRates.reduce(
     (accumulator, currentValue) => accumulator + currentValue,
     0
@@ -172,7 +172,7 @@ const getAllactive_sell = async () => {
     purchaseType: 'sell',
     segment: 'mcx'
   });
-  const mcxsellRates = mcxtrades.map((trade) => trade.sell_rate || 0 );
+  const mcxsellRates = mcxtrades.map((trade) => trade.sell_rate || 0);
   const mcxsumsellRates = mcxsellRates.reduce(
     (accumulator, currentValue) => accumulator + currentValue,
     0
@@ -183,7 +183,7 @@ const getAllactive_sell = async () => {
     purchaseType: 'sell',
     segment: 'eq'
   });
-  const eqsellRates = eqtrades.map((trade) => trade.sell_rate || 0 );
+  const eqsellRates = eqtrades.map((trade) => trade.sell_rate || 0);
   const eqsumsellRates = eqsellRates.reduce(
     (accumulator, currentValue) => accumulator + currentValue,
     0
@@ -367,6 +367,95 @@ const create = async (body, res) => {
           'You are not connected with any broker, please ask Admin to update your profile.'
       };
     }
+
+    var intradayMCXmarging = 0;
+    if (body?.segment == 'mcx' && body.buy_rate) {
+      if (body.lots) {
+        intradayMCXmarging = (body.buy_rate * body.lots) / 500;
+      } else {
+        intradayMCXmarging = (body.buy_rate * body.units) / 500;
+      }
+    } else if (body?.segment == 'mcx' && body.sell_rate) {
+      if (body.lots) {
+        intradayMCXmarging = (body.buy_rate * body.lots) / 500;
+      } else if (body.units) {
+        intradayMCXmarging = (body.buy_rate * body.units) / 500;
+      }
+    }
+    
+    var availbleIntradaymargingMCX = user?.funds - intradayMCXmarging;
+    // console.log(availbleIntradaymargingMCX, 'suraj1');
+    if (availbleIntradaymargingMCX < 0) {
+      return { message: 'intradayMCXmarging not availble' };
+    }
+    // console.log(intradayMCXmarging, 'suraj1');
+
+    var intradayEQmarging = 0;
+    if (body?.segment == 'eq' && body.buy_rate) {
+      if (body.lots) {
+        intradayEQmarging = (body.buy_rate * body.lots) / 500;
+      } else {
+        intradayEQmarging = (body.buy_rate * body.units) / 500;
+      }
+    } else if (body?.segment == 'eq' && body.sell_rate) {
+      if (body.lots) {
+        intradayEQmarging = (body.buy_rate * body.lots) / 500;
+      } else if (body.units) {
+        intradayEQmarging = (body.buy_rate * body.units) / 500;
+      }
+    }
+
+    var availbleIntradaymargingEQ = user?.funds - intradayEQmarging;
+    if (availbleIntradaymargingEQ < 0) {
+      return { message: 'intradayEQmarging not availble' };
+    }
+    // console.log(availbleIntradaymargingEQ, 'suraj12');
+    // console.log(intradayEQmarging, 'suraj12');
+
+    var holdingMCXmarging = 0;
+    if (body?.segment == 'mcx' && body.buy_rate) {
+      if (body.lots) {
+        holdingMCXmarging = (body.buy_rate * body.lots) / 60;
+      } else {
+        holdingMCXmarging = (body.buy_rate * body.units) / 60;
+      }
+    } else if (body?.segment == 'mcx' && body.sell_rate) {
+      if (body.lots) {
+        holdingMCXmarging = (body.buy_rate * body.lots) / 60;
+      } else if (body.units) {
+        holdingMCXmarging = (body.buy_rate * body.units) / 60;
+      }
+    }
+
+    var availbleholdingmargingmcx = user?.funds - holdingMCXmarging;
+    if (availbleholdingmargingmcx < 0) {
+      return { message: 'holdingMCXmarging not availble' };
+    }
+    // console.log(availbleholdingmargingmcx, 'suraj123');
+    // console.log(holdingMCXmarging, 'suraj123');
+
+    var holdingEQmarging = 0;
+    if (body?.segment == 'eq' && body.buy_rate) {
+      if (body.lots) {
+        holdingEQmarging = (body.buy_rate * body.lots) / 60;
+      } else {
+        holdingEQmarging = (body.buy_rate * body.units) / 60;
+      }
+    } else if (body?.segment == 'eq' && body.sell_rate) {
+      if (body.lots) {
+        holdingEQmarging = (body.buy_rate * body.lots) / 60;
+      } else if (body.units) {
+        holdingEQmarging = (body.buy_rate * body.units) / 60;
+      }
+    }
+
+    var availbleholdingmargingEQ = user?.funds - holdingEQmarging;
+    if (availbleholdingmargingEQ < 0) {
+      return { message: 'holdingEQmarging not availble' };
+    }
+    // console.log(availbleholdingmargingEQ, 'suraj1234');
+    // console.log(holdingEQmarging, 'suraj1234');
+
 
     if (user?.funds && user?.funds > amount) {
       if (body?.isDirect) {
