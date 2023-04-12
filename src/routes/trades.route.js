@@ -18,7 +18,7 @@ router.get('/api/ledgers/all', mw(['admin']), TradesController.getAllLedgers);
 router.get('/api/trades/allbuy_rate/buy', mw(['admin']), TradesController.getAllBuyRates);
 router.get('/api/trades/allbuy_rate/sell', mw(['admin']), TradesController.getAllsellRates);
 router.get('/api/trades/allternover/buy_sell', mw(['admin']), TradesController.getAllternover);
-router.get('/api/trades/activetrades/active', mw(['admin']), TradesController.getactivetrade);
+router.get('/api/Allactivetrade', mw(['admin']), TradesController.getactivetrade);
 router.get('/api/trades/getAllProfitandloss/profit_loss', mw(['admin']), TradesController.getAllProfitandloss);
 router.get('/api/trades/getAllactive_buy/buy', mw(['admin']), TradesController.getAllactive_buy);
 router.get('/api/trades/getAllactive_sell/sell', mw(['admin']), TradesController.getAllactive_sell);
