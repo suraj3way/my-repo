@@ -2,6 +2,7 @@
 import TradesModel from '@/models/trades.model';
 import LedgersModel from '@/models/ledgers.model';
 import AuthBusiness from '@/business/auth.business';
+import UserModel from '@/models/user.model';
 
 const getAllBuyRates = async () => {
   const mcxtrades = await TradesModel.find({ segment: 'mcx' });
@@ -382,7 +383,7 @@ const create = async (body, res) => {
         intradayMCXmarging = (body.buy_rate * body.units) / 500;
       }
     }
-    
+    console.log(intradayMCXmarging,'intradayMCXmarging');
     var availbleIntradaymargingMCX = user?.funds - intradayMCXmarging;
     // console.log(availbleIntradaymargingMCX, 'suraj1');
     if (availbleIntradaymargingMCX < 0) {
@@ -592,13 +593,98 @@ const update = async (id, body) => {
 const ledgerbalance = async (brokerageId) => {
   let data = await LedgersModel.find({ broker_id: brokerageId });
   const broker = data.map((broker) => broker.brokerage);
-  const mcxsumBuyRates = broker.reduce(
+  const brokerage = broker.reduce(
     (accumulator, currentValue) => accumulator + currentValue,
     0
   );
 
-  return mcxsumBuyRates;
+  return {
+    brokerledger:brokerage
+  };
 };
+
+const userledgerbalance = async (userId) => {
+  let data = await LedgersModel.find({ user_id: userId });
+  const user = data.map((user) => user.brokerage);
+  const userledger = user.reduce(
+    (accumulator, currentValue) => accumulator + currentValue,
+    0
+  );
+  const tradeIds = data.map(ledger => ledger.trade_id);
+  const trades = await TradesModel.find({ _id: { $in: tradeIds },status:'active'});
+  const profit = trades.map(trades=>trades.profit  || 0);
+  const loss = trades.map(trades=>trades.loss || 0);
+
+  const profitloss=profit-loss
+
+  return {
+    userledgerblance:userledger,
+    active_pl:profitloss || 0
+  };
+};
+
+
+const findFunds = async (userId) => {
+  let data = await TradesModel.find({ user_id: userId });
+  const user = data.map((user) => user.user_id);
+  const finduser = await UserModel.findById(user);
+
+
+  return {
+    Amount:finduser.funds,
+    CreatedAt:finduser.created_at
+  }
+};
+
+
+const ActiveTrades = async (userId) => {
+  let data = await TradesModel.find({ user_id: userId ,status:'active'});
+
+  return data
+};
+
+
+const ClosedTrades = async (userId) => {
+  let data = await TradesModel.find({ user_id: userId ,status:'closed'});
+
+  return data
+};
+
+
+const MCXpendingTrades = async (userId) => {
+  let data = await TradesModel.find({ user_id: userId ,status:'pending',segment:'mcx'});
+
+  return data
+};
+
+
+const EQpendingTrades = async (userId) => {
+  let data = await TradesModel.find({ user_id: userId ,status:'pending',segment:'eq'});
+  
+  return data
+};
+
+
+
+const weeklyfinduser = async (userId) => {
+  let date = new Date();
+  date.setDate(date.getDate() - 7); // Get date 7 days ago
+
+  let data = await TradesModel.find({user_id: userId,createdAt: { $gte: date }});
+
+  return data;
+};
+
+// const weeklyfinduser = async (userId) => {
+
+//   let data = await TradesModel.find({
+//     user_id: userId,
+//     createdAt:{$gte: new Date(new Date() - 7 * 60 * 60 * 24 * 1000) }
+//   });
+
+//   return data;
+// };
+
 
 export default {
   getAll,
@@ -616,5 +702,12 @@ export default {
   getAllactive_buy,
   getAllactive_sell,
   Brokerege,
-  ledgerbalance
+  ledgerbalance,
+  userledgerbalance,
+  findFunds,
+  ActiveTrades,
+  ClosedTrades,
+  MCXpendingTrades,
+  EQpendingTrades,
+  weeklyfinduser
 };
