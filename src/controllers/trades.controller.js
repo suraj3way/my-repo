@@ -518,6 +518,35 @@ const weeklyfinduser = async (req, res) => {
   }
 };
 
+const getTradesByUser = async (req, res) => {
+  try {
+    const user_id = req.params.id;
+
+    if (validator.isEmpty(user_id)) {
+      throw {
+        code: 'ERROR_AUTH_3',
+        message: 'The user id cannot be empty'
+      };
+    }
+
+    if (!validator.isMongoId(user_id)) {
+      throw {
+        code: 'ERROR_AUTH_4',
+        message: 'Invalid auth user id...'
+      };
+    }
+
+    if (user_id) {
+      let data = await TradesBusiness.getUserTrades(user_id);
+      return data ? success(res, data) : unauthorized(res);
+    } else {
+      return unauthorized(res);
+    }
+  } catch (err) {
+    error(res, err);
+  }
+};
+
 
 const testTrade = async (req, res) => {
   try {
@@ -557,6 +586,7 @@ export default {
   MCXpendingTrades,
   EQpendingTrades,
   weeklyfinduser,
+  getTradesByUser,
 
   testTrade
 

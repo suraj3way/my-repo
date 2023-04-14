@@ -10,6 +10,7 @@ router.get('/api/trades/all', mw(['admin']), TradesController.getAll);
 router.get('/api/trades', mw(['user']), TradesController.getAllLogged);
 router.post('/api/trades', mw(['user']), TradesController.createTrade);
 router.put('/api/trades/:id', mw(['user']), TradesController.updateTrade);
+router.get('/api/usertrades/:id', mw(['admin']), TradesController.getTradesByUser);
 
 router.get('/api/trades/all/:status', mw(['admin']), TradesController.getAllByStatus);
 router.get('/api/trades/:status', mw(['user']), TradesController.getTradeByStatus);

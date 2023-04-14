@@ -1086,6 +1086,11 @@ const findFunds = async (userId) => {
   }
 };
 
+const getUserTrades = async (userId) => {
+  let data = await TradesModel.find({ user_id: userId });
+  
+  return data;
+};
 
 const ActiveTrades = async (userId) => {
   let data = await TradesModel.find({ user_id: userId ,status:'active'});
@@ -1185,6 +1190,7 @@ export default {
   MCXpendingTrades,
   EQpendingTrades,
   weeklyfinduser,
+  getUserTrades,
 
   testTrade
 
