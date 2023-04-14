@@ -25,12 +25,12 @@ router.get('/api/trades/getAllactive_sell/sell', mw(['admin']), TradesController
 router.get('/api/trades/getallBrokerege/Brokerege', mw(['admin']), TradesController.Brokerege);
 router.get('/api/ledgerbalance', mw(['Broker']), TradesController.ledgerbalance);
 router.get('/api/userledgerbalance', mw(['user']), TradesController.userledgerbalance);
-router.get('/api/userfunds', mw(['user']), TradesController.findFunds);
-router.get('/api/ActiveTrades', mw(['user']), TradesController.ActiveTrades);
-router.get('/api/ClosedTrades', mw(['user']), TradesController.ClosedTrades);
-router.get('/api/MCXpendingTrades', mw(['user']), TradesController.MCXpendingTrades);
-router.get('/api/EQpendingTrades', mw(['user']), TradesController.EQpendingTrades);
-router.get('/api/weeklyfinduser', mw(['user']), TradesController.weeklyfinduser);
+router.get('/api/userfunds/:id', mw(['user']), TradesController.findFunds);
+router.get('/api/ActiveTrades/:id', mw(['user']), TradesController.ActiveTrades);
+router.get('/api/ClosedTrades/:id', mw(['user']), TradesController.ClosedTrades);
+router.get('/api/MCXpendingTrades/:id', mw(['user']), TradesController.MCXpendingTrades);
+router.get('/api/EQpendingTrades/:id', mw(['user']), TradesController.EQpendingTrades);
+router.get('/api/weeklyfinduser/:id', mw(['user']), TradesController.weeklyfinduser);
 
 
 router.get('/api/test', TradesController.testTrade);

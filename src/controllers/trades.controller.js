@@ -338,28 +338,13 @@ const userledgerbalance = async (req, res) => {
 
 const findFunds = async (req, res) => {
   try {
-    const user_id = req.user.id;
+    // console.log(req.user, "suraj");
+    req.body.user_id = req.user.id;
 
-    if (validator.isEmpty(user_id)) {
-      throw {
-        code: 'ERROR_AUTH_3',
-        message: 'The user id cannot be empty'
-      };
-    }
-
-    if (!validator.isMongoId(user_id)) {
-      throw {
-        code: 'ERROR_AUTH_4',
-        message: 'Invalid auth user id...'
-      };
-    }
-
-    if (user_id) {
-      let data = await TradesBusiness.findFunds(user_id);
-      return data ? success(res, data) : unauthorized(res);
-    } else {
-      return unauthorized(res);
-    }
+    const data = await TradesBusiness.findFunds(req.params.id);
+    // console.log(data,"data");
+    let updated = '_id' in data || 'n' in data;
+    return success(res, 201,  data );
   } catch (err) {
     error(res, err);
   }
@@ -369,28 +354,13 @@ const findFunds = async (req, res) => {
 
 const ActiveTrades = async (req, res) => {
   try {
-    const user_id = req.user.id;
+    // console.log(req.user, "suraj");
+    req.body.user_id = req.user.id;
 
-    if (validator.isEmpty(user_id)) {
-      throw {
-        code: 'ERROR_AUTH_3',
-        message: 'The user id cannot be empty'
-      };
-    }
-
-    if (!validator.isMongoId(user_id)) {
-      throw {
-        code: 'ERROR_AUTH_4',
-        message: 'Invalid auth user id...'
-      };
-    }
-
-    if (user_id) {
-      let data = await TradesBusiness.ActiveTrades(user_id);
-      return data ? success(res, data) : unauthorized(res);
-    } else {
-      return unauthorized(res);
-    }
+    const data = await TradesBusiness.ActiveTrades(req.params.id);
+    // console.log(data,"data");
+    let updated = '_id' in data || 'n' in data;
+    return success(res, 201,  data );
   } catch (err) {
     error(res, err);
   }
@@ -399,28 +369,13 @@ const ActiveTrades = async (req, res) => {
 
 const ClosedTrades = async (req, res) => {
   try {
-    const user_id = req.user.id;
+    // console.log(req.user, "suraj");
+    req.body.user_id = req.user.id;
 
-    if (validator.isEmpty(user_id)) {
-      throw {
-        code: 'ERROR_AUTH_3',
-        message: 'The user id cannot be empty'
-      };
-    }
-
-    if (!validator.isMongoId(user_id)) {
-      throw {
-        code: 'ERROR_AUTH_4',
-        message: 'Invalid auth user id...'
-      };
-    }
-
-    if (user_id) {
-      let data = await TradesBusiness.ClosedTrades(user_id);
-      return data ? success(res, data) : unauthorized(res);
-    } else {
-      return unauthorized(res);
-    }
+    const data = await TradesBusiness.ClosedTrades(req.params.id);
+    // console.log(data,"data");
+    let updated = '_id' in data || 'n' in data;
+    return success(res, 201,  data );
   } catch (err) {
     error(res, err);
   }
@@ -429,28 +384,13 @@ const ClosedTrades = async (req, res) => {
 
 const MCXpendingTrades = async (req, res) => {
   try {
-    const user_id = req.user.id;
+    // console.log(req.user, "suraj");
+    req.body.user_id = req.user.id;
 
-    if (validator.isEmpty(user_id)) {
-      throw {
-        code: 'ERROR_AUTH_3',
-        message: 'The user id cannot be empty'
-      };
-    }
-
-    if (!validator.isMongoId(user_id)) {
-      throw {
-        code: 'ERROR_AUTH_4',
-        message: 'Invalid auth user id...'
-      };
-    }
-
-    if (user_id) {
-      let data = await TradesBusiness.MCXpendingTrades(user_id);
-      return data ? success(res, data) : unauthorized(res);
-    } else {
-      return unauthorized(res);
-    }
+    const data = await TradesBusiness.MCXpendingTrades(req.params.id);
+    // console.log(data,"data");
+    let updated = '_id' in data || 'n' in data;
+    return success(res, 201,  data );
   } catch (err) {
     error(res, err);
   }
@@ -460,63 +400,62 @@ const MCXpendingTrades = async (req, res) => {
 
 const EQpendingTrades = async (req, res) => {
   try {
-    const user_id = req.user.id;
+    // console.log(req.user, "suraj");
+    req.body.user_id = req.user.id;
 
-    if (validator.isEmpty(user_id)) {
-      throw {
-        code: 'ERROR_AUTH_3',
-        message: 'The user id cannot be empty'
-      };
-    }
-
-    if (!validator.isMongoId(user_id)) {
-      throw {
-        code: 'ERROR_AUTH_4',
-        message: 'Invalid auth user id...'
-      };
-    }
-
-    if (user_id) {
-      let data = await TradesBusiness.EQpendingTrades(user_id);
-      return data ? success(res, data) : unauthorized(res);
-    } else {
-      return unauthorized(res);
-    }
+    const data = await TradesBusiness.EQpendingTrades(req.params.id);
+    // console.log(data,"data");
+    let updated = '_id' in data || 'n' in data;
+    return success(res, 201,  data );
   } catch (err) {
     error(res, err);
   }
 };
-
 
 
 const weeklyfinduser = async (req, res) => {
   try {
-    const user_id = req.user.id;
+    // console.log(req.user, "suraj");
+    req.body.user_id = req.user.id;
 
-    if (validator.isEmpty(user_id)) {
-      throw {
-        code: 'ERROR_AUTH_3',
-        message: 'The user id cannot be empty'
-      };
-    }
-
-    if (!validator.isMongoId(user_id)) {
-      throw {
-        code: 'ERROR_AUTH_4',
-        message: 'Invalid auth user id...'
-      };
-    }
-
-    if (user_id) {
-      let data = await TradesBusiness.weeklyfinduser(user_id);
-      return data ? success(res, data) : unauthorized(res);
-    } else {
-      return unauthorized(res);
-    }
+    const data = await TradesBusiness.weeklyfinduser(req.params.id);
+    // console.log(data,"data");
+    let updated = '_id' in data || 'n' in data;
+    return success(res, 201,  data );
   } catch (err) {
     error(res, err);
   }
 };
+
+
+// const weeklyfinduser = async (req, res) => {
+//   try {
+//     const user_id = req.user.id;
+
+//     if (validator.isEmpty(user_id)) {
+//       throw {
+//         code: 'ERROR_AUTH_3',
+//         message: 'The user id cannot be empty'
+//       };
+//     }
+
+//     if (!validator.isMongoId(user_id)) {
+//       throw {
+//         code: 'ERROR_AUTH_4',
+//         message: 'Invalid auth user id...'
+//       };
+//     }
+
+//     if (user_id) {
+//       let data = await TradesBusiness.weeklyfinduser(user_id);
+//       return data ? success(res, data) : unauthorized(res);
+//     } else {
+//       return unauthorized(res);
+//     }
+//   } catch (err) {
+//     error(res, err);
+//   }
+// };
 
 
 const testTrade = async (req, res) => {

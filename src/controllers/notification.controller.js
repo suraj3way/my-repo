@@ -40,27 +40,7 @@ const getAllnotification = async (req, res) => {
 };
 
 
-/**
- * delet
- *
- * @param {*} req
- * @param {*} res
- * @returns
- */
-const deletnotification = async (req, res) => {
-  try {
-    const data = await NotificationBusiness.deletnotification(req.params.id);
-    // let updated = '_id' in data || 'n' in data;
-    return success(res, 201, data);
-  } catch (err) {
-    error(res, err);
-  }
-}
-
-
-
 export default {
   createnotification,
-  getAllnotification,
-  deletnotification
+  getAllnotification
 };

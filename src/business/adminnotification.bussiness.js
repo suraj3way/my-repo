@@ -10,7 +10,7 @@ const create = async (body) => {
 
 const getAll = async () => {
   // Database query
-  return await AdminNotificationModel.find({ deleted_at: null });
+  return await AdminNotificationModel.find({});
 };
 
 

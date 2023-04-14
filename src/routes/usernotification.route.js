@@ -7,7 +7,7 @@ import { mw } from '@/utils/middleware.util';
 const router = express.Router();
 
 
-router.post('/api/usernotification', mw(['admin']), userNotificationController.createnotification);
-router.get('/api/userAllnotification', mw(['admin']), userNotificationController.getAllnotification);
+router.post('/api/usernotification', mw(['user']), userNotificationController.createnotification);
+router.get('/api/userAllnotification', mw(['user']), userNotificationController.getAllnotification);
 
 export default router;
