@@ -579,7 +579,7 @@ const update = async (id, body) => {
       }
 
     }
-    console.log(intradayMCXmarging,'intradayMCXmarging');
+    // console.log(intradayMCXmarging,'intradayMCXmarging');
     var availbleIntradaymargingMCX = user?.funds - intradayMCXmarging;
     // console.log(availbleIntradaymargingMCX, 'suraj1');
     if (availbleIntradaymargingMCX < 0) {
@@ -1086,6 +1086,11 @@ const findFunds = async (userId) => {
   }
 };
 
+const getUserTrades = async (userId) => {
+  let data = await TradesModel.find({ user_id: userId });
+  
+  return data;
+};
 
 const ActiveTrades = async (userId) => {
   let data = await TradesModel.find({ user_id: userId ,status:'active'});
@@ -1185,6 +1190,7 @@ export default {
   MCXpendingTrades,
   EQpendingTrades,
   weeklyfinduser,
+  getUserTrades,
 
   testTrade
 

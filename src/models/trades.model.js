@@ -69,7 +69,17 @@ const tradesSchema = new Schema({
     isCancel: {
       type: Boolean,
       default: false
-    }
+    },
+    tradeType: {
+      type: String,
+      enum: ['market', 'order'],
+      required: true
+    },
+    soldBy: {
+      type: String,
+      enum: ['trader', 'admin'],
+      required: true
+    },
   }, { timestamps: true });
   
 
