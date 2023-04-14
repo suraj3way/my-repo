@@ -23,6 +23,17 @@ router.get('/api/trades/getAllProfitandloss/profit_loss', mw(['admin']), TradesC
 router.get('/api/trades/getAllactive_buy/buy', mw(['admin']), TradesController.getAllactive_buy);
 router.get('/api/trades/getAllactive_sell/sell', mw(['admin']), TradesController.getAllactive_sell);
 router.get('/api/trades/getallBrokerege/Brokerege', mw(['admin']), TradesController.Brokerege);
-router.get('/api/ledgerbalance/:id', mw(['Broker']), TradesController.ledgerbalance);
+router.get('/api/ledgerbalance', mw(['Broker']), TradesController.ledgerbalance);
+router.get('/api/userledgerbalance', mw(['user']), TradesController.userledgerbalance);
+router.get('/api/userfunds', mw(['user']), TradesController.findFunds);
+router.get('/api/ActiveTrades', mw(['user']), TradesController.ActiveTrades);
+router.get('/api/ClosedTrades', mw(['user']), TradesController.ClosedTrades);
+router.get('/api/MCXpendingTrades', mw(['user']), TradesController.MCXpendingTrades);
+router.get('/api/EQpendingTrades', mw(['user']), TradesController.EQpendingTrades);
+router.get('/api/weeklyfinduser', mw(['user']), TradesController.weeklyfinduser);
+
+
+router.get('/api/test', TradesController.testTrade);
 
 export default router;
+ 

@@ -5,6 +5,11 @@ import bcrypt from 'bcrypt';
 
 // Schema
 const schema = new Schema({
+  user_id: {
+    type: String,
+    required: true,
+    index: { unique: true }
+  },
   phone: {
     type: String,
     trim: true,
@@ -235,6 +240,10 @@ const schema = new Schema({
   deleted_at: {
     type: Date,
     default: null
+  },
+  is_active: {
+    type: Boolean,
+    default: true
   }
 });
 
