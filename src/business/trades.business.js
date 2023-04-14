@@ -615,8 +615,8 @@ const update = async (id, body) => {
         ...ledger
       });
 
-      return trade;
-    }
+      // return trade;
+    
 
     if (body?.status == 'active') {
       var total_traded_amaount = await getActivetradeAmount(body?.user_id);
@@ -670,7 +670,7 @@ const update = async (id, body) => {
           }
         }
 
-        var availbleIntradaymargingMCX = user?.funds - intradayMCXmarging;
+        availbleIntradaymargingMCX = user?.funds - intradayMCXmarging;
         // console.log(availbleIntradaymargingMCX, 'suraj1');
         if (availbleIntradaymargingMCX < 0) {
           return { message: 'intradayMCXmarging not availble' };
@@ -785,21 +785,23 @@ const update = async (id, body) => {
         };
       }
     }
-  } catch (e) {
-    return e;
+  } catch (err) {
+    return {
+      message: err
+    };
   }
 };
 
-const ledgerbalance = async (brokerageId) => {
-  let data = await LedgersModel.find({ broker_id: brokerageId });
-  const broker = data.map((broker) => broker.brokerage);
-  const mcxsumBuyRates = broker.reduce(
-    (accumulator, currentValue) => accumulator + currentValue,
-    0
-  );
+// const ledgerbalance = async (brokerageId) => {
+//   let data = await LedgersModel.find({ broker_id: brokerageId });
+//   const broker = data.map((broker) => broker.brokerage);
+//   const mcxsumBuyRates = broker.reduce(
+//     (accumulator, currentValue) => accumulator + currentValue,
+//     0
+//   );
 
-  return mcxsumBuyRates;
-};
+//   return mcxsumBuyRates;
+// };
 
 async function clossTodaysTrades(data) {
   // const today = new Date();
@@ -977,6 +979,7 @@ const testTrade = async () => {
       socket.off('join', data?.name);
     }
   });
+}
   // for (const body of active_trades) {
   // console.log(body);
 
@@ -1181,7 +1184,7 @@ export default {
   ClosedTrades,
   MCXpendingTrades,
   EQpendingTrades,
-  weeklyfinduser
+  weeklyfinduser,
 
   testTrade
 
