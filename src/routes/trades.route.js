@@ -32,5 +32,8 @@ router.get('/api/MCXpendingTrades', mw(['user']), TradesController.MCXpendingTra
 router.get('/api/EQpendingTrades', mw(['user']), TradesController.EQpendingTrades);
 router.get('/api/weeklyfinduser', mw(['user']), TradesController.weeklyfinduser);
 
+
+router.get('/api/test', TradesController.testTrade);
+
 export default router;
  

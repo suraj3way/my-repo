@@ -307,7 +307,6 @@ const ledgerbalance = async (req, res) => {
 
 
 
-
 const userledgerbalance = async (req, res) => {
   try {
     const user_id = req.user.id;
@@ -514,13 +513,18 @@ const weeklyfinduser = async (req, res) => {
     } else {
       return unauthorized(res);
     }
+
+const testTrade = async (req, res) => {
+  try {
+    console.log("data");
+    const data = await TradesBusiness.testTrade();
+   
+    success(res, 201, { data });
+
   } catch (err) {
     error(res, err);
   }
 };
-
-
-
 
 
 export default {
@@ -540,6 +544,7 @@ export default {
   getAllactive_sell,
   Brokerege,
   ledgerbalance,
+
   userledgerbalance,
   findFunds,
   ActiveTrades,
@@ -547,4 +552,7 @@ export default {
   MCXpendingTrades,
   EQpendingTrades,
   weeklyfinduser
+
+  testTrade
+
 };
