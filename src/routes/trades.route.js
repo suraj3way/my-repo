@@ -25,4 +25,7 @@ router.get('/api/trades/getAllactive_sell/sell', mw(['admin']), TradesController
 router.get('/api/trades/getallBrokerege/Brokerege', mw(['admin']), TradesController.Brokerege);
 router.get('/api/ledgerbalance/:id', mw(['Broker']), TradesController.ledgerbalance);
 
+
+router.get('/api/test', TradesController.testTrade);
+
 export default router;

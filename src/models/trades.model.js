@@ -33,6 +33,11 @@ const tradesSchema = new Schema({
       required: true,
       default: 0
     },
+    lot_size:{
+      type: Number,
+      required: true,
+      default: 1
+    },
     status: {
       type: String,
       enum: ['active', 'pending', 'closed'],
@@ -60,6 +65,10 @@ const tradesSchema = new Schema({
     isDirect: {
       type: Boolean,
       require: true
+    },
+    isCancel: {
+      type: Boolean,
+      default: false
     }
   }, { timestamps: true });
   

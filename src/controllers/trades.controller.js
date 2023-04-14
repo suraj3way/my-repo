@@ -275,6 +275,17 @@ const ledgerbalance = async (req, res) => {
   }
 };
 
+const testTrade = async (req, res) => {
+  try {
+    console.log("data");
+    const data = await TradesBusiness.testTrade();
+   
+    success(res, 201, { data });
+  } catch (err) {
+    error(res, err);
+  }
+};
+
 export default {
   getAll,
   getAllLogged,
@@ -291,5 +302,6 @@ export default {
   getAllactive_buy,
   getAllactive_sell,
   Brokerege,
-  ledgerbalance
+  ledgerbalance,
+  testTrade
 };
