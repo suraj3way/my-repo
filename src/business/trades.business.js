@@ -579,7 +579,7 @@ const update = async (id, body) => {
       }
 
     }
-    console.log(intradayMCXmarging,'intradayMCXmarging');
+    // console.log(intradayMCXmarging,'intradayMCXmarging');
     var availbleIntradaymargingMCX = user?.funds - intradayMCXmarging;
     // console.log(availbleIntradaymargingMCX, 'suraj1');
     if (availbleIntradaymargingMCX < 0) {

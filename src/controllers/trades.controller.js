@@ -194,7 +194,7 @@ const createTrade = async (req, res) => {
       const payload = {
         notification: {
           title: 'New Notification',
-          body: `Trade of ${req.body.purchaseType} with the rate of ${req.body.buy_rate} is Entry by STOPLOSS(762)`
+          body: `Trade of ${req.body.purchaseType} with the rate of ${req.body?.purchaseType == 'buy' ? req.body.buy_rate : req.body.sell_rate} is Entry by STOPLOSS(762)`
         }
       };
 
