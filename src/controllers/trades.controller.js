@@ -513,6 +513,11 @@ const weeklyfinduser = async (req, res) => {
     } else {
       return unauthorized(res);
     }
+  } catch (err) {
+    error(res, err);
+  }
+};
+
 
 const testTrade = async (req, res) => {
   try {
@@ -551,7 +556,7 @@ export default {
   ClosedTrades,
   MCXpendingTrades,
   EQpendingTrades,
-  weeklyfinduser
+  weeklyfinduser,
 
   testTrade
 
