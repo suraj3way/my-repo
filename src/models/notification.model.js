@@ -3,14 +3,22 @@ import aggregatePaginate from 'mongoose-aggregate-paginate-v2';
 import AutoIncrement from 'mongoose-sequence';
 // Schema
 const notificationSchema = new Schema({
-    admin_id: {
-        type: Schema.Types.ObjectId,
-        ref: 'Admin',
-        required: true
-      },
-    FCM_token: {
+    User_type: {
+        type: String,
+        enum: ['admin', 'user'],
+        default: 'admin'
+    },
+    notification: {
         type: String,
         required: true
+    },
+    user_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    deleted_at: {
+        type: Date,
+        default: null
     },
     created_at: {
         type: Date,

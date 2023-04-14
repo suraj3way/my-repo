@@ -9,18 +9,24 @@ const create = async (body) => {
 };
 
 const getAll = async () => {
-  // Database query
-  return await NotificationModel.find({ deleted_at: null });
+
+  const previousweekdata = new Date();
+  previousweekdata.setDate(previousweekdata.getDate() - 7);
+
+  // Database query with filter
+  return await NotificationModel.find({ createdAt: { $gte: previousweekdata },deleted_at: null});
+
 };
 
-const deletnotification = async (script_id) => {
-  const trade = await NotificationModel.findByIdAndUpdate(
-    script_id,
-    { deleted_at: new Date() },
-    { new: true }
-  );
-  return trade;
+const deletnotification = async () => {
+  const now = new Date();
+  const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000); // 7 days ago
+
+  const result = await NotificationModel.deleteMany({ deleted_at: { $lt: oneWeekAgo } });
+
+  return result.deletedCount;
 };
+
 
 export default {
   create,
