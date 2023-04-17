@@ -30,7 +30,30 @@ const createnotification = async (req, res) => {
 const getAllnotification = async (req, res) => {
   try {
     // Business logic
-    const data = await NotificationBusiness.getAll();
+    const data = await NotificationBusiness.getAll({});
+    console.log(data,'data');
+    // Return success
+    success(res, data);
+  } catch (err) {
+    // Return error (if any)
+    error(res, err);
+  }
+};
+
+
+
+/**
+ * getAll
+ *
+ * @param {*} req
+ * @param {*} res
+ * @returns
+ */
+
+const deleteOldData = async (req, res) => {
+  try {
+    // Business logic
+    const data = await NotificationBusiness.deleteOldData({});
     // Return success
     success(res, data);
   } catch (err) {
@@ -42,5 +65,6 @@ const getAllnotification = async (req, res) => {
 
 export default {
   createnotification,
-  getAllnotification
+  getAllnotification,
+  deleteOldData
 };
