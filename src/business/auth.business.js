@@ -360,6 +360,8 @@ const getAll = async () => {
   return await UserModel.find({});
 };
 
+// let trades = await TradeModel.find({ user_id: user2._id });
+
 const update = async (id, body) => {
 
   const trade = UserModel.findByIdAndUpdate(id, body, { new: true })

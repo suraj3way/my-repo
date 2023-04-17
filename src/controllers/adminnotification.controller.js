@@ -1,5 +1,5 @@
 // Business
-import NotificationBusiness from '@/business/notification.bussiness';
+import adminNotificationBusiness from '@/business/adminnotification.bussiness';
 import { success, error } from '@/utils/helper.util';
 
 /**
@@ -11,7 +11,7 @@ import { success, error } from '@/utils/helper.util';
  */
 const createnotification = async (req, res) => {
   try {
-    const data = await NotificationBusiness.create(req.body);
+    const data = await adminNotificationBusiness.create(req.body);
     let created = '_id' in data || 'n' in data;
     return success(res, 201, created);
   } catch (err) {
@@ -30,7 +30,7 @@ const createnotification = async (req, res) => {
 const getAllnotification = async (req, res) => {
   try {
     // Business logic
-    const data = await NotificationBusiness.getAll();
+    const data = await adminNotificationBusiness.getAll();
     // Return success
     success(res, data);
   } catch (err) {
@@ -40,27 +40,8 @@ const getAllnotification = async (req, res) => {
 };
 
 
-/**
- * delet
- *
- * @param {*} req
- * @param {*} res
- * @returns
- */
-const deletnotification = async (req, res) => {
-  try {
-    const data = await NotificationBusiness.deletnotification(req.params.id);
-    // let updated = '_id' in data || 'n' in data;
-    return success(res, 201, data);
-  } catch (err) {
-    error(res, err);
-  }
-}
-
-
 
 export default {
   createnotification,
-  getAllnotification,
-  deletnotification
+  getAllnotification
 };
