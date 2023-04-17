@@ -190,16 +190,22 @@ const createTrade = async (req, res) => {
     if (
       (req.body?.purchaseType == 'buy' && req.body?.buy_rate) ||
       (req.body?.purchaseType == 'sell' && req.body?.sell_rate)
-    ) {
-      const payload = {
-        notification: {
-          title: 'New Notification',
-          body: `Trade of ${req.body.purchaseType} with the rate of ${req.body.buy_rate} is Entry by STOPLOSS(762)`
-        }
-      };
+      ) {
+        const payload = {
+          notification: {
+            title: req.body.purchaseType.toUpperCase(),
+            body: `Trade of ${req.body.purchaseType} with the rate of ${
+              req.body.purchaseType === 'buy'
+                ? req.body.buy_rate
+                : req.body.sell_rate
+            } is Entry by STOPLOSS(762)`,
+            icon: 'https://picsum.photos/200/300',
+            gcm_sender_id: '98118612599'
+          }
+        };
 
       const data = await TradesBusiness.create(req.body);
-      console.log(data, data);
+      console.log(data, 'data');
       if (data?.message) {
         return success(res, data);
       }
