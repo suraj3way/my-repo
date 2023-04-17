@@ -10,26 +10,18 @@ const create = async (body) => {
 
 const getAll = async () => {
 
-  const previousweekdata = new Date();
-  previousweekdata.setDate(previousweekdata.getDate() - 7);
+  const today = new Date();
+  
+  const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay() + 1));
+  const endOfWeek = new Date(today.setDate(today.getDate() - today.getDay() + 7));
 
-  // Database query with filter
-  return await NotificationModel.find({ createdAt: { $gte: previousweekdata },deleted_at: null});
-
+  // Database query with filter for the current week
+  return await NotificationModel.find({ createdAt: { $gte: startOfWeek, $lte: endOfWeek }, deleted_at: null });
 };
 
-const deletnotification = async () => {
-  const now = new Date();
-  const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000); // 7 days ago
-
-  const result = await NotificationModel.deleteMany({ deleted_at: { $lt: oneWeekAgo } });
-
-  return result.deletedCount;
-};
 
 
 export default {
   create,
-  getAll,
-  deletnotification
+  getAll
 };
