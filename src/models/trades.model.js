@@ -66,6 +66,10 @@ const tradesSchema = new Schema({
       type: Boolean,
       require: true
     },
+    ipAddress: {
+      type: String,
+      require: false
+    },
     isCancel: {
       type: Boolean,
       default: false
@@ -78,7 +82,6 @@ const tradesSchema = new Schema({
     soldBy: {
       type: String,
       enum: ['trader', 'admin'],
-      required: true
     },
   }, { timestamps: true });
   
