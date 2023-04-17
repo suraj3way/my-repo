@@ -1144,25 +1144,36 @@ const EQpendingTrades = async (userId) => {
 };
 
 
-
 const weeklyfinduser = async (userId) => {
-  let date = new Date();
-  date.setDate(date.getDate() - 7); // Get date 7 days ago
+  let dataByWeek = [];
+  let currentDate = new Date();
 
-  let data = await TradesModel.find({user_id: userId,createdAt: { $gte: date }});
+  // Iterate over the past 12 weeks (3 months)
+  for (let i = 0; i < 48; i++) {
+    let startDate = new Date(currentDate.getTime());
+    startDate.setDate(startDate.getDate() - 7); // Get date 7 days ago
+    let endDate = new Date(currentDate.getTime());
+    endDate.setDate(endDate.getDate() - 1); // Get date 1 day ago
 
-  return data;
+    // Search for data for this week
+    let data = await TradesModel.find({
+      user_id: userId,
+      createdAt: { $gte: startDate, $lt: endDate }
+    });
+
+    // Add the data to the array of data by week
+    if(data.length){
+      dataByWeek.push(data);
+    }
+
+    // Move the current date back 1 week for the next iteration
+    currentDate.setDate(currentDate.getDate() - 7);
+  }
+
+  return dataByWeek;
 };
 
-// const weeklyfinduser = async (userId) => {
 
-//   let data = await TradesModel.find({
-//     user_id: userId,
-//     createdAt:{$gte: new Date(new Date() - 7 * 60 * 60 * 24 * 1000) }
-//   });
-
-//   return data;
-// };
 
 
 export default {
