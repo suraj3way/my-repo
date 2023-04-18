@@ -244,7 +244,10 @@ const schema = new Schema({
   is_active: {
     type: Boolean,
     default: true
-  }
+  },
+  notes:{
+    type: String,
+  },
 });
 
 // Plugins

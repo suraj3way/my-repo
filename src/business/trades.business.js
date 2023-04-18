@@ -391,7 +391,7 @@ const create = async (body, res) => {
         }
       }
 
-      var availbleIntradaymargingMCX = user?.funds*user.intradayExposureMarginMCX - intradayMCXmarging;
+      var availbleIntradaymargingMCX = user?.funds - intradayMCXmarging;
       // console.log(availbleIntradaymargingMCX, 'suraj1');
       if (availbleIntradaymargingMCX < 0) {
         return { message: 'intradayMCXmarging not availble' };
@@ -413,7 +413,7 @@ const create = async (body, res) => {
         }
       }
 
-      var availbleIntradaymargingEQ = user?.funds * user.intradayExposureMarginEQ - intradayEQmarging;
+      var availbleIntradaymargingEQ = user?.funds - intradayEQmarging;
       if (availbleIntradaymargingEQ < 0) {
         return { message: 'intradayEQmarging not availble' };
       }
@@ -435,7 +435,7 @@ const create = async (body, res) => {
         }
       }
 
-      var availbleholdingmargingmcx = user?.funds * user.holdingExposureMarginMCX - holdingMCXmarging;
+      var availbleholdingmargingmcx = user?.funds - holdingMCXmarging;
       if (availbleholdingmargingmcx < 0) {
         return { message: 'holdingMCXmarging not availble' };
       }
@@ -457,7 +457,7 @@ const create = async (body, res) => {
         }
       }
 
-      var availbleholdingmargingEQ = user?.funds * user.holdingExposureMarginEQ - holdingEQmarging;
+      var availbleholdingmargingEQ = user?.funds - holdingEQmarging;
       if (availbleholdingmargingEQ < 0) {
         return { message: 'holdingEQmarging not availble' };
       }
@@ -590,7 +590,7 @@ const update = async (id, body) => {
       var ledger = {
         trade_id: id,
         user_id: body?.user_id,
-        broker_id: user?.broker_id,
+        broker_id: body?.broker_id,
         amount: body?.sell_rate,
         brokerage: brokerage,
         type: body?.purchaseType ? body?.purchaseType : 'buy'

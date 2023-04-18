@@ -70,6 +70,10 @@ const tradesSchema = new Schema({
       type: String,
       require: false
     },
+    i_funds:{
+      type: Boolean,
+      default: false
+    },
     isCancel: {
       type: Boolean,
       default: false

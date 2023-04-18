@@ -1,6 +1,9 @@
 // Business
 import TradesBusiness from '@/business/trades.business';
 import { success, error ,unauthorized} from '@/utils/helper.util';
+import adminNotificationBusiness from '@/business/adminnotification.bussiness';
+import userNotificationBusiness from '@/business/usernotification.bussiness';
+import NotificationBusiness from '@/business/notification.bussiness';
 // Libs
 import validator from 'validator';
 import admin from '@/firebase/firebase';
@@ -197,29 +200,39 @@ const createTrade = async (req, res) => {
           body: `Trade of ${req.body.purchaseType} with the rate of ${req.body?.purchaseType == 'buy' ? req.body.buy_rate : req.body.sell_rate} is Entry by STOPLOSS(762)`
         }
       };
+      console.log(payload.notification.body,'upper');
+      await NotificationBusiness.create({notification:payload.notification.body});
+      console.log(payload.notification.body,'down');
+      
+      const adminnotification = await adminNotificationBusiness.getAll();
+      const admintokens = adminnotification.map(user => user.fcm_token);
+
+      const usernotification = await userNotificationBusiness.getAll();
+      const usertokens = usernotification.map(user => user.fcm_token);
+
+      const tokens = admintokens || usertokens;
 
       const data = await TradesBusiness.create(req.body);
       console.log(data, 'data');
       if (data?.message) {
         return success(res, data);
-      }
+      } 
       // let created = '_id' in data || 'n' in data;
       // return success(res, 201, { created });
       //send notification from here from firebase
-
+      // const userFCMToken = req.user.fcm_token
       const multicastMessage = {
-        tokens: [
-          'cUE6jHHizMYLFeaOpLThIR:APA91bFWfQZBtHYWBZlhEkvsiKMhOCqCzefoCXuOa7bR44EffVfq1lvYxPWjPlF9I-Bx1RRB3ssFLnrqHHhG859jl0zG1NPf0IWyby3Jz1aObH6HMYSCH-896g6_DRCcTfgoyxa-LUBr'
-        ],
+        tokens: tokens,
         webpush: {
           notification: payload.notification
         }
       };
+      console.log(multicastMessage.webpush.notification,'notification last');
       admin
         .messaging()
         .sendMulticast(multicastMessage)
         .then((response) => {
-          console.log('Notification sent successfully:', response.data);
+          console.log('Notification sent successfully:', response);
         })
         .catch((error) => {
           console.log('Error sending notification:', error);

@@ -208,5 +208,5 @@ router.post('/api/admin/login', AuthController.loginAdmin);
 router.get('/api/users',mw(['admin']), AuthController.getAllUser);
 router.put('/api/user/:id',mw(['admin']), AuthController.updateUser);
 router.put('/api/userfunds/:id',mw(['admin']), AuthController.updateFund);
-
+router.get('/api/finduser/:id', mw(['user']), AuthController.finduser);
 export default router;

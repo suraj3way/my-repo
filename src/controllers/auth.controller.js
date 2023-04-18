@@ -344,6 +344,22 @@ const updateFund = async (req, res) => {
   }
 };
 
+const finduser = async (req, res) => {
+  try {
+    // console.log(req.user, "suraj");
+    req.body.user_id = req.user.id;
+
+    const data = await AuthBusiness.finduser(req.params.id);
+    // console.log(data,"data");
+    // let updated = '_id' in data || 'n' in data;
+    return success(res, 201,  data );
+  } catch (err) {
+    error(res, err);
+  }
+};
+
+
+
 export default {
   login,
   register,
@@ -354,5 +370,6 @@ export default {
   loginAdmin,
   getAllUser,
   updateUser,
-  updateFund
+  updateFund,
+  finduser
 };
