@@ -1,9 +1,14 @@
 import validator from 'validator';
 // Business
 import AuthBusiness from '@/business/auth.business';
+import adminNotificationBusiness from '@/business/adminnotification.bussiness';
+import userNotificationBusiness from '@/business/usernotification.bussiness';
+import NotificationBusiness from '@/business/notification.bussiness';
 // Utils
 import { session } from '@/utils/auth.util';
 import { success, error, unauthorized } from '@/utils/helper.util';
+// Libs
+import admin from '@/firebase/firebase';
 /**
  * login
  *
@@ -334,6 +339,42 @@ const updateFund = async (req, res) => {
   try {
     req.body.updated_by = req.user.id;
     const user = await AuthBusiness.updateFund(req.params.id, req.body.funds);
+    const payload = {
+      notification: {
+        title: 'New Notification',
+        body: `user ${user.name} update funds ${req.body.funds} `
+      }
+    };
+    await NotificationBusiness.create({notification:payload.notification.body});
+    
+    const adminnotification = await adminNotificationBusiness.getAll();
+    const admintokens = adminnotification.map(user => user.fcm_token);
+
+    const usernotification = await userNotificationBusiness.getAll();
+    const usertokens = usernotification.map(user => user.fcm_token);
+
+    const tokens = admintokens || usertokens;
+    
+    // console.log(user, user);
+      if (user?.message) {
+        return success(res, user);
+      }
+      const multicastMessage = {
+        tokens: tokens,
+        webpush: {
+          notification: payload.notification
+        }
+      };
+      admin
+        .messaging()
+        .sendMulticast(multicastMessage)
+        .then((response) => {
+          console.log('Notification sent successfully:', response);
+        })
+        .catch((error) => {
+          console.log('Error sending notification:', error);
+        });
+
     return success(res, 201, {
       msg: 'Successfully update funds...',
       name: user.name,
