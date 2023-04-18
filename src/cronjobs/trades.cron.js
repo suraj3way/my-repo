@@ -28,15 +28,15 @@ async function clossTodaysTrades(data) {
     if (body?.segment == 'mcx' && amount) {
       console.log('4');
       if (body.lots) {
-        holdingMCXmarging = (user.funds * body.lot_size) / 60;
+        holdingMCXmarging = (user.funds * body.lot_size) / user.holdingExposureMarginMCX;
       } else {
-        holdingMCXmarging = (user.funds * body.units) / 60;
+        holdingMCXmarging = (user.funds * body.units) / user.holdingExposureMarginMCX;
       }
     } else if (body?.segment == 'mcx' && body.sell_rate) {
       if (body.lots) {
-        holdingMCXmarging = (user.funds * body.lot_size) / 60;
+        holdingMCXmarging = (user.funds * body.lot_size) / user.holdingExposureMarginMCX;
       } else if (body.units) {
-        holdingMCXmarging = (user.funds * body.units) / 60;
+        holdingMCXmarging = (user.funds * body.units) / user.holdingExposureMarginMCX;
       }
     }
     console.log('5', user?.funds, holdingMCXmarging);
@@ -51,15 +51,15 @@ async function clossTodaysTrades(data) {
     if (body?.segment == 'eq' && amount) {
       console.log('6');
       if (body.lots) {
-        holdingEQmarging = (user.funds * body.lot_size) / 60;
+        holdingEQmarging = (user.funds * body.lot_size) / user.holdingExposureMarginEQ;
       } else {
-        holdingEQmarging = (user.funds * body.units) / 60;
+        holdingEQmarging = (user.funds * body.units) / user.holdingExposureMarginEQ;
       }
     } else if (body?.segment == 'eq' && body.sell_rate) {
       if (body.lots) {
-        holdingEQmarging = (user.funds * body.lot_size) / 60;
+        holdingEQmarging = (user.funds * body.lot_size) / user.holdingExposureMarginEQ;
       } else if (body.units) {
-        holdingEQmarging = (user.funds * body.units) / 60;
+        holdingEQmarging = (user.funds * body.units) / user.holdingExposureMarginEQ;
       }
     }
 
@@ -169,35 +169,35 @@ async function clossTodaysTrades(data) {
   }
 }
 
-async function runCronToCloseTrades() {
-  // var active_trades = await TradesModel.find({ status: 'active' });
-  console.log('0.1');
-  const canclePendingTrades = await TradesModel.updateMany(
-    { status: 'pending' },
-    { isCancel: true }
-  );
-  var id;
-  var mcx_scripts = ['ALUMINIUM_28APR2023', 'COPPER_28APR2023'];
-  var done_scripts = [];
-  const socket = io('ws://5.22.221.190:8000', {
-    transports: ['websocket']
-  });
-  for (const script of mcx_scripts) {
-    socket.emit('join', script);
-    console.log('0.2');
-  }
-  socket.on('stock', (data) => {
-    // console.log("data 173---------- ", data);
-    // console.log(done_scripts,data?.name)
-    if (!done_scripts.includes(data?.name)) {
-      clossTodaysTrades(data);
-      console.log('data---------- ', data);
-      done_scripts.push(data?.name);
-    } else {
-      socket.off('join', data?.name);
-    }
-  });
-}
+// async function runCronToCloseTrades() {
+//   // var active_trades = await TradesModel.find({ status: 'active' });
+//   console.log('0.1');
+//   const canclePendingTrades = await TradesModel.updateMany(
+//     { status: 'pending' },
+//     { isCancel: true }
+//   );
+//   var id;
+//   var mcx_scripts = ['ALUMINIUM_28APR2023', 'COPPER_28APR2023'];
+//   var done_scripts = [];
+//   const socket = io('ws://5.22.221.190:8000', {
+//     transports: ['websocket']
+//   });
+//   for (const script of mcx_scripts) {
+//     socket.emit('join', script);
+//     console.log('0.2');
+//   }
+//   socket.on('stock', (data) => {
+//     // console.log("data 173---------- ", data);
+//     // console.log(done_scripts,data?.name)
+//     if (!done_scripts.includes(data?.name)) {
+//       clossTodaysTrades(data);
+//       console.log('data---------- ', data);
+//       done_scripts.push(data?.name);
+//     } else {
+//       socket.off('join', data?.name);
+//     }
+//   });
+// }
 // Schedule a task to run every day at 23:15 IST
 // cron.schedule('55 18 * * *', () => {
 //   console.log('Running cron job...');
@@ -211,3 +211,40 @@ async function runCronToCloseTrades() {
 //     console.log("running crone--------------------------------------------------------------------------",new Date())
 //     runCronToCloseTrades();
 //   });
+
+
+
+// Schedule a task to run every day at 11:15pm to 11:30pm
+
+async function runCronToCloseTrades() {
+  const now = new Date();
+  const startTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 15, 0); // set start time to 11:15 pm
+  const endTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 30, 0); // set end time to 11:30 pm
+
+  if (now >= startTime && now <= endTime) { // check if the current time is between the start and end times
+    console.log('0.1');
+    const canclePendingTrades = await TradesModel.updateMany(
+      { status: 'pending' },
+      { isCancel: true }
+    );
+    var id;
+    var mcx_scripts = ['ALUMINIUM_28APR2023', 'COPPER_28APR2023'];
+    var done_scripts = [];
+    const socket = io('ws://5.22.221.190:8000', {
+      transports: ['websocket']
+    });
+    for (const script of mcx_scripts) {
+      socket.emit('join', script);
+      console.log('0.2');
+    }
+    socket.on('stock', (data) => {
+      if (!done_scripts.includes(data?.name)) {
+        clossTodaysTrades(data);
+        console.log('data---------- ', data);
+        done_scripts.push(data?.name);
+      } else {
+        socket.off('join', data?.name);
+      }
+    });
+  }
+}

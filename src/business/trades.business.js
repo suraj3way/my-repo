@@ -1125,9 +1125,20 @@ const ActiveTrades = async (userId) => {
 
 const ClosedTrades = async (userId) => {
   let data = await TradesModel.find({ user_id: userId ,status:'closed'});
+  const Ledgers = await LedgersModel.find({user_id: userId});
+  const findbroker = Ledgers.map((trade) => trade.brokerage || 0);
+  
+  // Map over the trades and add the brokerage value from the findbroker array
+  data = data.map((trade, index) => {
+    return {
+      ...trade.toObject(),
+      brokerage: findbroker[index]
+    }
+  });
 
-  return data
+  return { trades: data };
 };
+
 
 
 const MCXpendingTrades = async (userId) => {
