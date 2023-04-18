@@ -86,7 +86,7 @@ const tradesSchema = new Schema({
   }, { timestamps: true });
   
 
-// Plugins
+// Plugin
 tradesSchema.plugin(aggregatePaginate);
 tradesSchema.plugin(AutoIncrement(mongoose), {
   id: 'treads_seq',
