@@ -257,11 +257,57 @@ const updateTrade = async (req, res) => {
   try {
     // console.log(req.user, "suraj");
     req.body.user_id = req.user.id;
+    if (
+      (req.body?.purchaseType == 'buy' && req.body?.buy_rate) ||
+      (req.body?.purchaseType == 'sell' && req.body?.sell_rate)
+    ) {
+      const payload = {
+        notification: {
+          title: 'New Notification',
+          body: `Trade of ${req.body.purchaseType} with the rate of ${req.body?.purchaseType == 'buy' ? req.body.buy_rate : req.body.sell_rate} is Entry by STOPLOSS(762)`
+        }
+      };
+      await NotificationBusiness.create({notification:payload.notification.body});
+      
+      const adminnotification = await adminNotificationBusiness.getAll();
+      const admintokens = adminnotification.map(user => user.fcm_token);
+
+      const usernotification = await userNotificationBusiness.getAll();
+      const usertokens = usernotification.map(user => user.fcm_token);
+
+      const tokens = admintokens || usertokens;
 
     const data = await TradesBusiness.update(req.params.id, req.body);
-    // console.log(data,"data");
-    let updated = '_id' in data || 'n' in data;
-    return success(res, 201, { data });
+    console.log(data, data);
+      if (data?.message) {
+        return success(res, data);
+      }
+      // let created = '_id' in data || 'n' in data;
+      // return success(res, 201, { created });
+      //send notification from here from firebase
+      // const userFCMToken = req.user.fcm_token
+      const multicastMessage = {
+        tokens: tokens,
+        webpush: {
+          notification: payload.notification
+        }
+      };
+      admin
+        .messaging()
+        .sendMulticast(multicastMessage)
+        .then((response) => {
+          console.log('Notification sent successfully:', response);
+        })
+        .catch((error) => {
+          console.log('Error sending notification:', error);
+        });
+
+      return res.send({ msg: 'Successfully update trade ', data });
+    } else {
+      return success(res, {
+        message: 'You need to provide the Buy or Sell rate'
+      });
+    }
   } catch (err) {
     error(res, err);
   }

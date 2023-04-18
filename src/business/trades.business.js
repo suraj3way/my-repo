@@ -522,6 +522,7 @@ const update = async (id, body) => {
   try {
     var thisTrade = await TradesModel.findById(id);
     var user = await AuthBusiness.me(body?.user_id);
+    // console.log(user.funds);
     //console.log(body);
     var amount = body?.purchaseType == 'buy' ? body?.buy_rate : body?.sell_rate;
     var isProfit = false;
@@ -590,12 +591,11 @@ const update = async (id, body) => {
       var ledger = {
         trade_id: id,
         user_id: body?.user_id,
-        broker_id: user?.broker_id,
+        broker_id: body?.broker_id,
         amount: body?.sell_rate,
         brokerage: brokerage,
         type: body?.purchaseType ? body?.purchaseType : 'buy'
       };
-
 
       var remainingFund = user?.funds - amount - brokerage;
       console.log('funds', user?.funds, amount, brokerage);
