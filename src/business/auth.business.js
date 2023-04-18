@@ -369,7 +369,12 @@ const update = async (id, body) => {
 
 };
 
+const finduser = async (userId) => {
+  let data = await UserModel.find({ _id: userId });
+  //console.log(data,'sdaa');
 
+  return data
+};
 
 export default {
   login,
@@ -381,5 +386,6 @@ export default {
   loginAdmin,
   getAll,
   updateFund,
-  update
+  update,
+  finduser
 };

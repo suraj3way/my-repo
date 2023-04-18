@@ -66,6 +66,10 @@ const tradesSchema = new Schema({
       type: Boolean,
       require: true
     },
+    i_funds:{
+      type: Boolean,
+      default: false
+    },
     isCancel: {
       type: Boolean,
       default: false
