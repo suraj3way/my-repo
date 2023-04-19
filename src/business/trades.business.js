@@ -261,10 +261,43 @@ const getAllLedgers = async () => {
     .populate('broker_id');
 };
 
+// const getAllByStatus = async (status) => {
+//   // Database query
+//   const data = await TradesModel.find({ status });
+  
+//   // Extract trade IDs from the trade information
+//   const tradeIds = data.map((trade) => trade._id);
+//   const ledgers = await LedgersModel.find({ trade_id: { $in: tradeIds } });
+  
+//   // Map the brokerage values to an array
+//   const brokerages = ledgers.map((ledger) => ledger.brokerage || 0);
+  
+//   return { 
+//     data:data,
+//     brokerages:brokerages
+//   }
+
+// };
 const getAllByStatus = async (status) => {
   // Database query
-  return await TradesModel.find({ status });
+  const data = await TradesModel.find({ status });
+  
+  // Extract trade IDs from the trade information
+  const tradeIds = data.map((trade) => trade._id);
+  const ledgers = await LedgersModel.find({ trade_id: { $in: tradeIds } });
+  
+  // Map the brokerage values to an array
+  const brokerages = ledgers.map((ledger) => ledger.brokerage || 0);
+  
+  // Add brokerage value to each trade object
+  const dataWithBrokerage = data.map((trade) => {
+    const matchingLedger = ledgers.find((ledger) => ledger.trade_id.toString() === trade._id.toString());
+    return { ...trade._doc, brokerage: matchingLedger ? matchingLedger.brokerage : 0 };
+  });
+  
+  return dataWithBrokerage
 };
+
 
 const getByStatus = async (user_id, status) => {
   // Database query
@@ -526,8 +559,8 @@ const update = async (id, body) => {
     //console.log(body);
     var amount = body?.purchaseType == 'buy' ? body?.buy_rate : body?.sell_rate;
     var isProfit = false;
-    if (body?.status == 'pending') {
-      const tradePending = await TradesModel.findByIdAndUpdate(id, body, {
+    if (body?.status == 'active') {
+      const tradePending =  TradesModel.findByIdAndUpdate(id, body, {
         new: true
       });
       return tradePending;
