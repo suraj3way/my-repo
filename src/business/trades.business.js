@@ -299,10 +299,29 @@ const getAllByStatus = async (status) => {
 };
 
 
+// const getByStatus = async (user_id, status) => {
+//   // Database query
+//   return await TradesModel.find({ user_id, status });
+// };
+
 const getByStatus = async (user_id, status) => {
-  // Database query
-  return await TradesModel.find({ user_id, status });
+  let data;
+  if (status === 'closed') {
+    const today = new Date();
+  
+  const startOfWeek = new Date(today.setDate(today.getDate() - (today.getDay() - 1) % 7 - 1));
+  const endOfWeek = new Date(today.setDate(today.getDate() - (today.getDay() - 5) % 7));
+
+  // Database query with filter for the current week (Monday to Friday)
+  return await TradesModel.find({status , createdAt: { $gte: startOfWeek, $lte: endOfWeek }});    
+    
+  } else {
+    // For all other statuses, send data
+    data = await TradesModel.find({ user_id, status });
+  }
+  return data;
 };
+
 
 const getAllLogged = async (user_id) => {
   // Database query

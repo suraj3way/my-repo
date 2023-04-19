@@ -377,8 +377,9 @@ const updateFund = async (req, res) => {
 
     return success(res, 201, {
       msg: 'Successfully update funds...',
-      name: user.name,
-      funds: user.funds
+      user
+      // name: user.name,
+      // funds: user.funds
     });
   } catch (err) {
     error(res, err);
