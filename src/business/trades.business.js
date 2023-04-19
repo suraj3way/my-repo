@@ -346,8 +346,8 @@ const create = async (body, res) => {
       user?.funds,
       total_traded_amaount
     );
-    // console.log("375 --------- ",user?.funds,
-    // total_traded_amaount);
+    console.log("349 --------- ",user?.funds,
+    total_traded_amaount);
 
     if (current_percentage_funds) {
       var brokerage = 0;
@@ -522,7 +522,6 @@ const update = async (id, body) => {
   try {
     var thisTrade = await TradesModel.findById(id);
     var user = await AuthBusiness.me(body?.user_id);
-    // console.log(user.funds);
     //console.log(body);
     var amount = body?.purchaseType == 'buy' ? body?.buy_rate : body?.sell_rate;
     var isProfit = false;
@@ -556,9 +555,10 @@ const update = async (id, body) => {
         new: true
       });
 
-      // console.log("user",user);
+      // console.log("thisTrade",thisTrade);
       var brokerage = thisTrade?.brokerage ? thisTrade?.brokerage : 0;
-      console.log('brok', brokerage);
+      console.log('broker');
+      console.log('brokerage', brokerage);
       if (body?.segment == 'mcx') {
         if (body.lots) {
           amount = body?.lots * amount;
