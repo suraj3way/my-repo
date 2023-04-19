@@ -270,6 +270,7 @@ const updateTrade = async (req, res) => {
           body: `Trade of ${req.body.purchaseType} with the rate of ${req.body?.purchaseType == 'buy' ? req.body.buy_rate : req.body.sell_rate} is Entry by STOPLOSS(762)`
         }
       };
+
       await NotificationBusiness.create({notification:payload.notification.body});
       
       const adminnotification = await adminNotificationBusiness.getAll();
