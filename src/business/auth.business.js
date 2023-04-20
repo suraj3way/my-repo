@@ -1,7 +1,7 @@
 // Models
 import UserModel from '@/models/user.model';
 import AdminModel from '@/models/admin.model';
- 
+
 /**
  * login
  *
@@ -34,12 +34,12 @@ const login = async (username, password) => {
         code: 'ERROR_LOGIN_2',
         message: `Don't have a password, try in recover password`
       };
-    const isMatch = await UserModel.compare(password, user.password);
-    if (!isMatch)
-      throw {
-        code: 'ERROR_LOGIN_3',
-        message: `Incorrect password`
-      };
+    // const isMatch = await UserModel.compare(password, user.password);
+    // if (!isMatch)
+    //   throw {
+    //     code: 'ERROR_LOGIN_3',
+    //     message: `Incorrect password`
+    //   };
     return user;
   } else {
     throw {
@@ -195,12 +195,14 @@ const me = async (user_id) => {
  * @returns {object}
  */
 
-const updateFund = async (user_id,funds) => {
-  let data= await UserModel.findOneAndUpdate({ _id: user_id }, { funds: Number(funds) });
-  const user = await UserModel.findOne({ _id:data}, { name: 1, funds: 1 });
-  return user
+const updateFund = async (user_id, funds) => {
+  let data = await UserModel.findOneAndUpdate(
+    { _id: user_id },
+    { funds: Number(funds) }
+  );
+  const user = await UserModel.findOne({ _id: data }, { name: 1, funds: 1 });
+  return user;
 };
-
 
 /**
  * verify
@@ -333,7 +335,6 @@ const loginAdmin = async (username, password) => {
     .lean();
 
   if (userAdmin) {
-    
     if (!userAdmin.password)
       throw {
         code: 'ERROR_LOGIN_2',
@@ -345,7 +346,7 @@ const loginAdmin = async (username, password) => {
         code: 'ERROR_LOGIN_3',
         message: `Incorrect password`
       };
-      //create entry for new model of fcm token
+    //create entry for new model of fcm token
     return userAdmin;
   } else {
     throw {
@@ -360,20 +361,44 @@ const getAll = async () => {
   return await UserModel.find({});
 };
 
-// let trades = await TradeModel.find({ user_id: user2._id });
+// const update = async (id, body) => {
 
-const update = async (id, body) => {
+//   const trade = UserModel.findByIdAndUpdate(id, body, { new: true })
+//   return trade;
 
-  const trade = UserModel.findByIdAndUpdate(id, body, { new: true })
-  return trade;
+// };
+
+
+const update = async (id, body, password) => {
+  // First, verify that the user's id and password match
+  const user = await UserModel.findById(id).select('+password');
+  if (!user) {
+    throw {
+      code: 'ERROR_LOGIN_2',
+      message: `user not found`
+    };
+  }
+  console.log(body.password,'body');
+  console.log(user.password,'hdd');
+  if ((user.password === body.password)) {
+    const updatedTrade = await UserModel.findByIdAndUpdate(id, body, {
+      new: true
+    });
+    return updatedTrade;
+  }else{
+    throw {
+      message: `your password is incorrect`
+    };
+  }
 
 };
+
 
 const finduser = async (userId) => {
   let data = await UserModel.find({ _id: userId });
   //console.log(data,'sdaa');
 
-  return data
+  return data;
 };
 
 export default {

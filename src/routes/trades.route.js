@@ -28,7 +28,7 @@ router.get('/api/ledgerbalance', mw(['Broker']), TradesController.ledgerbalance)
 router.get('/api/userledgerbalance', mw(['user']), TradesController.userledgerbalance);
 router.get('/api/userfunds/:id', mw(['admin']), TradesController.findFunds);
 router.get('/api/ActiveTrades/:id', mw(['admin']), TradesController.ActiveTrades);
-router.get('/api/ClosedTrades/:id', mw(['admin']), TradesController.ClosedTrades);
+router.get('/api/ClosedTrades/:id', mw(['admin','user']), TradesController.ClosedTrades);
 router.get('/api/MCXpendingTrades/:id', mw(['admin']), TradesController.MCXpendingTrades);
 router.get('/api/EQpendingTrades/:id', mw(['admin']), TradesController.EQpendingTrades);
 router.get('/api/weeklyfinduser/:id', mw(['admin']), TradesController.weeklyfinduser);

@@ -587,19 +587,19 @@ const update = async (id, body) => {
       if (body?.buy_rate && body?.sell_rate) {
         if (thisTrade?.purchaseType == 'sell') {
           if (body?.sell_rate > body?.buy_rate) {
-            body.profit = (body?.sell_rate - body?.buy_rate) * body?.lots;
+            body.profit = (body?.sell_rate - body?.buy_rate) * body?.lots * body.lot_size;
             isProfit = true;
           }
           if (body?.sell_rate < body?.buy_rate) {
-            body.loss = (body?.buy_rate - body?.sell_rate) * body?.lots;
+            body.loss = (body?.buy_rate - body?.sell_rate) * body?.lots * body.lot_size;
           }
         } else {
           if (body?.sell_rate > body?.buy_rate) {
-            body.profit = (body?.sell_rate - body?.buy_rate) * body?.lots;
+            body.profit = (body?.sell_rate - body?.buy_rate) * body?.lots * body.lot_size;
             isProfit = true;
           }
           if (body?.sell_rate < body?.buy_rate) {
-            body.loss = (body?.buy_rate - body?.sell_rate) * body?.lots;
+            body.loss = (body?.buy_rate - body?.sell_rate) * body?.lots * body.lot_size;
           }
         }
       }
@@ -710,15 +710,15 @@ const update = async (id, body) => {
         var intradayMCXmarging = 0;
         if (body?.segment == 'mcx' && amount) {
           if (body.lots) {
-            intradayMCXmarging = (amount * body.lot_size) / 500;
+            intradayMCXmarging = (amount * body.lot_size) / user.intradayExposureMarginMCX;
           } else {
-            intradayMCXmarging = (amount * body.units) / 500;
+            intradayMCXmarging = (amount * body.units) / user.intradayExposureMarginMCX;
           }
         } else if (body?.segment == 'mcx' && body.sell_rate) {
           if (body.lots) {
-            intradayMCXmarging = (amount * body.lot_size) / 500;
+            intradayMCXmarging = (amount * body.lot_size) / user.intradayExposureMarginMCX;
           } else if (body.units) {
-            intradayMCXmarging = (amount * body.units) / 500;
+            intradayMCXmarging = (amount * body.units) / user.intradayExposureMarginMCX;
           }
         }
 
@@ -732,15 +732,15 @@ const update = async (id, body) => {
         var intradayEQmarging = 0;
         if (body?.segment == 'eq' && amount) {
           if (body.lots) {
-            intradayEQmarging = (amount * body.lot_size) / 500;
+            intradayEQmarging = (amount * body.lot_size) / user.intradayExposureMarginEQ;
           } else {
-            intradayEQmarging = (amount * body.units) / 500;
+            intradayEQmarging = (amount * body.units) / user.intradayExposureMarginEQ;
           }
         } else if (body?.segment == 'eq' && body.sell_rate) {
           if (body.lots) {
-            intradayEQmarging = (amount * body.lot_size) / 500;
+            intradayEQmarging = (amount * body.lot_size) / user.intradayExposureMarginEQ;
           } else if (body.units) {
-            intradayEQmarging = (amount * body.units) / 500;
+            intradayEQmarging = (amount * body.units) / user.intradayExposureMarginEQ;
           }
         }
 
@@ -872,15 +872,15 @@ async function clossTodaysTrades(data) {
     var holdingMCXmarging = 0;
     if (body?.segment == 'mcx' && amount) {
       if (body.lots) {
-        holdingMCXmarging = (amount * body.lots) / 60;
+        holdingMCXmarging = (amount * body.lots) / user.holdingExposureMarginMCX;
       } else {
-        holdingMCXmarging = (amount * body.units) / 60;
+        holdingMCXmarging = (amount * body.units) / user.holdingExposureMarginMCX;
       }
     } else if (body?.segment == 'mcx' && body.sell_rate) {
       if (body.lots) {
-        holdingMCXmarging = (amount * body.lots) / 60;
+        holdingMCXmarging = (amount * body.lots) / user.holdingExposureMarginMCX;
       } else if (body.units) {
-        holdingMCXmarging = (amount * body.units) / 60;
+        holdingMCXmarging = (amount * body.units) / user.holdingExposureMarginMCX;
       }
     }
 
@@ -894,15 +894,15 @@ async function clossTodaysTrades(data) {
     var holdingEQmarging = 0;
     if (body?.segment == 'eq' && amount) {
       if (body.lots) {
-        holdingEQmarging = (amount * body.lots) / 60;
+        holdingEQmarging = (amount * body.lots) / user.holdingExposureMarginEQ;
       } else {
-        holdingEQmarging = (amount * body.units) / 60;
+        holdingEQmarging = (amount * body.units) / user.holdingExposureMarginEQ;
       }
     } else if (body?.segment == 'eq' && body.sell_rate) {
       if (body.lots) {
-        holdingEQmarging = (amount * body.lots) / 60;
+        holdingEQmarging = (amount * body.lots) / user.holdingExposureMarginEQ;
       } else if (body.units) {
-        holdingEQmarging = (amount * body.units) / 60;
+        holdingEQmarging = (amount * body.units) / user.holdingExposureMarginEQ;
       }
     }
 
@@ -925,19 +925,19 @@ async function clossTodaysTrades(data) {
       if (body?.buy_rate && body?.sell_rate) {
         if (body?.purchaseType == 'sell') {
           if (body?.sell_rate > body?.buy_rate) {
-            body.profit = (body?.sell_rate - body?.buy_rate) * body?.lots;
+            body.profit = (body?.sell_rate - body?.buy_rate) * body?.lots * body.lot_size;
             isProfit = true;
           }
           if (body?.sell_rate < body?.buy_rate) {
-            body.loss = (body?.buy_rate - body?.sell_rate) * body?.lots;
+            body.loss = (body?.buy_rate - body?.sell_rate) * body?.lots * body.lot_size;
           }
         } else {
           if (body?.sell_rate > body?.buy_rate) {
-            body.profit = (body?.sell_rate - body?.buy_rate) * body?.lots;
+            body.profit = (body?.sell_rate - body?.buy_rate) * body?.lots * body.lot_size;
             isProfit = true;
           }
           if (body?.sell_rate < body?.buy_rate) {
-            body.loss = (body?.buy_rate - body?.sell_rate) * body?.lots;
+            body.loss = (body?.buy_rate - body?.sell_rate) * body?.lots * body.lot_size;
           }
         }
       }
@@ -1188,7 +1188,7 @@ const ClosedTrades = async (userId) => {
     }
   });
 
-  return { trades: data };
+  return data;
 };
 
 
