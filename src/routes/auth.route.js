@@ -209,4 +209,7 @@ router.get('/api/users',mw(['admin']), AuthController.getAllUser);
 router.put('/api/user/:id',mw(['admin']), AuthController.updateUser);
 router.put('/api/userfunds/:id',mw(['admin']), AuthController.updateFund);
 router.get('/api/finduser/:id', mw(['user']), AuthController.finduser);
+router.post('/api/createamount/:id', mw(['user']), AuthController.createamount);
+router.get('/api/findamount', mw(['user']), AuthController.findamount);
+
 export default router;

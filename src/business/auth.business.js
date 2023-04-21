@@ -1,6 +1,7 @@
 // Models
 import UserModel from '@/models/user.model';
 import AdminModel from '@/models/admin.model';
+import amountModel from '@/models/amount.model';
 
 /**
  * login
@@ -368,7 +369,6 @@ const getAll = async () => {
 
 // };
 
-
 const update = async (id, body, password) => {
   // First, verify that the user's id and password match
   const user = await UserModel.findById(id).select('+password');
@@ -392,14 +392,44 @@ const update = async (id, body, password) => {
   }
 
 };
-
-
 const finduser = async (userId) => {
   let data = await UserModel.find({ _id: userId });
   //console.log(data,'sdaa');
 
   return data;
 };
+
+const createamount = async (id, body,password) => {
+  const user = await UserModel.findById(id).select('+password');
+  if (!user) {
+    throw {
+      code: 'ERROR_LOGIN_2',
+      message: `user not found`
+    };
+  }
+  console.log(body.password, 'body');
+  console.log(user.password, 'hdd');
+  if (user.password === body.password) {
+    const trade = await amountModel.create({
+      ...body
+    });
+    return trade;
+  } else {
+    throw {
+      message: `your password is incorrect`
+    };
+  }
+};
+
+
+const findamount = async (userId) => {
+  let data = await amountModel.find({ user_id: userId });
+  //console.log(data,'sdaa');
+
+  return data;
+};
+
+
 
 export default {
   login,
@@ -412,5 +442,7 @@ export default {
   getAll,
   updateFund,
   update,
-  finduser
+  finduser,
+  createamount,
+  findamount
 };

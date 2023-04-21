@@ -4,6 +4,7 @@ import LedgersModel from '@/models/ledgers.model';
 import AuthBusiness from '@/business/auth.business';
 
 import UserModel from '@/models/user.model';
+import { async } from '@babel/runtime/regenerator';
 
 const io = require('socket.io-client');
 
@@ -631,6 +632,60 @@ const update = async (id, body) => {
         brokerage = brokerage + getBrokarage(amount, user?.EQBrokragePerCrore);
       }
 
+    }
+    if (body?.status == 'pending') {
+        var mcx_scripts = body.script;
+        // var mcx_scripts = ['COPPER_28APR2023'];
+        var done_scripts = [];
+        const socket = io('ws://5.22.221.190:8000', {
+          transports: ['websocket']
+        });
+      
+        for (const script of mcx_scripts) {
+          socket.emit('join', script);
+        }
+      
+        socket.on('stock', async (data) => {
+          if (data.ask <= body.buy_rate) {
+            await TradesModel.findByIdAndUpdate(id, {...body, status: 'active'}, {
+              new: true
+            });
+          } 
+          else if(data.bid <= body.sell_rate) {
+            await TradesModel.findByIdAndUpdate(id, {...body, status: 'active'}, {
+              new: true
+            });
+          }else {
+            console.log(data.ask, 'buy condition not met');
+            await TradesModel.findByIdAndUpdate(id, body, {
+              new: true
+            });
+          }
+        });
+
+       brokerage = thisTrade?.brokerage ? thisTrade?.brokerage : 0;
+       console.log('broker');
+       console.log('brokerage', brokerage);
+       if (body?.segment == 'mcx') {
+         if (body.lots) {
+           amount = body?.lots * amount;
+         } else {
+           return {
+             message: 'Lots must not be empty'
+           };
+         }
+         brokerage =
+           brokerage + getBrokarage(amount, user?.mcxBrokeragePerCrore);
+       }
+       if (body?.segment == 'eq') {
+         if (body.lots) {
+           amount = body?.lots * amount;
+         } else if (body.units) {
+           amount = body?.units * amount;
+         }
+         brokerage = brokerage + getBrokarage(amount, user?.EQBrokragePerCrore);
+       }
+ 
     }
     // console.log(intradayMCXmarging,'intradayMCXmarging');
     var availbleIntradaymargingMCX = user?.funds - intradayMCXmarging;
