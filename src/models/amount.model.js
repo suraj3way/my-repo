@@ -2,28 +2,28 @@ import mongoose, { Schema, model } from 'mongoose';
 import aggregatePaginate from 'mongoose-aggregate-paginate-v2';
 import AutoIncrement from 'mongoose-sequence';
 // Schema
-const amountSchema = new Schema({
+const amountSchema = new Schema(
+  {
     user_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
     },
-    funds:{
-        type: Number,
-        default:0
+    funds: {
+      type: Number,
+      default: 0
     },
-    notes:{
-        type: String,
+    notes: {
+      type: String
     }
-
-
-}, { timestamps: true });
+  },
+  { timestamps: true }
+);
 
 // Plugins
 amountSchema.plugin(aggregatePaginate);
 amountSchema.plugin(AutoIncrement(mongoose), {
-    id: 'amount_seq',
-    inc_field: 'id'
+  id: 'amount_seq',
+  inc_field: 'id'
 });
 
 // Indexes
