@@ -279,6 +279,7 @@ const getAllLedgers = async () => {
 //   }
 
 // };
+
 const getAllByStatus = async (status) => {
   // Database query
   const data = await TradesModel.find({ status });

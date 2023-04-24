@@ -416,7 +416,7 @@ const createamount = async (id, body, password) => {
     user.funds = newFunds;
 
     await updateFund(body?.user_id, newFunds);
-    
+
     const trade = await amountModel.create({
       ...body
     });
@@ -432,8 +432,12 @@ const createamount = async (id, body, password) => {
 const findamount = async (userId) => {
   let data = await amountModel.find({ user_id: userId });
   //console.log(data,'sdaa');
-
   return data;
+};
+
+const findAllamount = async () => {
+  // Database query
+  return await amountModel.find({});
 };
 
 export default {
@@ -449,5 +453,6 @@ export default {
   update,
   finduser,
   createamount,
-  findamount
+  findamount,
+  findAllamount
 };
