@@ -6,7 +6,8 @@ const amountSchema = new Schema(
   {
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User'
+      ref: 'User',
+      require:true
     },
     funds: {
       type: Number,
