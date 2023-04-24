@@ -400,6 +400,47 @@ const finduser = async (req, res) => {
   }
 };
 
+const createamount = async (req, res) => {
+  try {
+    req.body.updated_by = req.user.id;
+    const data = await AuthBusiness.createamount(req.params.id, req.body);
+    // let updated = '_id' in data || 'n' in data;
+    // return success(res, 201, { updated });
+    return res.send({ msg: 'Successfully update funds...', data });
+  } catch (err) {
+    error(res, err);
+  }
+};
+
+const findamount = async (req, res) => {
+  try {
+    const user_id = req.user.id;
+
+    if (validator.isEmpty(user_id)) {
+      throw {
+        code: 'ERROR_AUTH_3',
+        message: 'The User id cannot be empty'
+      };
+    }
+
+    if (!validator.isMongoId(user_id)) {
+      throw {
+        code: 'ERROR_AUTH_4',
+        message: 'Invalid auth User id...'
+      };
+    }
+
+    if (user_id) {
+      let data = await AuthBusiness.findamount(user_id);
+      return data ? success(res, data) : unauthorized(res);
+    } else {
+      return unauthorized(res);
+    }
+  } catch (err) {
+    error(res, err);
+  }
+};
+
 
 
 export default {
@@ -413,5 +454,7 @@ export default {
   getAllUser,
   updateUser,
   updateFund,
-  finduser
+  finduser,
+  createamount,
+  findamount
 };
