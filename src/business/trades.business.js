@@ -584,6 +584,12 @@ const update = async (id, body) => {
       });
       return tradePending;
     }
+    if (body?.status == 'pending') {
+      const tradePending =  TradesModel.findByIdAndUpdate(id, {...body}, {
+        new: true
+      });
+      return tradePending;
+    }
     if (body?.status == 'closed') {
       if (body?.buy_rate && body?.sell_rate) {
         if (thisTrade?.purchaseType == 'sell') {
@@ -1231,7 +1237,12 @@ const ActiveTrades = async (userId) => {
 
 
 const ClosedTrades = async (userId) => {
-  let data = await TradesModel.find({ user_id: userId ,status:'closed'});
+  const today = new Date();
+  
+  const startOfWeek = new Date(today.setDate(today.getDate() - (today.getDay() - 1) % 7 - 1));
+  const endOfWeek = new Date(today.setDate(today.getDate() - (today.getDay() - 5) % 7));
+
+  let data = await TradesModel.find({ user_id: userId ,status:'closed', createdAt: { $gte: startOfWeek, $lte: endOfWeek }});
   const Ledgers = await LedgersModel.find({user_id: userId});
   const findbroker = Ledgers.map((trade) => trade.brokerage || 0);
   
@@ -1242,8 +1253,9 @@ const ClosedTrades = async (userId) => {
       brokerage: findbroker[index]
     }
   });
+  
+  return data
 
-  return data;
 };
 
 
