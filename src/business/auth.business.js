@@ -91,7 +91,7 @@ const register = async (username, password, body) => {
     const user = await UserModel.create({
       ...body,
       password,
-      funds:body.funds || 0 
+      funds: body.funds || 0
     });
 
     // const page = await PagesModel.create({ user: user._id });
@@ -379,19 +379,18 @@ const update = async (id, body, password) => {
       message: `user not found`
     };
   }
-  console.log(body.password,'body');
-  console.log(user.password,'hdd');
-  if ((user.password === body.password)) {
+  console.log(body.password, 'body');
+  console.log(user.password, 'hdd');
+  if (user.password === body.password) {
     const updatedTrade = await UserModel.findByIdAndUpdate(id, body, {
       new: true
     });
     return updatedTrade;
-  }else{
+  } else {
     throw {
       message: `your password is incorrect`
     };
   }
-
 };
 const finduser = async (userId) => {
   let data = await UserModel.find({ _id: userId });
@@ -400,7 +399,7 @@ const finduser = async (userId) => {
   return data;
 };
 
-const createamount = async (id, body,password) => {
+const createamount = async (id, body, password) => {
   const user = await UserModel.findById(id).select('+password');
   if (!user) {
     throw {
@@ -408,12 +407,20 @@ const createamount = async (id, body,password) => {
       message: `user not found`
     };
   }
-  console.log(body.password, 'body');
-  console.log(user.password, 'hdd');
+  // console.log(body.password, 'body');
+  // console.log(user.password, 'hdd');
   if (user.password === body.password) {
+    const currentFunds = user.funds || 0;
+    // console.log(currentFunds, 'body');
+    const newFunds = currentFunds + body.funds;
+    user.funds = newFunds;
+
+    await updateFund(body?.user_id, newFunds);
+    
     const trade = await amountModel.create({
       ...body
     });
+
     return trade;
   } else {
     throw {
@@ -422,15 +429,12 @@ const createamount = async (id, body,password) => {
   }
 };
 
-
 const findamount = async (userId) => {
   let data = await amountModel.find({ user_id: userId });
   //console.log(data,'sdaa');
 
   return data;
 };
-
-
 
 export default {
   login,
