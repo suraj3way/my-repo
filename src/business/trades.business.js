@@ -585,7 +585,12 @@ const update = async (id, body) => {
       });
       return tradePending;
     }
-
+    if (body?.status == 'pending') {
+      const tradePending =  TradesModel.findByIdAndUpdate(id, {...body}, {
+        new: true
+      });
+      return tradePending;
+    }
     if (body?.status == 'closed') {
       if (body?.buy_rate && body?.sell_rate) {
         if (thisTrade?.purchaseType == 'sell') {
