@@ -234,9 +234,9 @@ const createTrade = async (req, res) => {
         .then((response) => {
           console.log('Notification sent successfully:', response);
         })
-        .catch((error) => {
-          console.log('Error sending notification:', error);
-        });
+        // .catch((error) => {
+        //   console.log('Error sending notification:', error);
+        // });
 
       return res.send({ msg: 'Successfully trade create', data });
     } else {
@@ -244,7 +244,8 @@ const createTrade = async (req, res) => {
         message: 'You need to provide the Buy or Sell rate'
       });
     }
-  } catch (err) {
+  } 
+  catch (err) {
     error(res, err);
   }
 };

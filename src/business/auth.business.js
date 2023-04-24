@@ -90,7 +90,8 @@ const register = async (username, password, body) => {
 
     const user = await UserModel.create({
       ...body,
-      password
+      password,
+      funds:body.funds || 0 
     });
 
     // const page = await PagesModel.create({ user: user._id });
