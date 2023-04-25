@@ -403,7 +403,8 @@ const finduser = async (req, res) => {
 const createamount = async (req, res) => {
   try {
     req.body.updated_by = req.user.id;
-    const data = await AuthBusiness.createamount(req.params.id, req.body);
+    console.log(req.body.user_id,'jbv');
+    const data = await AuthBusiness.createamount(req.body.user_id, req.body);
     // let updated = '_id' in data || 'n' in data;
     // return success(res, 201, { updated });
     return res.send({ msg: 'Successfully update funds...', data });
@@ -441,6 +442,15 @@ const findamount = async (req, res) => {
   }
 };
 
+const findAllamount = async (req, res) => {
+  try {
+    const data = await AuthBusiness.findAllamount();
+    success(res, data);
+  } catch (err) {
+    error(res, err);
+  }
+};
+
 
 
 export default {
@@ -456,5 +466,6 @@ export default {
   updateFund,
   finduser,
   createamount,
-  findamount
+  findamount,
+  findAllamount
 };
