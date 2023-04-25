@@ -262,43 +262,44 @@ const getAllLedgers = async () => {
     .populate('broker_id');
 };
 
-// const getAllByStatus = async (status) => {
-//   // Database query
-//   const data = await TradesModel.find({ status });
-  
-//   // Extract trade IDs from the trade information
-//   const tradeIds = data.map((trade) => trade._id);
-//   const ledgers = await LedgersModel.find({ trade_id: { $in: tradeIds } });
-  
-//   // Map the brokerage values to an array
-//   const brokerages = ledgers.map((ledger) => ledger.brokerage || 0);
-  
-//   return { 
-//     data:data,
-//     brokerages:brokerages
-//   }
 
-// };
 
 const getAllByStatus = async (status) => {
   // Database query
   const data = await TradesModel.find({ status });
-  
-  // Extract trade IDs from the trade information
+
+  // Extract trade IDs and user IDs from the trade information
   const tradeIds = data.map((trade) => trade._id);
+  const userIds = data.map((trade) => trade.user_id);
+
+  // Fetch user information
+  const users = await UserModel.find({ _id: { $in: userIds } });
+
+  // Map user IDs to user names
+  const userIdToNameMap = {};
+  users.forEach((user) => {
+    userIdToNameMap[user._id.toString()] = user.user_id;
+  });
+
+  // Fetch ledger information
   const ledgers = await LedgersModel.find({ trade_id: { $in: tradeIds } });
-  
+
   // Map the brokerage values to an array
   const brokerages = ledgers.map((ledger) => ledger.brokerage || 0);
-  
-  // Add brokerage value to each trade object
-  const dataWithBrokerage = data.map((trade) => {
+
+  // Add brokerage value and user name to each trade object
+  const dataWithBrokerageAndUserName = data.map((trade) => {
     const matchingLedger = ledgers.find((ledger) => ledger.trade_id.toString() === trade._id.toString());
-    return { ...trade._doc, brokerage: matchingLedger ? matchingLedger.brokerage : 0 };
+    return {
+      ...trade._doc,
+      brokerage: matchingLedger ? matchingLedger.brokerage : 0,
+      user_name: userIdToNameMap[trade.user_id.toString()] || "Unknown User",
+    };
   });
-  
-  return dataWithBrokerage
+
+  return dataWithBrokerageAndUserName;
 };
+
 
 
 // const getByStatus = async (user_id, status) => {
