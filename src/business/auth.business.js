@@ -411,10 +411,8 @@ const createamount = async (id, body, password) => {
   // console.log(user.password, 'hdd');
   if (user.password === body.password) {
     const currentFunds = user.funds || 0;
-    // console.log(currentFunds, 'body');
-    const newFunds = currentFunds + body.funds;
+    const newFunds = parseFloat(currentFunds) + parseFloat(body.funds);
     user.funds = newFunds;
-
     await updateFund(body?.user_id, newFunds);
 
     const trade = await amountModel.create({
@@ -431,24 +429,35 @@ const createamount = async (id, body, password) => {
 
 const findamount = async (userId) => {
   const today = new Date();
-  
-  const startOfWeek = new Date(today.setDate(today.getDate() - (today.getDay() - 1) % 7 - 1));
-  const endOfWeek = new Date(today.setDate(today.getDate() - (today.getDay() - 5) % 7));
 
-  let data = await amountModel.find({ user_id: userId , createdAt: { $gte: startOfWeek, $lte: endOfWeek }});
+  const startOfWeek = new Date(
+    today.setDate(today.getDate() - ((today.getDay() - 1) % 7) - 1)
+  );
+  const endOfWeek = new Date(
+    today.setDate(today.getDate() - ((today.getDay() - 5) % 7))
+  );
+
+  let data = await amountModel.find({
+    user_id: userId,
+    createdAt: { $gte: startOfWeek, $lte: endOfWeek }
+  });
   //console.log(data,'sdaa');
   return data;
 };
 
-
-
 const findAllamount = async () => {
   const today = new Date();
-  
-  const startOfWeek = new Date(today.setDate(today.getDate() - (today.getDay() - 1) % 7 - 1));
-  const endOfWeek = new Date(today.setDate(today.getDate() - (today.getDay() - 5) % 7));
 
-  const data = await amountModel.find({createdAt: { $gte: startOfWeek, $lte: endOfWeek }});
+  const startOfWeek = new Date(
+    today.setDate(today.getDate() - ((today.getDay() - 1) % 7) - 1)
+  );
+  const endOfWeek = new Date(
+    today.setDate(today.getDate() - ((today.getDay() - 5) % 7))
+  );
+
+  const data = await amountModel.find({
+    createdAt: { $gte: startOfWeek, $lte: endOfWeek }
+  });
   let newdata = [];
   for (let i = 0; i < data.length; i++) {
     const trade = data[i];
@@ -457,13 +466,11 @@ const findAllamount = async () => {
       ...trade.toObject(),
       name: user.name,
       last_name: user.last_name,
-      user_id: user.user_id,
+      user_id: user.user_id
     });
   }
   return newdata;
 };
-
-
 
 export default {
   login,
