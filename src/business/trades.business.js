@@ -399,6 +399,7 @@ async function getActivetradeAmount(user_id) {
 
   return active_amount + pending_amaount;
 }
+
 const create = async (body, res) => {
   var user = await AuthBusiness.me(body?.user_id);
   console.log('ststusssss', body?.status);
@@ -416,7 +417,7 @@ const create = async (body, res) => {
         body?.purchaseType == 'buy' ? body?.buy_rate : body?.sell_rate;
       if (body?.segment == 'mcx') {
         if (body.lots) {
-          amount = body?.lots * amount* body?.lot_size;
+          amount = body?.lots * amount;
         } else {
           return {
             message: 'Lots must not be empty'
@@ -425,7 +426,7 @@ const create = async (body, res) => {
         brokerage = getBrokarage(amount, user?.mcxBrokeragePerCrore);
       } else if (body?.segment == 'eq') {
         if (body.lots) {
-          amount = body?.lots * amount* body?.lot_size;
+          amount = body?.lots * amount;
         } else if (body.units) {
           amount = body?.units * amount;
         }
@@ -436,7 +437,6 @@ const create = async (body, res) => {
             'You are not connected with any broker, please ask Admin to update your profile.'
         };
       }
-      console.log(brokerage,'brokerage');
 
       // var intradayMCXmarging = 0;
       // if (body?.segment == 'mcx' && body.buy_rate) {
@@ -488,25 +488,26 @@ const create = async (body, res) => {
           holdingMCXmarging =
             (body.buy_rate * body.lots * body.lot_size) /
             user.holdingExposureMarginMCX;
-          console.log(holdingMCXmarging, 'holdingMCXmarging---buy');
+            console.log(holdingMCXmarging,'holdingMCXmarging---buy');
         } else {
           holdingMCXmarging =
             (body.buy_rate * body.units * body.lot_size) /
             user.holdingExposureMarginMCX;
         }
-      } else if (body?.segment == 'mcx' && body.sell_rate) {
+      } else if (body?.segment == 'mcx' && body.sell_rate ) {
         if (body.lots) {
           holdingMCXmarging =
             (body.sell_rate * body.lots * body.lot_size) /
             user.holdingExposureMarginMCX;
-          console.log(holdingMCXmarging, 'holdingMCXmarging2 ----- sell');
+            console.log(holdingMCXmarging,'holdingMCXmarging2 ----- sell');
+
         } else if (body.units) {
           holdingMCXmarging =
             (body.sell_rate * body.units * body.lot_size) /
             user.holdingExposureMarginMCX;
         }
       }
-      console.log(holdingMCXmarging, 'holdingMCXmarging ---last');
+      console.log(holdingMCXmarging,'holdingMCXmarging ---last');
 
       var availbleholdingmargingmcx = user?.funds - holdingMCXmarging;
       if (availbleholdingmargingmcx < 0) {
@@ -593,9 +594,6 @@ const create = async (body, res) => {
     };
   }
 };
-
-// s = 100
-// b = 200
 
 const update = async (id, body) => {
   try {
@@ -699,17 +697,10 @@ const update = async (id, body) => {
       }
       console.log(brokerage,'brokerage');
 
-      let Amount = body.profit + body.loss;
+      let Amount = body.profit - body.loss;
       let remainingFund = user.funds + Amount - parseFloat(brokerage + buybrokerage);
-      console.log('funds', user?.funds, amount, brokerage);
-      console.log(remainingFund,'sk1');
-      console.log(user.funds,'user.funds');
-      console.log(Amount,'user.funds');
-      console.log(body.profit,'body.profit');
-      console.log(body.loss,'body.loss');
+
       await AuthBusiness.updateFund(body?.user_id, remainingFund);
-      console.log(body?.user_id,'body?.user_id');
-      console.log(brokerage+buybrokerage,'brokerage+buybrokerage');
 
     }
     // else if (body?.status == 'pending') {
@@ -801,16 +792,12 @@ const update = async (id, body) => {
     };
 
     var remainingFund = user?.funds - amount - brokerage;
-    console.log('funds', user?.funds, amount, brokerage);
     if (isProfit && body.buy_rate < body.sell_rate) {
       remainingFund = user?.funds + (amount - brokerage);
-      console.log('profit');
     } else if (isProfit && body.buy_rate > body.sell_rate) {
       remainingFund = user?.funds - (amount - brokerage);
-      console.log('loss');
     } else {
       remainingFund = user?.funds + body.buy_rate - brokerage;
-      console.log('no profit/loss');
     }
 
     // await AuthBusiness.updateFund(body?.user_id, remainingFund);
