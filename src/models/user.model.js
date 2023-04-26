@@ -254,7 +254,7 @@ const schema = new Schema({
 schema.plugin(aggregatePaginate);
 schema.plugin(AutoIncrement(mongoose), { id: 'user_seq', inc_field: 'id' });
 
-// // Statics
+// Statics
 // schema.statics.compare = async (candidatePassword, password) => {
 //   return await bcrypt.compareSync(candidatePassword, password);
 // };

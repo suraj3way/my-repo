@@ -1406,5 +1406,5 @@ export default {
   weeklyfinduser,
   getUserTrades,
   testTrade,
-  ActiveTradesbyuser,
+  ActiveTradesbyuser
 };

@@ -347,35 +347,37 @@ const updateFund = async (req, res) => {
         body: `user ${user.name} update funds ${req.body.funds} `
       }
     };
-    await NotificationBusiness.create({notification:payload.notification.body});
-    
+    await NotificationBusiness.create({
+      notification: payload.notification.body
+    });
+
     const adminnotification = await adminNotificationBusiness.getAll();
-    const admintokens = adminnotification.map(user => user.fcm_token);
+    const admintokens = adminnotification.map((user) => user.fcm_token);
 
     const usernotification = await userNotificationBusiness.getAll();
-    const usertokens = usernotification.map(user => user.fcm_token);
+    const usertokens = usernotification.map((user) => user.fcm_token);
 
     const tokens = admintokens || usertokens;
-    
+
     // console.log(user, user);
-      if (user?.message) {
-        return success(res, user);
+    if (user?.message) {
+      return success(res, user);
+    }
+    const multicastMessage = {
+      tokens: tokens,
+      webpush: {
+        notification: payload.notification
       }
-      const multicastMessage = {
-        tokens: tokens,
-        webpush: {
-          notification: payload.notification
-        }
-      };
-      admin
-        .messaging()
-        .sendMulticast(multicastMessage)
-        .then((response) => {
-          console.log('Notification sent successfully:', response);
-        })
-        .catch((error) => {
-          console.log('Error sending notification:', error);
-        });
+    };
+    admin
+      .messaging()
+      .sendMulticast(multicastMessage)
+      .then((response) => {
+        console.log('Notification sent successfully:', response);
+      })
+      .catch((error) => {
+        console.log('Error sending notification:', error);
+      });
 
     return success(res, 201, {
       msg: 'Successfully update funds...',
@@ -396,7 +398,7 @@ const finduser = async (req, res) => {
     const data = await AuthBusiness.finduser(req.params.id);
     // console.log(data,"data");
     // let updated = '_id' in data || 'n' in data;
-    return success(res, 201,  data );
+    return success(res, 201, data);
   } catch (err) {
     error(res, err);
   }
@@ -405,7 +407,7 @@ const finduser = async (req, res) => {
 const createamount = async (req, res) => {
   try {
     req.body.updated_by = req.user.id;
-    console.log(req.body.user_id,'jbv');
+    console.log(req.body.user_id, 'jbv');
     const data = await AuthBusiness.createamount(req.body.user_id, req.body);
     // let updated = '_id' in data || 'n' in data;
     // return success(res, 201, { updated });
@@ -453,19 +455,69 @@ const findAllamount = async (req, res) => {
   }
 };
 
+// const changePassword = async (req, res) => {
+//   try {
+//     const { currentPassword, newPassword, confirmNewPassword } = req.body;
+//     console.log(req.user.id);
+
+//     const userId = req.user.id; // assuming you're using JWT authentication and have a middleware to extract the user ID from the token
+//     if (validator.isEmpty(currentPassword.toString())) {
+//       throw {
+//         code: 'ERROR_PASSWORD_1',
+//         message: 'The current password cannot be empty'
+//       };
+//     }
+// console.log('here');
+//     if (validator.isEmpty(newPassword.toString())) {
+//       throw {
+//         code: 'ERROR_PASSWORD_2',
+//         message: 'The new password cannot be empty'
+//       };
+//     }
+
+//     if (newPassword !== confirmNewPassword) {
+//       throw {
+//         code: 'ERROR_PASSWORD_3',
+//         message: 'The new password and confirmation do not match'
+//       };
+//     }
+// console.log(userId,'user');
+//     const user = await UserModel.findById(userId).select('+password').lean();
+//     if (!user) {
+//       throw {
+//         code: 'ERROR_PASSWORD_4',
+//         message: `User not found`
+//       };
+//     }
+
+//     const isMatch = await UserModel.compare(currentPassword, user.password);
+//     if (!isMatch) {
+//       throw {
+//         code: 'ERROR_PASSWORD_5',
+//         message: `Incorrect current password`
+//       };
+//     }
+
+//     await UserModel.updateOne({ _id: userId }, { password: newPassword });
+
+//     return success(res, { message: 'Password changed successfully' });
+//   } catch (err) {
+//     error(res, err);
+//   }
+// };
 const changePassword = async (req, res) => {
   try {
     const { currentPassword, newPassword, confirmNewPassword } = req.body;
-    const { userId } = req.user; // assuming you're using JWT authentication and have a middleware to extract the user ID from the token
-
-    if (validator.isEmpty(currentPassword)) {
+    const userId = req.user.id; // assuming you're using JWT authentication and have a middleware to extract the user ID from the token
+    console.log(userId, 'here');
+    if (validator.isEmpty(currentPassword.toString())) {
       throw {
         code: 'ERROR_PASSWORD_1',
         message: 'The current password cannot be empty'
       };
     }
 
-    if (validator.isEmpty(newPassword)) {
+    if (validator.isEmpty(newPassword.toString())) {
       throw {
         code: 'ERROR_PASSWORD_2',
         message: 'The new password cannot be empty'
@@ -479,6 +531,7 @@ const changePassword = async (req, res) => {
       };
     }
 
+    console.log(userId, 'userId');
     const user = await UserModel.findById(userId).select('+password').lean();
     if (!user) {
       throw {
@@ -487,8 +540,7 @@ const changePassword = async (req, res) => {
       };
     }
 
-    const isMatch = await UserModel.compare(currentPassword, user.password);
-    if (!isMatch) {
+    if (user.password !== currentPassword.toString()) {
       throw {
         code: 'ERROR_PASSWORD_5',
         message: `Incorrect current password`
