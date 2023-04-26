@@ -10,6 +10,7 @@
     "test": "jest",
     "serve": "yarn build && node dist/app.js"
   },
+  "type": "module",
   "keywords": [
     "nodetomic",
     "nodejs",
@@ -20,15 +21,6 @@
     "node-boilerplate",
     "express-boilerplate"
   ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/kevoj/nodetomic.git"
-  },
-  "author": {
-    "name": "leonardo Rico",
-    "email": "leonardo.ricog@gmail.com",
-    "url": "https://github.com/kevoj"
-  },
   "license": "MIT",
   "dependencies": {
     "apisauce": "^2.1.1",
