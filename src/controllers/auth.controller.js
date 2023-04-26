@@ -4,6 +4,8 @@ import AuthBusiness from '@/business/auth.business';
 import adminNotificationBusiness from '@/business/adminnotification.bussiness';
 import userNotificationBusiness from '@/business/usernotification.bussiness';
 import NotificationBusiness from '@/business/notification.bussiness';
+import UserModel from '@/models/user.model';
+
 // Utils
 import { session } from '@/utils/auth.util';
 import { success, error, unauthorized } from '@/utils/helper.util';
@@ -451,7 +453,55 @@ const findAllamount = async (req, res) => {
   }
 };
 
+const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword, confirmNewPassword } = req.body;
+    const { userId } = req.user; // assuming you're using JWT authentication and have a middleware to extract the user ID from the token
 
+    if (validator.isEmpty(currentPassword)) {
+      throw {
+        code: 'ERROR_PASSWORD_1',
+        message: 'The current password cannot be empty'
+      };
+    }
+
+    if (validator.isEmpty(newPassword)) {
+      throw {
+        code: 'ERROR_PASSWORD_2',
+        message: 'The new password cannot be empty'
+      };
+    }
+
+    if (newPassword !== confirmNewPassword) {
+      throw {
+        code: 'ERROR_PASSWORD_3',
+        message: 'The new password and confirmation do not match'
+      };
+    }
+
+    const user = await UserModel.findById(userId).select('+password').lean();
+    if (!user) {
+      throw {
+        code: 'ERROR_PASSWORD_4',
+        message: `User not found`
+      };
+    }
+
+    const isMatch = await UserModel.compare(currentPassword, user.password);
+    if (!isMatch) {
+      throw {
+        code: 'ERROR_PASSWORD_5',
+        message: `Incorrect current password`
+      };
+    }
+
+    await UserModel.updateOne({ _id: userId }, { password: newPassword });
+
+    return success(res, { message: 'Password changed successfully' });
+  } catch (err) {
+    error(res, err);
+  }
+};
 
 export default {
   login,
@@ -467,5 +517,6 @@ export default {
   finduser,
   createamount,
   findamount,
-  findAllamount
+  findAllamount,
+  changePassword
 };

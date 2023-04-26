@@ -1407,5 +1407,4 @@ export default {
   getUserTrades,
   testTrade,
   ActiveTradesbyuser,
-  testTrade
 };

@@ -213,5 +213,7 @@ router.post('/api/createamount', mw(['admin']), AuthController.createamount);
 router.get('/api/findamount', mw(['user']), AuthController.findamount);
 router.get('/api/finduseramount', mw(['user']), AuthController.findamount);
 router.get('/api/findAllamount', mw(['admin']), AuthController.findAllamount);
+router.post('/api/admin/change-password', AuthController.changePassword);
+
 
 export default router;

@@ -363,6 +363,8 @@ const getAll = async () => {
   return await UserModel.find({});
 };
 
+
+
 // const update = async (id, body) => {
 
 //   const trade = UserModel.findByIdAndUpdate(id, body, { new: true })
@@ -486,5 +488,5 @@ export default {
   finduser,
   createamount,
   findamount,
-  findAllamount
+  findAllamount,
 };
