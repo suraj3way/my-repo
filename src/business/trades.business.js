@@ -5,6 +5,7 @@ import AuthBusiness from '@/business/auth.business';
 
 import UserModel from '@/models/user.model';
 import { async } from '@babel/runtime/regenerator';
+import { isCancel } from 'apisauce';
 
 const io = require('socket.io-client');
 
@@ -334,8 +335,12 @@ const getAllLogged = async (user_id) => {
 };
 
 function getBrokarage(total, BrokeragePerCrore) {
-  var broker_per = parseInt(BrokeragePerCrore) / 10000;
+  var broker_per = parseInt(BrokeragePerCrore) / 100000;
+  console.log(broker_per,'broker_per');
   var amaount = (total * broker_per) / 100;
+  console.log(amaount,'amaount');
+  console.log(total,'total');
+  // console.log(lot_size,'lot_size');
   return amaount;
 }
 
@@ -411,7 +416,7 @@ const create = async (body, res) => {
         body?.purchaseType == 'buy' ? body?.buy_rate : body?.sell_rate;
       if (body?.segment == 'mcx') {
         if (body.lots) {
-          amount = body?.lots * amount;
+          amount = body?.lots * amount* body?.lot_size;
         } else {
           return {
             message: 'Lots must not be empty'
@@ -420,7 +425,7 @@ const create = async (body, res) => {
         brokerage = getBrokarage(amount, user?.mcxBrokeragePerCrore);
       } else if (body?.segment == 'eq') {
         if (body.lots) {
-          amount = body?.lots * amount;
+          amount = body?.lots * amount* body?.lot_size;
         } else if (body.units) {
           amount = body?.units * amount;
         }
@@ -431,6 +436,7 @@ const create = async (body, res) => {
             'You are not connected with any broker, please ask Admin to update your profile.'
         };
       }
+      console.log(brokerage,'brokerage');
 
       // var intradayMCXmarging = 0;
       // if (body?.segment == 'mcx' && body.buy_rate) {
@@ -545,8 +551,8 @@ const create = async (body, res) => {
         const trade = await TradesModel.create({
           ...body
         }); //.select({user_id:1,buy_rate:1});
-        var remainingFund = user?.funds - amount;
-        await AuthBusiness.updateFund(body?.user_id, remainingFund);
+        // var remainingFund = user?.funds - amount;
+        // await AuthBusiness.updateFund(body?.user_id, remainingFund);
         //console.log("user",user)
         var ledger = {
           trade_id: trade._id,
@@ -595,6 +601,7 @@ const update = async (id, body) => {
   try {
     var thisTrade = await TradesModel.findById(id);
     console.log(thisTrade, 'thisTrade');
+    console.log(await create().user_name, 'suraj');
     var user = await AuthBusiness.me(body?.user_id);
     //console.log(body);
     var amount = body?.purchaseType == 'buy' ? body?.buy_rate : body?.sell_rate;
@@ -606,7 +613,7 @@ const update = async (id, body) => {
       return tradePending;
     }
 
-    if (body?.status == 'closed') {
+    else if (body?.status == 'closed') {
       if (body?.buy_rate && body?.sell_rate) {
         if (thisTrade?.purchaseType == 'sell') {
           if (body?.sell_rate > body?.buy_rate) {
@@ -638,6 +645,31 @@ const update = async (id, body) => {
           }
         }
       }
+      var buyamount = body?.purchaseType == 'buy' ? body?.sell_rate : body?.buy_rate;
+      var buybrokerage = thisTrade?.buybrokerage ? thisTrade?.buybrokerage : 0;
+      console.log('broker');
+      console.log('buybrokerage', buybrokerage);
+      if (body?.segment == 'mcx') {
+        if (body.lots) {
+          buyamount = body?.lots * buyamount * body?.lot_size;
+        } else {
+          return {
+            message: 'Lots must not be empty'
+          };
+        }
+        buybrokerage =
+          buybrokerage + getBrokarage(buyamount, user?.mcxBrokeragePerCrore);
+      }
+      if (body?.segment == 'eq') {
+        if (body.lots) {
+          buyamount = body?.lots * buyamount * body?.lot_size;
+        } else if (body.units) {
+          buyamount = body?.units * buyamount;
+        }
+        buybrokerage = buybrokerage + getBrokarage(buyamount, user?.EQBrokragePerCrore);
+      }
+      console.log(buybrokerage,'buybrokerage');
+
       const trade = await TradesModel.findByIdAndUpdate(id, body, {
         new: true
       });
@@ -648,7 +680,7 @@ const update = async (id, body) => {
       console.log('brokerage', brokerage);
       if (body?.segment == 'mcx') {
         if (body.lots) {
-          amount = body?.lots * amount;
+          amount = body?.lots * amount * body?.lot_size;
         } else {
           return {
             message: 'Lots must not be empty'
@@ -659,15 +691,39 @@ const update = async (id, body) => {
       }
       if (body?.segment == 'eq') {
         if (body.lots) {
-          amount = body?.lots * amount;
+          amount = body?.lots * amount * body?.lot_size;
         } else if (body.units) {
           amount = body?.units * amount;
         }
         brokerage = brokerage + getBrokarage(amount, user?.EQBrokragePerCrore);
       }
-    }
+      console.log(brokerage,'brokerage');
 
-    if (body?.status == 'pending') {
+      let Amount = body.profit + body.loss;
+      let remainingFund = user.funds + Amount - parseFloat(brokerage + buybrokerage);
+      console.log('funds', user?.funds, amount, brokerage);
+      console.log(remainingFund,'sk1');
+      console.log(user.funds,'user.funds');
+      console.log(Amount,'user.funds');
+      console.log(body.profit,'body.profit');
+      console.log(body.loss,'body.loss');
+      await AuthBusiness.updateFund(body?.user_id, remainingFund);
+      console.log(body?.user_id,'body?.user_id');
+      console.log(brokerage+buybrokerage,'brokerage+buybrokerage');
+
+    }
+    // else if (body?.status == 'pending') {
+    //   const tradePending = TradesModel.findByIdAndUpdate(
+    //     id,
+    //     { ...body },
+    //     {
+    //       new: true
+    //     }
+    //   );
+    //   return tradePending;
+    // }
+
+    else if (body?.status == 'pending') {
       var mcx_scripts = body.script;
       // var mcx_scripts = ['COPPER_28APR2023'];
       var done_scripts = [];
@@ -698,7 +754,7 @@ const update = async (id, body) => {
           );
         } else {
           console.log(data.ask, 'buy condition not met');
-          await TradesModel.findByIdAndUpdate(id, body, {
+          await TradesModel.findByIdAndUpdate(id, ...body, {
             new: true
           });
         }
@@ -757,7 +813,7 @@ const update = async (id, body) => {
       console.log('no profit/loss');
     }
 
-    await AuthBusiness.updateFund(body?.user_id, remainingFund);
+    // await AuthBusiness.updateFund(body?.user_id, remainingFund);
     await LedgersModel.create({
       ...ledger
     });
