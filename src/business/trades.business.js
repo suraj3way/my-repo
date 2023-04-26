@@ -482,26 +482,25 @@ const create = async (body, res) => {
           holdingMCXmarging =
             (body.buy_rate * body.lots * body.lot_size) /
             user.holdingExposureMarginMCX;
-            console.log(holdingMCXmarging,'holdingMCXmarging---buy');
+          console.log(holdingMCXmarging, 'holdingMCXmarging---buy');
         } else {
           holdingMCXmarging =
             (body.buy_rate * body.units * body.lot_size) /
             user.holdingExposureMarginMCX;
         }
-      } else if (body?.segment == 'mcx' && body.sell_rate ) {
+      } else if (body?.segment == 'mcx' && body.sell_rate) {
         if (body.lots) {
           holdingMCXmarging =
             (body.sell_rate * body.lots * body.lot_size) /
             user.holdingExposureMarginMCX;
-            console.log(holdingMCXmarging,'holdingMCXmarging2 ----- sell');
-
+          console.log(holdingMCXmarging, 'holdingMCXmarging2 ----- sell');
         } else if (body.units) {
           holdingMCXmarging =
             (body.sell_rate * body.units * body.lot_size) /
             user.holdingExposureMarginMCX;
         }
       }
-      console.log(holdingMCXmarging,'holdingMCXmarging ---last');
+      console.log(holdingMCXmarging, 'holdingMCXmarging ---last');
 
       var availbleholdingmargingmcx = user?.funds - holdingMCXmarging;
       if (availbleholdingmargingmcx < 0) {
@@ -608,7 +607,6 @@ const update = async (id, body) => {
     }
 
     if (body?.status == 'closed') {
-
       if (body?.buy_rate && body?.sell_rate) {
         if (thisTrade?.purchaseType == 'sell') {
           if (body?.sell_rate > body?.buy_rate) {
@@ -1366,13 +1364,8 @@ const weeklyfinduser = async (userId) => {
   return dataByWeek;
 };
 
-
-
-
-
-
 const ActiveTradesbyuser = async () => {
-  let data = await TradesModel.find({status:'active'});
+  let data = await TradesModel.find({ status: 'active' });
   let newdata = [];
   for (let i = 0; i < data.length; i++) {
     const trade = data[i];
@@ -1381,14 +1374,11 @@ const ActiveTradesbyuser = async () => {
       ...trade.toObject(),
       name: user.name,
       ledgerbalance: user.funds,
-      user_name: user.user_id,
+      user_name: user.user_id
     });
   }
   return newdata;
 };
-
-
-
 
 export default {
   getAll,
@@ -1415,10 +1405,7 @@ export default {
   EQpendingTrades,
   weeklyfinduser,
   getUserTrades,
-
   testTrade,
-  ActiveTradesbyuser
-
-
+  ActiveTradesbyuser,
   testTrade
 };
