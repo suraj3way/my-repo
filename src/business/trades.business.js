@@ -332,8 +332,12 @@ const getAllLogged = async (user_id) => {
 };
 
 function getBrokarage(total, BrokeragePerCrore) {
-  var broker_per = parseInt(BrokeragePerCrore) / 10000;
+  var broker_per = parseInt(BrokeragePerCrore) / 100000;
+  console.log(broker_per,'broker_per');
   var amaount = (total * broker_per) / 100;
+  console.log(amaount,'amaount');
+  console.log(total,'total');
+  // console.log(lot_size,'lot_size');
   return amaount;
 }
 
@@ -410,7 +414,7 @@ const create = async (body, res) => {
         body?.purchaseType == 'buy' ? body?.buy_rate : body?.sell_rate;
       if (body?.segment == 'mcx') {
         if (body.lots) {
-          amount = body?.lots * amount;
+          amount = body?.lots * amount* body?.lot_size;
         } else {
           return {
             message: 'Lots must not be empty'
@@ -419,7 +423,7 @@ const create = async (body, res) => {
         brokerage = getBrokarage(amount, user?.mcxBrokeragePerCrore);
       } else if (body?.segment == 'eq') {
         if (body.lots) {
-          amount = body?.lots * amount;
+          amount = body?.lots * amount* body?.lot_size;
         } else if (body.units) {
           amount = body?.units * amount;
         }
@@ -430,6 +434,7 @@ const create = async (body, res) => {
             'You are not connected with any broker, please ask Admin to update your profile.'
         };
       }
+      console.log(brokerage,'brokerage');
 
       var intradayMCXmarging = 0;
       if (body?.segment == 'mcx' && body.buy_rate) {
@@ -527,8 +532,8 @@ const create = async (body, res) => {
         const trade = await TradesModel.create({
           ...body
         }); //.select({user_id:1,buy_rate:1});
-        var remainingFund = user?.funds - amount;
-        await AuthBusiness.updateFund(body?.user_id, remainingFund);
+        // var remainingFund = user?.funds - amount;
+        // await AuthBusiness.updateFund(body?.user_id, remainingFund);
         //console.log("user",user)
         var ledger = {
           trade_id: trade._id,
@@ -607,6 +612,7 @@ const update = async (id, body) => {
           }
         }
       }
+
       const trade = await TradesModel.findByIdAndUpdate(id, body, {
         new: true
       });
@@ -617,7 +623,7 @@ const update = async (id, body) => {
       console.log('brokerage', brokerage);
       if (body?.segment == 'mcx') {
         if (body.lots) {
-          amount = body?.lots * amount;
+          amount = body?.lots * amount * body?.lot_size;
         } else {
           return {
             message: 'Lots must not be empty'
@@ -628,12 +634,22 @@ const update = async (id, body) => {
       }
       if (body?.segment == 'eq') {
         if (body.lots) {
-          amount = body?.lots * amount;
+          amount = body?.lots * amount * body?.lot_size;
         } else if (body.units) {
           amount = body?.units * amount;
         }
         brokerage = brokerage + getBrokarage(amount, user?.EQBrokragePerCrore);
       }
+      let Amount = body.profit - body.loss;
+      let remainingFund = user.funds + Amount - brokerage;
+      console.log('funds', user?.funds, amount, brokerage);
+      console.log(remainingFund,'sk1');
+      console.log(user.funds,'user.funds');
+      console.log(Amount,'user.funds');
+      console.log(body.profit,'body.profit');
+      console.log(body.loss,'body.loss');
+      await AuthBusiness.updateFund(body?.user_id, remainingFund);
+      console.log(body?.user_id,'body?.user_id');
 
     }
     else if (body?.status == 'pending') {
@@ -720,7 +736,7 @@ const update = async (id, body) => {
         console.log('no profit/loss');
       }
 
-      await AuthBusiness.updateFund(body?.user_id, remainingFund);
+      // await AuthBusiness.updateFund(body?.user_id, remainingFund);
       await LedgersModel.create({
         ...ledger
       });
