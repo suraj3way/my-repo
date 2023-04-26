@@ -517,36 +517,6 @@ const getTradesByUser = async (req, res) => {
 };
 
 
-// const weeklyfinduser = async (req, res) => {
-//   try {
-//     const user_id = req.user.id;
-
-//     if (validator.isEmpty(user_id)) {
-//       throw {
-//         code: 'ERROR_AUTH_3',
-//         message: 'The user id cannot be empty'
-//       };
-//     }
-
-//     if (!validator.isMongoId(user_id)) {
-//       throw {
-//         code: 'ERROR_AUTH_4',
-//         message: 'Invalid auth user id...'
-//       };
-//     }
-
-//     if (user_id) {
-//       let data = await TradesBusiness.weeklyfinduser(user_id);
-//       return data ? success(res, data) : unauthorized(res);
-//     } else {
-//       return unauthorized(res);
-//     }
-//   } catch (err) {
-//     error(res, err);
-//   }
-// };
-
-
 const testTrade = async (req, res) => {
   try {
     console.log("data");
@@ -554,6 +524,20 @@ const testTrade = async (req, res) => {
    
     success(res, 201, { data });
 
+  } catch (err) {
+    error(res, err);
+  }
+};
+
+const ActiveTradesbyuser = async (req, res) => {
+  try {
+    // console.log(req.user, "suraj");
+    req.body.user_id = req.user.id;
+
+    const data = await TradesBusiness.ActiveTradesbyuser(req.params.id);
+    // console.log(data,"data");
+    let updated = '_id' in data || 'n' in data;
+    return success(res, 201,  data );
   } catch (err) {
     error(res, err);
   }
@@ -577,7 +561,6 @@ export default {
   getAllactive_sell,
   Brokerege,
   ledgerbalance,
-
   userledgerbalance,
   findFunds,
   ActiveTrades,
@@ -586,7 +569,6 @@ export default {
   EQpendingTrades,
   weeklyfinduser,
   getTradesByUser,
-
-  testTrade
-
+  testTrade,
+  ActiveTradesbyuser
 };

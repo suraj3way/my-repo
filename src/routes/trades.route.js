@@ -32,6 +32,7 @@ router.get('/api/ClosedTrades/:id', mw(['admin','user']), TradesController.Close
 router.get('/api/MCXpendingTrades/:id', mw(['admin']), TradesController.MCXpendingTrades);
 router.get('/api/EQpendingTrades/:id', mw(['admin']), TradesController.EQpendingTrades);
 router.get('/api/weeklyfinduser/:id', mw(['admin']), TradesController.weeklyfinduser);
+router.get('/api/ActiveTradesbyuser', mw(['admin']), TradesController.ActiveTradesbyuser);
 
 router.get('/api/test', TradesController.testTrade);
 

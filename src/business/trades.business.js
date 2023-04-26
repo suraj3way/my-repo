@@ -587,13 +587,7 @@ const update = async (id, body) => {
       });
       return tradePending;
     }
-    if (body?.status == 'pending') {
-      const tradePending =  TradesModel.findByIdAndUpdate(id, {...body}, {
-        new: true
-      });
-      return tradePending;
-    }
-    if (body?.status == 'closed') {
+    else if (body?.status == 'closed') {
       if (body?.buy_rate && body?.sell_rate) {
         if (thisTrade?.purchaseType == 'sell') {
           if (body?.sell_rate > body?.buy_rate) {
@@ -642,7 +636,7 @@ const update = async (id, body) => {
       }
 
     }
-    if (body?.status == 'pending') {
+    else if (body?.status == 'pending') {
         var mcx_scripts = body.script;
         // var mcx_scripts = ['COPPER_28APR2023'];
         var done_scripts = [];
@@ -1309,6 +1303,27 @@ const weeklyfinduser = async (userId) => {
 
 
 
+const ActiveTradesbyuser = async () => {
+  let data = await TradesModel.find({status:'active'});
+  let newdata = [];
+  for (let i = 0; i < data.length; i++) {
+    const trade = data[i];
+    const user = await UserModel.findById(trade.user_id);
+    newdata.push({
+      ...trade.toObject(),
+      name: user.name,
+      ledgerbalance: user.funds,
+      user_name: user.user_id,
+    });
+  }
+  return newdata;
+};
+
+
+
+
+
+
 export default {
   getAll,
   getAllLogged,
@@ -1326,7 +1341,6 @@ export default {
   getAllactive_sell,
   Brokerege,
   ledgerbalance,
-
   userledgerbalance,
   findFunds,
   ActiveTrades,
@@ -1335,7 +1349,6 @@ export default {
   EQpendingTrades,
   weeklyfinduser,
   getUserTrades,
-
-  testTrade
-
+  testTrade,
+  ActiveTradesbyuser
 };
