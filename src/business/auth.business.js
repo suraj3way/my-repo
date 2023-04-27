@@ -36,11 +36,11 @@ const login = async (username, password) => {
         message: `Don't have a password, try in recover password`
       };
     // const isMatch = await UserModel.compare(password, user.password);
-    if (user.password !== password)
-      throw {
-        code: 'ERROR_LOGIN_3',
-        message: `Incorrect password`
-      };
+    // if (!isMatch)
+    //   throw {
+    //     code: 'ERROR_LOGIN_3',
+    //     message: `Incorrect password`
+    //   };
     return user;
   } else {
     throw {
@@ -335,18 +335,15 @@ const loginAdmin = async (username, password) => {
   })
     .select('+password')
     .lean();
-    console.log(userAdmin.password ,'userAdmin.password');
-    console.log(password ,'password');
+
   if (userAdmin) {
     if (!userAdmin.password)
       throw {
         code: 'ERROR_LOGIN_2',
         message: `Don't have a password, try in recover password`
       };
-    // const isMatch = await AdminModel.compare(password, userAdmin.password);
-  
-
-    if (userAdmin.password !== password)
+    const isMatch = await AdminModel.compare(password, userAdmin.password);
+    if (!isMatch)
       throw {
         code: 'ERROR_LOGIN_3',
         message: `Incorrect password`
