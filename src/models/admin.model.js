@@ -51,34 +51,34 @@ adminSchema.plugin(AutoIncrement(mongoose), {
 });
 
 // Statics
-adminSchema.statics.compare = async (candidatePassword, password) => {
-  return await bcrypt.compareSync(candidatePassword, password);
-};
+// adminSchema.statics.compare = async (candidatePassword, password) => {
+//   return await bcrypt.compareSync(candidatePassword, password);
+// };
 
-// Hooks
-adminSchema.pre('save', async function () {
-  const user = this;
-  if (user.password) {
-    const hash = await bcrypt.hashSync(user.password, 10);
-    user.password = hash;
-  }
-});
+// // Hooks
+// adminSchema.pre('save', async function () {
+//   const user = this;
+//   if (user.password) {
+//     const hash = await bcrypt.hashSync(user.password, 10);
+//     user.password = hash;
+//   }
+// });
 
-adminSchema.pre('updateOne', async function () {
-  const user = this._update;
-  if (user.password) {
-    const hash = await bcrypt.hashSync(user.password, 10);
-    this._update.password = hash;
-  }
-});
+// adminSchema.pre('updateOne', async function () {
+//   const user = this._update;
+//   if (user.password) {
+//     const hash = await bcrypt.hashSync(user.password, 10);
+//     this._update.password = hash;
+//   }
+// });
 
-adminSchema.pre('updateMany', async function () {
-  const user = this._update;
-  if (user.password) {
-    const hash = await bcrypt.hashSync(user.password, 10);
-    this._update.password = hash;
-  }
-});
+// adminSchema.pre('updateMany', async function () {
+//   const user = this._update;
+//   if (user.password) {
+//     const hash = await bcrypt.hashSync(user.password, 10);
+//     this._update.password = hash;
+//   }
+// });
 
 // Indexes
 adminSchema.index({ id: 1 });

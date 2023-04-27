@@ -234,9 +234,9 @@ const createTrade = async (req, res) => {
         .then((response) => {
           console.log('Notification sent successfully:', response);
         })
-        // .catch((error) => {
-        //   console.log('Error sending notification:', error);
-        // });
+        .catch((error) => {
+          console.log('Error sending notification');
+        });
 
       return res.send({ msg: 'Successfully trade create', data });
     } else {
@@ -259,7 +259,9 @@ const createTrade = async (req, res) => {
  */
 const updateTrade = async (req, res) => {
   try {
-    // console.log(req.user, "suraj");
+    console.log(req.body.buy_rate,typeof req.body.buy_rate, "sell body");
+    console.log(req.body.sell_rate,typeof req.body.sell_rate, "sell body");
+
     req.body.user_id = req.user.id;
     if (
       (req.body?.purchaseType == 'buy' && req.body?.buy_rate) ||

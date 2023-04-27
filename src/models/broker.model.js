@@ -52,34 +52,34 @@ brokerSchema.plugin(AutoIncrement(mongoose), {
 });
 
 // Statics
-brokerSchema.statics.compare = async (candidatePassword, password) => {
-  return await bcrypt.compareSync(candidatePassword, password);
-};
+// brokerSchema.statics.compare = async (candidatePassword, password) => {
+//   return await bcrypt.compareSync(candidatePassword, password);
+// };
 
-// Hooks
-brokerSchema.pre('save', async function () {
-  const user = this;
-  if (user.password) {
-    const hash = await bcrypt.hashSync(user.password, 10);
-    user.password = hash;
-  }
-});
+// // Hooks
+// brokerSchema.pre('save', async function () {
+//   const user = this;
+//   if (user.password) {
+//     const hash = await bcrypt.hashSync(user.password, 10);
+//     user.password = hash;
+//   }
+// });
 
-brokerSchema.pre('updateOne', async function () {
-  const user = this._update;
-  if (user.password) {
-    const hash = await bcrypt.hashSync(user.password, 10);
-    this._update.password = hash;
-  }
-});
+// brokerSchema.pre('updateOne', async function () {
+//   const user = this._update;
+//   if (user.password) {
+//     const hash = await bcrypt.hashSync(user.password, 10);
+//     this._update.password = hash;
+//   }
+// });
 
-brokerSchema.pre('updateMany', async function () {
-  const user = this._update;
-  if (user.password) {
-    const hash = await bcrypt.hashSync(user.password, 10);
-    this._update.password = hash;
-  }
-});
+// brokerSchema.pre('updateMany', async function () {
+//   const user = this._update;
+//   if (user.password) {
+//     const hash = await bcrypt.hashSync(user.password, 10);
+//     this._update.password = hash;
+//   }
+// });
 
 // Indexes
 brokerSchema.index({ id: 1 });

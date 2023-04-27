@@ -336,7 +336,7 @@ const getAllLogged = async (user_id) => {
 
 function getBrokarage(total, BrokeragePerCrore) {
   var broker_per = parseInt(BrokeragePerCrore) / 100000;
-  console.log(broker_per,'broker_per');
+  console.log(broker_per,total,'----------- total --------- broker_per');
   var amaount = (total * broker_per) / 100;
   console.log(amaount,'amaount');
   console.log(total,'total');
@@ -402,7 +402,7 @@ async function getActivetradeAmount(user_id) {
 
 const create = async (body, res) => {
   var user = await AuthBusiness.me(body?.user_id);
-  console.log('ststusssss', body?.status);
+  console.log('create treade', body);
   if (body?.status != 'pending') {
     var total_traded_amaount = await getActivetradeAmount(body?.user_id);
     var current_percentage_funds = await checkBalanceInPercentage(
@@ -598,7 +598,7 @@ const create = async (body, res) => {
 const update = async (id, body) => {
   try {
     var thisTrade = await TradesModel.findById(id);
-    console.log(thisTrade, 'thisTrade');
+    console.log(body, 'this close Trade');
     console.log(await create().user_name, 'suraj');
     var user = await AuthBusiness.me(body?.user_id);
     //console.log(body);
@@ -648,19 +648,22 @@ const update = async (id, body) => {
       console.log('broker');
       console.log('buybrokerage', buybrokerage);
       if (body?.segment == 'mcx') {
+        console.log(body?.lots ,'lots' , buyamount,'buyamount' , thisTrade?.lot_size,'lot-size');
         if (body.lots) {
-          buyamount = body?.lots * buyamount * body?.lot_size;
+          buyamount = body?.lots * buyamount * thisTrade?.lot_size;
         } else {
           return {
             message: 'Lots must not be empty'
           };
         }
+      console.log(buyamount,'buyamount' ,user?.mcxBrokeragePerCrore,'user?.mcxBrokeragePerCrore' ,buybrokerage ,'buybrokerage');
+
         buybrokerage =
           buybrokerage + getBrokarage(buyamount, user?.mcxBrokeragePerCrore);
       }
       if (body?.segment == 'eq') {
         if (body.lots) {
-          buyamount = body?.lots * buyamount * body?.lot_size;
+          buyamount = body?.lots * buyamount * thisTrade?.lot_size;
         } else if (body.units) {
           buyamount = body?.units * buyamount;
         }
