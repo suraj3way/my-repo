@@ -643,7 +643,7 @@ const update = async (id, body) => {
           }
         }
       }
-      var buyamount = body?.purchaseType == 'buy' ? body?.sell_rate : body?.buy_rate;
+      var buyamount = body?.purchaseType == 'buy' ? body?.sell_rate : body?.buy_rate * thisTrade.lot_size;
       var buybrokerage = thisTrade?.buybrokerage ? thisTrade?.buybrokerage : 0;
       console.log('broker');
       console.log('buybrokerage', buybrokerage);
@@ -681,7 +681,7 @@ const update = async (id, body) => {
       console.log('brokerage', brokerage);
       if (body?.segment == 'mcx') {
         if (body.lots) {
-          amount = body?.lots * amount * body?.lot_size;
+          amount = body?.lots * amount * thisTrade?.lot_size;
         } else {
           return {
             message: 'Lots must not be empty'
@@ -692,7 +692,7 @@ const update = async (id, body) => {
       }
       if (body?.segment == 'eq') {
         if (body.lots) {
-          amount = body?.lots * amount * body?.lot_size;
+          amount = body?.lots * amount * thisTrade?.lot_size;
         } else if (body.units) {
           amount = body?.units * amount;
         }
