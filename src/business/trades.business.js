@@ -607,18 +607,18 @@ const create = async (body, res) => {
         // var remainingFund = user?.funds - amount;
         // await AuthBusiness.updateFund(body?.user_id, remainingFund);
         //console.log("user",user)
-        var ledger = {
-          trade_id: trade._id,
-          user_id: body?.user_id,
-          broker_id: body.broker_id,
-          amount: amount,
-          brokerage: brokerage,
-          type: body?.purchaseType ? body?.purchaseType : 'buy'
-        };
+        // var ledger = {
+        //   trade_id: trade._id,
+        //   user_id: body?.user_id,
+        //   broker_id: body.broker_id,
+        //   amount: amount,
+        //   brokerage: brokerage,
+        //   type: body?.purchaseType ? body?.purchaseType : 'buy'
+        // };
         ///console.log("ledger",ledger)
-        await LedgersModel.create({
-          ...ledger
-        });
+        // await LedgersModel.create({
+        //   ...ledger
+        // });
         // const selectedTrade = await TradesModel.findOne({ _id: trade._id }).populate('user_id', 'name').select({ buy_rate: 1, _id:0  });
         //  return selectedTrade;
         return {
@@ -846,7 +846,7 @@ const update = async (id, body) => {
       user_id: body?.user_id,
       broker_id: body?.broker_id,
       amount: body?.sell_rate,
-      brokerage: brokerage,
+      brokerage: brokerage + buybrokerage,
       type: body?.purchaseType ? body?.purchaseType : 'buy'
     };
 
