@@ -648,7 +648,6 @@ const update = async (id, body) => {
       console.log('broker');
       console.log('buybrokerage', buybrokerage);
       if (body?.segment == 'mcx') {
-        console.log(body?.lots ,'lots' , buyamount,'buyamount' , thisTrade?.lot_size,'lot-size');
         if (body.lots) {
           buyamount = body?.lots * buyamount * thisTrade?.lot_size;
         } else {
