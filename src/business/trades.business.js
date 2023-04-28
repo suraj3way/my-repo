@@ -846,7 +846,7 @@ const update = async (id, body) => {
     }
     else if (body?.status == 'pending') {
       // var mcx_scripts = body.script;
-      var mcx_scripts = ['COPPER_28APR2023'];
+      var mcx_scripts = [body?.script];
       var done_scripts = [];
       const socket = io('ws://5.22.221.190:8000', {
         transports: ['websocket']
