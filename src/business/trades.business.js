@@ -6,6 +6,7 @@ import AuthBusiness from '@/business/auth.business';
 import UserModel from '@/models/user.model';
 import { async } from '@babel/runtime/regenerator';
 import { isCancel } from 'apisauce';
+const ObjectId = require('mongodb').ObjectId;
 
 const io = require('socket.io-client');
 
@@ -1458,12 +1459,12 @@ const ClosedTrades = async (userId) => {
   });
   const Ledgers = await LedgersModel.find({ user_id: userId });
   const findbroker = Ledgers.map((trade) => trade.brokerage || 0);
-
   // Map over the trades and add the brokerage value from the findbroker array
-  data = data.map((trade, index) => {
+  data = data.map((trade) => {
+    const brokerage = Ledgers.filter(i=>new ObjectId(i.trade_id).equals(new ObjectId(trade._id))).length > 0 ? Ledgers.filter(i=>new ObjectId(i.trade_id).equals(new ObjectId(trade._id)))[0].brokerage : 0;
     return {
       ...trade.toObject(),
-      brokerage: findbroker[index]
+      brokerage
     };
   });
 
