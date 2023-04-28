@@ -834,19 +834,19 @@ const update = async (id, body) => {
 
       await AuthBusiness.updateFund(body?.user_id, remainingFund);
     }
-    // else if (body?.status == 'pending') {
-    //   const tradePending = TradesModel.findByIdAndUpdate(
-    //     id,
-    //     { ...body },
-    //     {
-    //       new: true
-    //     }
-    //   );
-    //   return tradePending;
-    // }
+    else if (body?.status == 'pending' && body.isCancel) {
+      const tradePending = TradesModel.findByIdAndUpdate(
+        id,
+        { ...body },
+        {
+          new: true
+        }
+      );
+      return tradePending;
+    }
     else if (body?.status == 'pending') {
-      var mcx_scripts = body.script;
-      // var mcx_scripts = ['COPPER_28APR2023'];
+      // var mcx_scripts = body.script;
+      var mcx_scripts = ['COPPER_28APR2023'];
       var done_scripts = [];
       const socket = io('ws://5.22.221.190:8000', {
         transports: ['websocket']
@@ -857,6 +857,7 @@ const update = async (id, body) => {
       }
 
       socket.on('stock', async (data) => {
+        console.log(data, 'bt met');
         if (data.ask <= body.buy_rate) {
           await TradesModel.findByIdAndUpdate(
             id,
