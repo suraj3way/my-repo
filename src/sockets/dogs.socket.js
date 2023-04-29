@@ -22,10 +22,11 @@ function joinRoom(data){
     }
   });
 
-  for (const script of mcx_scripts) {
-    socket_client.emit('join', script);
-  }
+  // for (const script of mcx_scripts) {
+  //   socket_client.emit('join', script);
+  // }
 
+  socket_client.emit('join', data);
   socket_client.on('stock', async (data) => {
     console.log(data, 'bt met');
     io.emit('stock', data)
@@ -42,9 +43,11 @@ function joinRoom(data){
     }
   });
 
-  for (const script of mcx_scripts) {
-    socket_client2.emit('join', script);
-  }
+  // for (const script of mcx_scripts) {
+  //   socket_client2.emit('join', script);
+  // }
+
+  socket_client2.emit('join', data);
 
   socket_client2.on('stock', async (data) => {
     console.log(data, 'bt met');
