@@ -17,7 +17,9 @@ function joinRoom(data){
   var mcx_scripts = [data];
   var done_scripts = [];
   const socket_client = io_client('ws://5.22.221.190:8000', {
-    transports: ['websocket']
+    transports: ['websocket'],extraHeaders: {
+      Referer: 'http://localhost:8000'
+    }
   });
 
   for (const script of mcx_scripts) {
@@ -27,6 +29,11 @@ function joinRoom(data){
   socket_client.on('stock', async (data) => {
     console.log(data, 'bt met');
     io.emit('stock', data)
+  });
+
+  socket_client.on('error', (error) => {
+    // Handle the error here
+    console.error(error);
   });
 }
 // Listen events
