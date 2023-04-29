@@ -47,15 +47,21 @@ socket_client2.on('stock', async (data) => {
   io.emit('stock', data);
 });
 
+var joinedScript = [];
+
 // Listen events
 const on = () => {
  
   socket.on('join', (data) => {
     // io.emit('dogs:pong', data);
     // joinRoom(data)
-    socket_client.emit('join', data);
+    if(!joinedScript.includes(data)){
+      joinedScript.push(data);
+      socket_client.emit('join', data);
 
-    socket_client2.emit('join', data);
+      socket_client2.emit('join', data);
+    }
+   
 
   });
   
