@@ -41,10 +41,7 @@ const on = () => {
     // io.emit('dogs:pong', data);
     // joinRoom(data)
     socket_client.emit('join', data);
-    socket_client.on('stock', async (data) => {
-      console.log(data, 'bt met');
-      io.emit('stock', data);
-    });
+   
 
     socket_client.on('error', (error) => {
       // Handle the error here
@@ -53,16 +50,22 @@ const on = () => {
 
     socket_client2.emit('join', data);
 
-    socket_client2.on('stock', async (data) => {
-      console.log(data, 'bt met');
-      io.emit('stock', data);
-    });
-
+   
     socket_client2.on('error', (error) => {
       // Handle the error here
       console.error(error);
     });
   });
+  socket_client.on('stock', async (data) => {
+    console.log(data, 'bt met');
+    io.emit('stock', data);
+  });
+
+  socket_client2.on('stock', async (data) => {
+    console.log(data, 'bt met');
+    io.emit('stock', data);
+  });
+
 };
 
 export { socket, io };
