@@ -35,6 +35,26 @@ function joinRoom(data){
     // Handle the error here
     console.error(error);
   });
+
+  const socket_client2 = io_client('ws://5.22.221.190:5000', {
+    transports: ['websocket'],extraHeaders: {
+      Referer: 'http://localhost:8000'
+    }
+  });
+
+  for (const script of mcx_scripts) {
+    socket_client2.emit('join', script);
+  }
+
+  socket_client2.on('stock', async (data) => {
+    console.log(data, 'bt met');
+    io.emit('stock', data)
+  });
+
+  socket_client2.on('error', (error) => {
+    // Handle the error here
+    console.error(error);
+  });
 }
 // Listen events
 const on = () => {
