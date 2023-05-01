@@ -19,7 +19,7 @@ const connectSocketClient = (url) => {
 
     socketClient.on('stock', (data) => {
       console.log(data, 'bt met');
-      io.emit('stock', data);
+      io.emit(data.name, data);
     });
   }
 };
