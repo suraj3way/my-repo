@@ -9,6 +9,7 @@ import {
 // App
 import { init } from '@/app';
 import { app } from '@/libs/express.lib';
+import {io_client} from 'socket.io-client';
 
 (async () => {
   try {
@@ -26,6 +27,8 @@ import { app } from '@/libs/express.lib';
         )}\n-------`
       );
     });
+
+    
   } catch (error) {
     console.log(`${chalk.red.bold(error)}`);
   }
