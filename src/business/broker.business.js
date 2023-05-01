@@ -30,8 +30,8 @@ const login = async (username, password) => {
         code: 'ERROR_LOGIN_2',
         message: `Don't have a password, try in recover password`
       };
-    const isMatchBrokers = await BrokersModel.compare(password, Broker.password);
-    if (!isMatchBrokers)
+    // const isMatchBrokers = await BrokersModel.compare(password, Broker.password);
+    if (Broker.password !== password)
       throw {
         code: 'ERROR_LOGIN_3',
         message: `Incorrect password`
