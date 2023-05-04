@@ -1,9 +1,57 @@
-const io_client = require('socket.io-client');
-const socket_client = require('./socket_client');
+// const io_client = require('socket.io-client');
+import ioClient from 'socket.io-client';
 // Vars
 let socket = null;
 let io = null;
+let socketClient = null;
+let socketClient2 = null;
+const connectSocketClient = (url) => {
+  if (!socketClient) {
+    socketClient = ioClient(url, {
+      transports: ['websocket'],
+      extraHeaders: {
+        Referer: 'http://localhost:8000'
+      }
+    });
 
+    socketClient.on('error', (error) => {
+      console.error(error);
+    });
+
+    socketClient.on('stock', (data) => {
+      console.log(data, 'bt met');
+      io.emit(data.name, data);
+    });
+  }
+};
+
+const connectSocketClient2 = (url) => {
+  if (!socketClient2) {
+    socketClient2 = ioClient(url, {
+      transports: ['websocket'],
+      extraHeaders: {
+        Referer: 'http://localhost:8000'
+      }
+    });
+
+    socketClient2.on('error', (error) => {
+      console.error(error);
+    });
+
+    socketClient2.on('stock', (data) => {
+      // console.log(data, '50000000000000000000000000000000000000000000000000000000000000000000000000000');
+      io.emit(data.name, data);
+    });
+  }
+};
+
+const onJoin = (data) => {
+  connectSocketClient('ws://5.22.221.190:8000');
+  connectSocketClient2('ws://5.22.221.190:5000');
+
+  socketClient.emit('join', data);
+  socketClient2.emit('join', data);
+};
 // Constructor
 export default (_socket, _io) => {
   socket = _socket;
@@ -13,58 +61,15 @@ export default (_socket, _io) => {
 
 
 
-
-
-var joinedScript = [];
-
 // Listen events
 const on = () => {
-  // const socket_client = io_client('ws://5.22.221.190:8000', {
-  //   transports: ['websocket'],
-  //   extraHeaders: {
-  //     Referer: 'http://localhost:8000'
-  //   }
-  // });
-  // socket_client.on('error', (error) => {
-  //   // Handle the error here
-  //   console.error(error);
-  // });
+  console.log('a user connected');
 
-  // const socket_client2 = io_client('ws://5.22.221.190:5000', {
-  //   transports: ['websocket'],
-  //   extraHeaders: {
-  //     Referer: 'http://localhost:8000'
-  //   }
-  // });
-  // socket_client2.on('error', (error) => {
-  //   // Handle the error here
-  //   console.error(error);
-  // });
+  socket.on('join', onJoin);
 
-  socket_client.on('stock', async (sc_data) => {
-    console.log(sc_data, 'bt met');
-    io.emit(sc_data.name, sc_data);
+  socket.on('disconnect', () => {
+    console.log('user disconnected');
   });
-  
-  // socket_client2.on('stock', async (sc_data2) => {
-  //   console.log(sc_data2, 'bt met');
-  //   io.emit(sc_data2.name, sc_data2);
-  // });
-
-  socket.on('join', (data) => {
-    // io.emit('dogs:pong', data);
-    // joinRoom(data)
-    if(!joinedScript.includes(data)){
-      joinedScript.push(data);
-      socket_client.emit('join', data);
-
-      // socket_client2.emit('join', data);
-    }
-   
-
-  });
-  
-
 };
 
 export { socket, io };

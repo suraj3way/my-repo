@@ -1,19 +1,38 @@
-// In the main file of your Node.js application
-const io_client = require('socket.io-client');
+// import ioClient from 'socket.io-client';
 
-const socket_client = io_client('ws://5.22.221.190:8000', {
-  transports: ['websocket'],
-  extraHeaders: {
-    Referer: 'http://localhost:8000'
-  }
-});
+// let socketClient = null;
+// let io = null;
 
-socket_client.once('connect', () => {
-  console.log('Socket client connected!');
-});
+// const connectSocketClient = (url) => {
+//   if (!socketClient) {
+//     socketClient = ioClient(url, {
+//       transports: ['websocket'],
+//       extraHeaders: {
+//         Referer: 'http://localhost:8000'
+//       }
+//     });
 
-socket_client.once('connect_error', (error) => {
-  console.error('Socket client connection error:', error);
-});
+//     socketClient.on('error', (error) => {
+//       console.error(error);
+//     });
 
-module.exports = socket_client;
+//     socketClient.on('stock', (data) => {
+//       console.log(data, 'bt met');
+//       io.emit('stock', data);
+//     });
+//   }
+// };
+
+// const onJoin = (data) => {
+//   connectSocketClient('ws://5.22.221.190:8000');
+//   connectSocketClient('ws://5.22.221.190:5000');
+
+//   socketClient.emit('join', data);
+// };
+
+// export default (_io) => {
+//   io = _io;
+//   io.on('connection', (socket) => {
+//     socket.on('join', onJoin);
+//   });
+// };
