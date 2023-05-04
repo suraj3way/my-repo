@@ -337,10 +337,8 @@ const getAllLogged = async (user_id) => {
 
 function getBrokarage(total, BrokeragePerCrore) {
   var broker_per = parseInt(BrokeragePerCrore) / 100000;
-  console.log(broker_per, total, '----------- total --------- broker_per');
   var amaount = (total * broker_per) / 100;
-  console.log(amaount, 'amaount');
-  console.log(total, 'total');
+
   // console.log(lot_size,'lot_size');
   return amaount;
 }
@@ -419,9 +417,7 @@ const create = async (body, res) => {
       user?.funds,
       total_traded_amaount
     );
-    console.log('349 --------- ', user?.funds, total_traded_amaount);
     var all_active_trades = await getActivetrades(body?.user_id);
-    console.log('active trades', all_active_trades);
 
     if (current_percentage_funds) {
       var brokerage = 0;
@@ -452,9 +448,18 @@ const create = async (body, res) => {
 
       var intradayMCXmarging = 0;
       if (body?.segment == 'mcx' && amount) {
+        console.log(body.lots, 'body.lots');
         if (body.lots) {
           intradayMCXmarging =
             (amount * body.lot_size) / user.intradayExposureMarginMCX;
+          console.log(
+            amount,
+            'amount',
+            body.lot_size,
+            'body.lot_size',
+            'user.intradayExposureMarginMCX',
+            user.intradayExposureMarginMCX
+          );
         } else {
           intradayMCXmarging =
             (amount * body.units) / user.intradayExposureMarginMCX;
@@ -468,9 +473,9 @@ const create = async (body, res) => {
             (amount * body.units) / user.intradayExposureMarginMCX;
         }
       }
-
+      console.log(user?.funds, 'user?.funds');
       var availbleIntradaymargingMCX = user?.funds - intradayMCXmarging;
-      console.log(availbleIntradaymargingMCX, 'suraj1');
+      console.log(availbleIntradaymargingMCX, 'availbleIntradaymargingMCX');
       if (availbleIntradaymargingMCX < 0) {
         return { message: 'intradayMCXmarging not availble' };
       }
@@ -493,7 +498,6 @@ const create = async (body, res) => {
         } else if (body.units) {
           intradayEQmarging =
             (amount * body.units) / user.intradayExposureMarginEQ;
-          console.log(intradayEQmarging, 'intradayEQmarging');
         }
       }
       all_active_trades.forEach((body) => {
@@ -544,7 +548,6 @@ const create = async (body, res) => {
         }
       });
       var availbleIntradaymargingEQ = user?.funds - intradayEQmarging;
-      console.log(availbleIntradaymargingEQ, 'availbleIntradaymargingEQ');
       if (availbleIntradaymargingEQ < 0) {
         return { message: 'intradayEQmarging not availble' };
       }
@@ -563,12 +566,11 @@ const create = async (body, res) => {
       //   }
       // }
 
-      availbleIntradaymargingMCX = user?.funds - intradayMCXmarging;
-      // console.log(availbleIntradaymargingMCX, 'suraj1');
-      if (availbleIntradaymargingMCX < 0) {
-        return { message: 'intradayMCXmarging not availble' };
-      }
-      console.log(intradayMCXmarging, 'suraj1');
+      // availbleIntradaymargingMCX = user?.funds - intradayMCXmarging;
+      // // console.log(availbleIntradaymargingMCX, 'suraj1');
+      // if (availbleIntradaymargingMCX < 0) {
+      //   return { message: 'intradayMCXmarging not availble' };
+      // }
 
       // var intradayEQmarging = 0;
       // if (body?.segment == 'eq' && body.buy_rate) {
@@ -652,8 +654,7 @@ const create = async (body, res) => {
       // }
       // console.log(availbleholdingmargingEQ, 'suraj1234');
       // console.log(holdingEQmarging, 'suraj1234');
-      console.log(amount, 'amount');
-      if (user?.funds && user?.funds > amount) {
+      if (user?.funds > 0) {
         if (body?.isDirect) {
           body.status = 'active';
         }
@@ -833,8 +834,7 @@ const update = async (id, body) => {
         user.funds + Amount - parseFloat(brokerage + buybrokerage);
 
       await AuthBusiness.updateFund(body?.user_id, remainingFund);
-    }
-    else if (body?.status == 'pending' && body.isCancel) {
+    } else if (body?.status == 'pending' && body.isCancel) {
       const tradePending = TradesModel.findByIdAndUpdate(
         id,
         { ...body },
@@ -843,8 +843,7 @@ const update = async (id, body) => {
         }
       );
       return tradePending;
-    }
-    else if (body?.status == 'pending') {
+    } else if (body?.status == 'pending') {
       // var mcx_scripts = body.script;
       var mcx_scripts = [body?.script];
       var done_scripts = [];
@@ -905,7 +904,7 @@ const update = async (id, body) => {
         brokerage = brokerage + getBrokarage(amount, user?.EQBrokragePerCrore);
       }
     }
-    // console.log(intradayMCXmarging,'intradayMCXmarging');
+
     var availbleIntradaymargingMCX = user?.funds - intradayMCXmarging;
     // console.log(availbleIntradaymargingMCX, 'suraj1');
     if (availbleIntradaymargingMCX < 0) {
@@ -995,7 +994,6 @@ const update = async (id, body) => {
         }
 
         availbleIntradaymargingMCX = user?.funds - intradayMCXmarging;
-        console.log(availbleIntradaymargingMCX, 'suraj1');
         if (availbleIntradaymargingMCX < 0) {
           return { message: 'intradayMCXmarging not availble' };
         }
@@ -1575,20 +1573,17 @@ const ActiveTradesbyuser = async () => {
 
 const getAllbroker = async (broker_id) => {
   // Database query
-    return await TradesModel.find({broker_id:broker_id});
+  return await TradesModel.find({ broker_id: broker_id });
 };
-
 
 const findUserByBroker = async (broker_id) => {
   // Database query
-    let data = await TradesModel.find({broker_id:broker_id});
-    const allbroker = data.map((trade) => trade.user_id);
-    let userdata = await UserModel.find({_id:allbroker})
-    
-    return userdata
+  let data = await TradesModel.find({ broker_id: broker_id });
+  const allbroker = data.map((trade) => trade.user_id);
+  let userdata = await UserModel.find({ _id: allbroker });
+
+  return userdata;
 };
-
-
 
 export default {
   getAll,
