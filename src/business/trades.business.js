@@ -1684,6 +1684,78 @@ const findUserByBroker = async (broker_id) => {
   return userdata;
 };
 
+
+const ActiveTradesByBroker = async (userId,broker_id) => {
+  let data = await TradesModel.find({ user_id: userId,broker_id:broker_id, status: 'active' });
+
+  return data;
+};
+
+
+const   ClosedTradesByBroker = async (userId,broker_id) => {
+  const today = new Date();
+
+  const startOfWeek = new Date(
+    today.setDate(today.getDate() - ((today.getDay() - 1) % 7) - 1)
+  );
+  const endOfWeek = new Date(
+    today.setDate(today.getDate() - ((today.getDay() - 5) % 7))
+  );
+
+  let data = await TradesModel.find({
+    user_id: userId,
+    broker_id:broker_id,
+    status: 'closed',
+    createdAt: { $gte: startOfWeek, $lte: endOfWeek }
+  });
+  const Ledgers = await LedgersModel.find({ user_id: userId });
+  const findbroker = Ledgers.map((trade) => trade.brokerage || 0);
+  // Map over the trades and add the brokerage value from the findbroker array
+  data = data.map((trade) => {
+    const brokerage =
+      Ledgers.filter((i) =>
+        new ObjectId(i.trade_id).equals(new ObjectId(trade._id))
+      ).length > 0
+        ? Ledgers.filter((i) =>
+            new ObjectId(i.trade_id).equals(new ObjectId(trade._id))
+          )[0].brokerage
+        : 0;
+    return {
+      ...trade.toObject(),
+      brokerage
+    };
+  });
+
+  return data;
+};
+
+
+
+const MCXpendingTradesByBroker = async (userId,broker_id) => {
+  let data = await TradesModel.find({
+    user_id: userId,
+    broker_id:broker_id,
+    status: 'pending',
+    segment: 'mcx'
+  });
+
+  return data;
+};
+
+const EQpendingTradesBYBroker = async (userId,broker_id) => {
+  let data = await TradesModel.find({
+    user_id: userId,
+    broker_id:broker_id,
+    status: 'pending',
+    segment: 'eq'
+  });
+
+  return data;
+};
+
+
+
+
 export default {
   getAll,
   getAllLogged,
@@ -1712,5 +1784,9 @@ export default {
   testTrade,
   ActiveTradesbyuser,
   getAllbroker,
-  findUserByBroker
+  findUserByBroker,
+  ActiveTradesByBroker,
+  ClosedTradesByBroker,
+  MCXpendingTradesByBroker,
+  EQpendingTradesBYBroker
 };
