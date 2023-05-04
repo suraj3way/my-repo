@@ -604,6 +604,128 @@ const findUserByBroker = async (req, res) => {
 };
 
 
+const ActiveTradesByBroker = async (req, res) => {
+  try {
+    const broker_id = req.user.id;
+
+    if (validator.isEmpty(broker_id)) {
+      throw {
+        code: 'ERROR_AUTH_3',
+        message: 'The broker id cannot be empty'
+      };
+    }
+
+    if (!validator.isMongoId(broker_id)) {
+      throw {
+        code: 'ERROR_AUTH_4',
+        message: 'Invalid auth broker id...'
+      };
+    }
+
+    if (broker_id) {
+      let data = await TradesBusiness.ActiveTradesByBroker(req.params.id,broker_id);
+      return data ? success(res, data) : unauthorized(res);
+    } else {
+      return unauthorized(res);
+    }
+  } catch (err) {
+    error(res, err);
+  }
+};
+
+
+const ClosedTradesByBroker = async (req, res) => {
+  try {
+    const broker_id = req.user.id;
+
+    if (validator.isEmpty(broker_id)) {
+      throw {
+        code: 'ERROR_AUTH_3',
+        message: 'The broker id cannot be empty'
+      };
+    }
+
+    if (!validator.isMongoId(broker_id)) {
+      throw {
+        code: 'ERROR_AUTH_4',
+        message: 'Invalid auth broker id...'
+      };
+    }
+
+    if (broker_id) {
+      let data = await TradesBusiness.ClosedTradesByBroker(req.params.id,broker_id);
+      return data ? success(res, data) : unauthorized(res);
+    } else {
+      return unauthorized(res);
+    }
+  } catch (err) {
+    error(res, err);
+  }
+};
+
+
+const MCXpendingTradesByBroker = async (req, res) => {
+  try {
+    const broker_id = req.user.id;
+
+    if (validator.isEmpty(broker_id)) {
+      throw {
+        code: 'ERROR_AUTH_3',
+        message: 'The broker id cannot be empty'
+      };
+    }
+
+    if (!validator.isMongoId(broker_id)) {
+      throw {
+        code: 'ERROR_AUTH_4',
+        message: 'Invalid auth broker id...'
+      };
+    }
+
+    if (broker_id) {
+      let data = await TradesBusiness.MCXpendingTradesByBroker(req.params.id,broker_id);
+      return data ? success(res, data) : unauthorized(res);
+    } else {
+      return unauthorized(res);
+    }
+  } catch (err) {
+    error(res, err);
+  }
+};
+
+
+
+const EQpendingTradesBYBroker = async (req, res) => {
+  try {
+    const broker_id = req.user.id;
+
+    if (validator.isEmpty(broker_id)) {
+      throw {
+        code: 'ERROR_AUTH_3',
+        message: 'The broker id cannot be empty'
+      };
+    }
+
+    if (!validator.isMongoId(broker_id)) {
+      throw {
+        code: 'ERROR_AUTH_4',
+        message: 'Invalid auth broker id...'
+      };
+    }
+
+    if (broker_id) {
+      let data = await TradesBusiness.EQpendingTradesBYBroker(req.params.id,broker_id);
+      return data ? success(res, data) : unauthorized(res);
+    } else {
+      return unauthorized(res);
+    }
+  } catch (err) {
+    error(res, err);
+  }
+};
+
+
+
 
 
 export default {
@@ -634,5 +756,9 @@ export default {
   testTrade,
   ActiveTradesbyuser,
   getAllbroker,
-  findUserByBroker
+  findUserByBroker,
+  ActiveTradesByBroker,
+  ClosedTradesByBroker,
+  MCXpendingTradesByBroker,
+  EQpendingTradesBYBroker
 };
