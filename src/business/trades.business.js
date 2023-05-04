@@ -448,10 +448,15 @@ const create = async (body, res) => {
         }
         brokerage = getBrokarage(amount, user?.mcxBrokeragePerCrore);
       } else if (body?.segment == 'eq') {
-        if (body.lots) {
+        
+        if (user?.equityTradeType == 'lots' && body.lots) {
           amount = body?.lots * amount;
-        } else if (body.units) {
+        } else if (user?.equityTradeType == 'units' && body.units) {
           amount = body?.units * amount;
+        }else {
+          return {
+            message: 'Lots or Units must not be empty'
+          };
         }
         brokerage = getBrokarage(amount, user?.EQBrokragePerCrore);
       } else {
@@ -466,18 +471,20 @@ const create = async (body, res) => {
         if (body.lots) {
           intradayMCXmarging =
             (amount * body.lot_size) / user.intradayExposureMarginMCX;
-        } else {
-          intradayMCXmarging =
-            (amount * body.units) / user.intradayExposureMarginMCX;
-        }
+        } 
+        // else {
+        //   intradayMCXmarging =
+        //     (amount * body.units) / user.intradayExposureMarginMCX;
+        // }
       } else if (body?.segment == 'mcx' && body.sell_rate) {
         if (body.lots) {
           intradayMCXmarging =
             (amount * body.lot_size) / user.intradayExposureMarginMCX;
-        } else if (body.units) {
-          intradayMCXmarging =
-            (amount * body.units) / user.intradayExposureMarginMCX;
-        }
+        } 
+        // else if (body.units) {
+        //   intradayMCXmarging =
+        //     (amount * body.units) / user.intradayExposureMarginMCX;
+        // }
       }
 
       var availbleIntradaymargingMCX = user?.funds - intradayMCXmarging;
@@ -733,31 +740,78 @@ const update = async (id, body) => {
       if (body?.buy_rate && body?.sell_rate) {
         if (thisTrade?.purchaseType == 'sell') {
           if (body?.sell_rate > body?.buy_rate) {
-            body.profit =
+            if(user?.equityTradeType == 'lots'){
+              body.profit =
               (body?.sell_rate - body?.buy_rate) *
               body?.lots *
               thisTrade.lot_size;
+            } else if(user?.equityTradeType == 'units'){
+              body.profit =
+              (body?.sell_rate - body?.buy_rate) *
+              body?.units;
+            }else{
+              return {
+                message: 'Equity Trade Type (Unit or Lots) is not added to your account, please contact admin.'
+              };
+            }
+            
             isProfit = true;
           }
           if (body?.sell_rate < body?.buy_rate) {
-            body.loss =
-              (body?.buy_rate - body?.sell_rate) *
-              body?.lots *
-              thisTrade.lot_size;
+           
+
+              if(user?.equityTradeType == 'lots'){
+                body.loss =
+                (body?.buy_rate - body?.sell_rate) *
+                body?.lots *
+                thisTrade.lot_size;
+              } else if(user?.equityTradeType == 'units'){
+                body.loss =
+                (body?.buy_rate - body?.sell_rate) *
+                body?.units;
+              }else{
+                return {
+                  message: 'Equity Trade Type (Unit or Lots) is not added to your account, please contact admin.'
+                };
+              }
           }
         } else {
           if (body?.sell_rate > body?.buy_rate) {
-            body.profit =
-              (body?.sell_rate - body?.buy_rate) *
-              body?.lots *
-              thisTrade.lot_size;
+            
+
+              if(user?.equityTradeType == 'lots'){
+                body.profit =
+                (body?.sell_rate - body?.buy_rate) *
+                body?.lots *
+                thisTrade.lot_size;
+              } else if(user?.equityTradeType == 'units'){
+                body.profit =
+                (body?.sell_rate - body?.buy_rate) *
+                body?.units;
+              }else{
+                return {
+                  message: 'Equity Trade Type (Unit or Lots) is not added to your account, please contact admin.'
+                };
+              }
             isProfit = true;
           }
           if (body?.sell_rate < body?.buy_rate) {
-            body.loss =
+           
+
+              if(user?.equityTradeType == 'lots'){
+                body.loss =
               (body?.buy_rate - body?.sell_rate) *
               body?.lots *
               thisTrade.lot_size;
+              } else if(user?.equityTradeType == 'units'){
+                body.loss =
+                (body?.buy_rate - body?.sell_rate) *
+                body?.units;
+              }else{
+                return {
+                  message: 'Equity Trade Type (Unit or Lots) is not added to your account, please contact admin.'
+                };
+              }
           }
         }
       }
@@ -788,9 +842,10 @@ const update = async (id, body) => {
           buybrokerage + getBrokarage(buyamount, user?.mcxBrokeragePerCrore);
       }
       if (body?.segment == 'eq') {
-        if (body.lots) {
+        
+        if (user?.equityTradeType == 'lots' && body.lots) {
           buyamount = body?.lots * buyamount;
-        } else if (body.units) {
+        } else if (user?.equityTradeType == 'units' && body.units) {
           buyamount = body?.units * buyamount;
         }
         buybrokerage =
@@ -818,9 +873,9 @@ const update = async (id, body) => {
           brokerage + getBrokarage(amount, user?.mcxBrokeragePerCrore);
       }
       if (body?.segment == 'eq') {
-        if (body.lots) {
+        if (user?.equityTradeType == 'lots' && body.lots) {
           amount = body?.lots * amount * thisTrade?.lot_size;
-        } else if (body.units) {
+        } else if (user?.equityTradeType == 'units' && body.units) {
           amount = body?.units * amount;
         }
         brokerage = brokerage + getBrokarage(amount, user?.EQBrokragePerCrore);
@@ -906,9 +961,9 @@ const update = async (id, body) => {
           brokerage + getBrokarage(amount, user?.mcxBrokeragePerCrore);
       }
       if (body?.segment == 'eq') {
-        if (body.lots) {
+        if (user?.equityTradeType == 'lots' && body.lots) {
           amount = body?.lots * amount;
-        } else if (body.units) {
+        } else if (user?.equityTradeType == 'units' && body.units) {
           amount = body?.units * amount;
         }
         brokerage = brokerage + getBrokarage(amount, user?.EQBrokragePerCrore);
@@ -971,9 +1026,9 @@ const update = async (id, body) => {
           }
           brokerage = getBrokarage(amount, user?.mcxBrokeragePerCrore);
         } else if (body?.segment == 'eq') {
-          if (body.lots) {
+          if (user?.equityTradeType == 'lots' && body.lots) {
             amount = body?.lots * amount;
-          } else if (body.units) {
+          } else if (user?.equityTradeType == 'units' && body.units) {
             amount = body?.units * amount;
           }
           brokerage = getBrokarage(amount, user?.EQBrokragePerCrore);
@@ -1012,7 +1067,7 @@ const update = async (id, body) => {
 
         var intradayEQmarging = 0;
         if (body?.segment == 'eq' && amount) {
-          if (body.lots) {
+          if (user?.equityTradeType == 'lots' && body.lots) {
             intradayEQmarging =
               (amount * thisTrade.lot_size) / user.intradayExposureMarginEQ;
           } else {
@@ -1020,10 +1075,10 @@ const update = async (id, body) => {
               (amount * body.units) / user.intradayExposureMarginEQ;
           }
         } else if (body?.segment == 'eq' && body.sell_rate) {
-          if (body.lots) {
+          if (user?.equityTradeType == 'lots' && body.lots) {
             intradayEQmarging =
               (amount * thisTrade.lot_size) / user.intradayExposureMarginEQ;
-          } else if (body.units) {
+          } else if (user?.equityTradeType == 'units' && body.units) {
             intradayEQmarging =
               (amount * body.units) / user.intradayExposureMarginEQ;
           }
@@ -1152,6 +1207,7 @@ async function clossTodaysTrades(data) {
   // console.log("active trades",active_trades)
   var amount = 0;
   var isProfit = false;
+  var user = await AuthBusiness.me(body?.user_id);
   for (var body of active_trades) {
     amount = body?.purchaseType == 'buy' ? body?.buy_rate : body?.sell_rate;
     var holdingMCXmarging = 0;
@@ -1182,13 +1238,13 @@ async function clossTodaysTrades(data) {
 
     var holdingEQmarging = 0;
     if (body?.segment == 'eq' && amount) {
-      if (body.lots) {
+      if (user?.equityTradeType == 'lots' && body.lots) {
         holdingEQmarging = (amount * body.lots) / user.holdingExposureMarginEQ;
       } else {
         holdingEQmarging = (amount * body.units) / user.holdingExposureMarginEQ;
       }
     } else if (body?.segment == 'eq' && body.sell_rate) {
-      if (body.lots) {
+      if (user?.equityTradeType == 'lots' && body.lots) {
         holdingEQmarging = (amount * body.lots) / user.holdingExposureMarginEQ;
       } else if (body.units) {
         holdingEQmarging = (amount * body.units) / user.holdingExposureMarginEQ;
@@ -1204,7 +1260,7 @@ async function clossTodaysTrades(data) {
     if (availableHoldingMargin < 0) {
       // return { message: 'holdingEQmarging not availble' };
       body.status = 'closed';
-      var user = await AuthBusiness.me(body?.user_id);
+     
       if (body?.purchaseType == 'buy') {
         body.sell_rate = data.bid;
       } else if (body?.purchaseType == 'sell') {
@@ -1217,23 +1273,62 @@ async function clossTodaysTrades(data) {
       if (body?.buy_rate && body?.sell_rate) {
         if (body?.purchaseType == 'sell') {
           if (body?.sell_rate > body?.buy_rate) {
-            body.profit =
-              (body?.sell_rate - body?.buy_rate) * body?.lots * body.lot_size;
+              if(user?.equityTradeType == 'lots'){
+                body.profit =
+                (body?.sell_rate - body?.buy_rate) * body?.lots * body.lot_size;
+              } else if(user?.equityTradeType == 'units'){
+                body.profit =
+                (body?.sell_rate - body?.buy_rate) * body?.units;
+              }else{
+                return {
+                  message: 'Equity Trade Type (Unit or Lots) is not added to your account, please contact admin.'
+                };
+              }
             isProfit = true;
           }
           if (body?.sell_rate < body?.buy_rate) {
-            body.loss =
+           
+              if(user?.equityTradeType == 'lots'){
+                body.loss =
               (body?.buy_rate - body?.sell_rate) * body?.lots * body.lot_size;
+              } else if(user?.equityTradeType == 'units'){
+                body.loss =
+              (body?.buy_rate - body?.sell_rate) * body?.units;
+              }else{
+                return {
+                  message: 'Equity Trade Type (Unit or Lots) is not added to your account, please contact admin.'
+                };
+              }
           }
         } else {
           if (body?.sell_rate > body?.buy_rate) {
-            body.profit =
-              (body?.sell_rate - body?.buy_rate) * body?.lots * body.lot_size;
+           
+              if(user?.equityTradeType == 'lots'){
+                body.profit =
+                (body?.sell_rate - body?.buy_rate) * body?.lots * body.lot_size;
+              } else if(user?.equityTradeType == 'units'){
+                body.profit =
+              (body?.sell_rate - body?.buy_rate) * body?.units;
+              }else{
+                return {
+                  message: 'Equity Trade Type (Unit or Lots) is not added to your account, please contact admin.'
+                };
+              }
             isProfit = true;
           }
           if (body?.sell_rate < body?.buy_rate) {
-            body.loss =
+           
+              if(user?.equityTradeType == 'lots'){
+                body.loss =
               (body?.buy_rate - body?.sell_rate) * body?.lots * body.lot_size;
+              } else if(user?.equityTradeType == 'units'){
+                body.loss =
+              (body?.buy_rate - body?.sell_rate) * body?.units;
+              }else{
+                return {
+                  message: 'Equity Trade Type (Unit or Lots) is not added to your account, please contact admin.'
+                };
+              }
           }
         }
       }
@@ -1262,7 +1357,7 @@ async function clossTodaysTrades(data) {
           brokerage + getBrokarage(amount, user?.mcxBrokeragePerCrore);
       }
       if (body?.segment == 'eq') {
-        if (body.lots) {
+        if (user?.equityTradeType == 'lots' && body.lots) {
           amount = body?.lots * amount;
         } else if (body.units) {
           amount = body?.units * amount;
@@ -1303,31 +1398,31 @@ async function clossTodaysTrades(data) {
 
 const testTrade = async () => {
   // var active_trades = await TradesModel.find({ status: 'active' });
-  const canclePendingTrades = await TradesModel.updateMany(
-    { status: 'pending' },
-    { isCancel: true }
-  );
-  var id;
-  var mcx_scripts = ['AARTIIND_27APR2023'];
-  var done_scripts = [];
-  const socket = io('ws://5.22.221.190:5000', {
-    transports: ['websocket']
-  });
-  for (const script of mcx_scripts) {
-    socket.emit('join', script);
-  }
-  socket.on('stock', (data) => {
-    // console.log("data 173---------- ", data);
-    // console.log(done_scripts,data?.name)
-    if (!done_scripts.includes(data?.name)) {
-      clossTodaysTrades(data);
-      // console.log("data 174---------- ", data);
-      done_scripts.push(data?.name);
-    } else {
-      socket.off('join', data?.name);
-    }
-  });
-};
+//   const canclePendingTrades = await TradesModel.updateMany(
+//     { status: 'pending' },
+//     { isCancel: true }
+//   );
+//   var id;
+//   var mcx_scripts = ['AARTIIND_27APR2023'];
+//   var done_scripts = [];
+//   const socket = io('ws://5.22.221.190:5000', {
+//     transports: ['websocket']
+//   });
+//   for (const script of mcx_scripts) {
+//     socket.emit('join', script);
+//   }
+//   socket.on('stock', (data) => {
+//     // console.log("data 173---------- ", data);
+//     // console.log(done_scripts,data?.name)
+//     if (!done_scripts.includes(data?.name)) {
+//       clossTodaysTrades(data);
+//       // console.log("data 174---------- ", data);
+//       done_scripts.push(data?.name);
+//     } else {
+//       socket.off('join', data?.name);
+//     }
+//   });
+// };
 // for (const body of active_trades) {
 // console.log(body);
 
@@ -1386,6 +1481,7 @@ const testTrade = async () => {
 //     brokerage: brokerage,
 //     type: body?.purchaseType ? body?.purchaseType : 'buy'
 //   };
+}
 
 const ledgerbalance = async (brokerageId) => {
   let data = await LedgersModel.find({ broker_id: brokerageId });
