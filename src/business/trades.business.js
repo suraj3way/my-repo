@@ -265,7 +265,18 @@ const getAllLedgers = async () => {
 
 const getAllByStatus = async (status) => {
   // Database query
-  const data = await TradesModel.find({ status });
+  const today = new Date();
+
+  const startOfWeek = new Date(
+    today.setDate(today.getDate() - ((today.getDay() - 1) % 7) - 1)
+  );
+  const endOfWeek = new Date(
+    today.setDate(today.getDate() - ((today.getDay() - 5) % 7))
+  );
+  const data = await TradesModel.find({
+    status,
+    createdAt: { $gte: startOfWeek, $lte: endOfWeek }
+  });
 
   // Extract trade IDs and user IDs from the trade information
   const tradeIds = data.map((trade) => trade._id);
@@ -833,8 +844,7 @@ const update = async (id, body) => {
         user.funds + Amount - parseFloat(brokerage + buybrokerage);
 
       await AuthBusiness.updateFund(body?.user_id, remainingFund);
-    }
-    else if (body?.status == 'pending' && body.isCancel) {
+    } else if (body?.status == 'pending' && body.isCancel) {
       const tradePending = TradesModel.findByIdAndUpdate(
         id,
         { ...body },
@@ -843,8 +853,7 @@ const update = async (id, body) => {
         }
       );
       return tradePending;
-    }
-    else if (body?.status == 'pending') {
+    } else if (body?.status == 'pending') {
       // var mcx_scripts = body.script;
       var mcx_scripts = [body?.script];
       var done_scripts = [];
@@ -1575,20 +1584,17 @@ const ActiveTradesbyuser = async () => {
 
 const getAllbroker = async (broker_id) => {
   // Database query
-    return await TradesModel.find({broker_id:broker_id});
+  return await TradesModel.find({ broker_id: broker_id });
 };
-
 
 const findUserByBroker = async (broker_id) => {
   // Database query
-    let data = await TradesModel.find({broker_id:broker_id});
-    const allbroker = data.map((trade) => trade.user_id);
-    let userdata = await UserModel.find({_id:allbroker})
-    
-    return userdata
+  let data = await TradesModel.find({ broker_id: broker_id });
+  const allbroker = data.map((trade) => trade.user_id);
+  let userdata = await UserModel.find({ _id: allbroker });
+
+  return userdata;
 };
-
-
 
 export default {
   getAll,
