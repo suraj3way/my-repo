@@ -546,6 +546,65 @@ const ActiveTradesbyuser = async (req, res) => {
   }
 };
 
+const getAllbroker = async (req, res) => {
+  try {
+    const broker_id = req.user.id;
+    if (validator.isEmpty(broker_id)) {
+      throw {
+        code: 'ERROR_AUTH_3',
+        message: 'The broker id cannot be empty'
+      };
+    }
+
+    if (!validator.isMongoId(broker_id)) {
+      throw {
+        code: 'ERROR_AUTH_4',
+        message: 'Invalid auth broker id...'
+      };
+    }
+
+    if (broker_id) {
+      let data = await TradesBusiness.getAllbroker(broker_id);
+      return data ? success(res, data) : unauthorized(res);
+    } else {
+      return unauthorized(res);
+    }
+  } catch (err) {
+    error(res, err);
+  }
+};
+
+
+const findUserByBroker = async (req, res) => {
+  try {
+    const broker_id = req.user.id;
+    if (validator.isEmpty(broker_id)) {
+      throw {
+        code: 'ERROR_AUTH_3',
+        message: 'The broker id cannot be empty'
+      };
+    }
+
+    if (!validator.isMongoId(broker_id)) {
+      throw {
+        code: 'ERROR_AUTH_4',
+        message: 'Invalid auth broker id...'
+      };
+    }
+
+    if (broker_id) {
+      let data = await TradesBusiness.findUserByBroker(broker_id);
+      return data ? success(res, data) : unauthorized(res);
+    } else {
+      return unauthorized(res);
+    }
+  } catch (err) {
+    error(res, err);
+  }
+};
+
+
+
 
 export default {
   getAll,
@@ -573,5 +632,7 @@ export default {
   weeklyfinduser,
   getTradesByUser,
   testTrade,
-  ActiveTradesbyuser
+  ActiveTradesbyuser,
+  getAllbroker,
+  findUserByBroker
 };

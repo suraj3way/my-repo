@@ -8,6 +8,10 @@ const tradesSchema = new Schema({
       ref: 'User',
       required: true
     },
+    broker_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Broker'
+    },
     script: {
       type: String,
       required: true

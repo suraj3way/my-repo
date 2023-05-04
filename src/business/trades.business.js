@@ -1573,6 +1573,23 @@ const ActiveTradesbyuser = async () => {
   return newdata;
 };
 
+const getAllbroker = async (broker_id) => {
+  // Database query
+    return await TradesModel.find({broker_id:broker_id});
+};
+
+
+const findUserByBroker = async (broker_id) => {
+  // Database query
+    let data = await TradesModel.find({broker_id:broker_id});
+    const allbroker = data.map((trade) => trade.user_id);
+    let userdata = await UserModel.find({_id:allbroker})
+    
+    return userdata
+};
+
+
+
 export default {
   getAll,
   getAllLogged,
@@ -1599,5 +1616,7 @@ export default {
   weeklyfinduser,
   getUserTrades,
   testTrade,
-  ActiveTradesbyuser
+  ActiveTradesbyuser,
+  getAllbroker,
+  findUserByBroker
 };
