@@ -138,6 +138,7 @@ const getAllLogged = async (req, res) => {
   try {
     // Get current user id from session
     const user_id = req.user.id;
+    console.log(req.user);
     // Validate data format
     if (!validator.isMongoId(user_id)) {
       throw {

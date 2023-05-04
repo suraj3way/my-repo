@@ -5,8 +5,6 @@ import { success, error, unauthorized } from '@/utils/helper.util';
 import validator from 'validator';
 import { session } from '@/utils/auth.util';
 
-
-
 /**
  * login
  *
@@ -42,8 +40,6 @@ const login = async (req, res) => {
     error(res, err);
   }
 };
-
-
 
 const getAll = async (req, res) => {
   try {
@@ -156,7 +152,6 @@ const updateBroker = async (req, res) => {
   }
 };
 
-
 const buybroker = async (req, res) => {
   try {
     const broker_id = req.user.id;
@@ -185,8 +180,6 @@ const buybroker = async (req, res) => {
     error(res, err);
   }
 };
-
-
 
 const sellbroker = async (req, res) => {
   try {
@@ -218,8 +211,6 @@ const sellbroker = async (req, res) => {
   }
 };
 
-
-
 const totalbroker = async (req, res) => {
   try {
     const broker_id = req.user.id;
@@ -250,8 +241,6 @@ const totalbroker = async (req, res) => {
   }
 };
 
-
-
 const activebroker = async (req, res) => {
   try {
     const broker_id = req.user.id;
@@ -280,9 +269,6 @@ const activebroker = async (req, res) => {
     error(res, err);
   }
 };
-
-
-
 
 const profitlossbroker = async (req, res) => {
   try {
@@ -313,9 +299,6 @@ const profitlossbroker = async (req, res) => {
   }
 };
 
-
-
-
 const activebuybroker = async (req, res) => {
   try {
     const broker_id = req.user.id;
@@ -344,9 +327,6 @@ const activebuybroker = async (req, res) => {
     error(res, err);
   }
 };
-
-
-
 
 const activesellbroker = async (req, res) => {
   try {
@@ -377,8 +357,6 @@ const activesellbroker = async (req, res) => {
   }
 };
 
-
-
 const Brokerage = async (req, res) => {
   try {
     const broker_id = req.user.id;
@@ -407,8 +385,6 @@ const Brokerage = async (req, res) => {
     error(res, err);
   }
 };
-
-
 
 const getbrokerageByStatus = async (req, res) => {
   try {
@@ -443,8 +419,21 @@ const getbrokerageByStatus = async (req, res) => {
   }
 };
 
-
-
-
-
-export default { getAll, getAllLogged, createBroker, updateBroker, getAllByStatus, getTradeByStatus, login, buybroker, sellbroker, totalbroker, activebroker, profitlossbroker, activebuybroker, activesellbroker, Brokerage, getbrokerageByStatus };
+export default {
+  getAll,
+  getAllLogged,
+  createBroker,
+  updateBroker,
+  getAllByStatus,
+  getTradeByStatus,
+  login,
+  buybroker,
+  sellbroker,
+  totalbroker,
+  activebroker,
+  profitlossbroker,
+  activebuybroker,
+  activesellbroker,
+  Brokerage,
+  getbrokerageByStatus
+};
