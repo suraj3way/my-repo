@@ -248,6 +248,11 @@ const schema = new Schema({
   notes:{
     type: String,
   },
+  equityTradeType:{
+    type: String,
+    enum : ['units','lots'],
+    required: true
+  },
 });
 
 // Plugins

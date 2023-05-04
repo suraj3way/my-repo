@@ -265,7 +265,18 @@ const getAllLedgers = async () => {
 
 const getAllByStatus = async (status) => {
   // Database query
-  const data = await TradesModel.find({ status });
+  const today = new Date();
+
+  const startOfWeek = new Date(
+    today.setDate(today.getDate() - ((today.getDay() - 1) % 7) - 1)
+  );
+  const endOfWeek = new Date(
+    today.setDate(today.getDate() - ((today.getDay() - 5) % 7))
+  );
+  const data = await TradesModel.find({
+    status,
+    createdAt: { $gte: startOfWeek, $lte: endOfWeek }
+  });
 
   // Extract trade IDs and user IDs from the trade information
   const tradeIds = data.map((trade) => trade._id);
