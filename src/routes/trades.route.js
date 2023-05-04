@@ -35,7 +35,8 @@ router.get('/api/MCXpendingTrades/:id', mw(['admin']), TradesController.MCXpendi
 router.get('/api/EQpendingTrades/:id', mw(['admin']), TradesController.EQpendingTrades);
 router.get('/api/weeklyfinduser/:id', mw(['admin']), TradesController.weeklyfinduser);
 router.get('/api/ActiveTradesbyuser', mw(['admin']), TradesController.ActiveTradesbyuser);
-
+router.get('/api/allBrokerByTrade', mw(['Broker']), TradesController.getAllbroker);
+router.get('/api/findUserByBroker', mw(['Broker']), TradesController.findUserByBroker);
 router.get('/api/test', TradesController.testTrade);
 
 export default router;
