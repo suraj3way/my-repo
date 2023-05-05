@@ -434,7 +434,7 @@ const create = async (body, res) => {
       var brokerage = 0;
       var amount =
         body?.purchaseType == 'buy' ? body?.buy_rate : body?.sell_rate;
-      if (body?.segment == 'mcx') {
+      if (body?.segment.toLowerCase() == 'mcx') {
         if (body.lots) {
           amount = body?.lots * amount;
         } else {
@@ -443,7 +443,7 @@ const create = async (body, res) => {
           };
         }
         brokerage = getBrokarage(amount, user?.mcxBrokeragePerCrore);
-      } else if (body?.segment == 'eq') {
+      } else if (body?.segment.toLowerCase() == 'eq') {
         
         if (user?.equityTradeType == 'lots' && body.lots) {
           amount = body?.lots * amount;
@@ -463,7 +463,7 @@ const create = async (body, res) => {
       }
 
       var intradayMCXmarging = 0;
-      if (body?.segment == 'mcx' && amount) {
+      if (body?.segment.toLowerCase() == 'mcx' && amount) {
         console.log(body.lots, 'body.lots');
         if (body.lots) {
           intradayMCXmarging =
@@ -473,7 +473,7 @@ const create = async (body, res) => {
         //   intradayMCXmarging =
         //     (amount * body.units) / user.intradayExposureMarginMCX;
         // }
-      } else if (body?.segment == 'mcx' && body.sell_rate) {
+      } else if (body?.segment.toLowerCase() == 'mcx' && body.sell_rate) {
         if (body.lots) {
           intradayMCXmarging =
             (amount * body.lot_size) / user.intradayExposureMarginMCX;
@@ -492,7 +492,7 @@ const create = async (body, res) => {
       // console.log(intradayMCXmarging, 'suraj1');
 
       var intradayEQmarging = 0;
-      if (body?.segment == 'eq' && amount) {
+      if (body?.segment.toLowerCase() == 'eq' && amount) {
         if (body.lots) {
           intradayEQmarging =
             (amount * body.lot_size) / user.intradayExposureMarginEQ;
@@ -500,7 +500,7 @@ const create = async (body, res) => {
           intradayEQmarging =
             (amount * body.units) / user.intradayExposureMarginEQ;
         }
-      } else if (body?.segment == 'eq' && body.sell_rate) {
+      } else if (body?.segment.toLowerCase() == 'eq' && body.sell_rate) {
         if (body.lots) {
           intradayEQmarging =
             (amount * body.lot_size) / user.intradayExposureMarginEQ;
@@ -511,7 +511,7 @@ const create = async (body, res) => {
         }
       }
       all_active_trades.forEach((body) => {
-        if (body?.segment == 'mcx' && amount) {
+        if (body?.segment.toLowerCase() == 'mcx' && amount) {
           if (body.lots) {
             intradayMCXmarging =
               intradayMCXmarging +
@@ -521,7 +521,7 @@ const create = async (body, res) => {
               intradayMCXmarging +
               (amount * body.units) / user.intradayExposureMarginMCX;
           }
-        } else if (body?.segment == 'mcx' && body.sell_rate) {
+        } else if (body?.segment.toLowerCase() == 'mcx' && body.sell_rate) {
           if (body.lots) {
             intradayMCXmarging =
               intradayMCXmarging +
@@ -533,7 +533,7 @@ const create = async (body, res) => {
           }
         }
 
-        if (body?.segment == 'eq' && amount) {
+        if (body?.segment.toLowerCase() == 'eq' && amount) {
           if (body.lots) {
             intradayEQmarging =
               intradayEQmarging +
@@ -543,7 +543,7 @@ const create = async (body, res) => {
               intradayEQmarging +
               (amount * body.units) / user.intradayExposureMarginEQ;
           }
-        } else if (body?.segment == 'eq' && body.sell_rate) {
+        } else if (body?.segment.toLowerCase() == 'eq' && body.sell_rate) {
           if (body.lots) {
             intradayEQmarging =
               intradayEQmarging +
@@ -562,13 +562,13 @@ const create = async (body, res) => {
         return { message: 'intradayEQmarging not availble' };
       }
       // var intradayMCXmarging = 0;
-      // if (body?.segment == 'mcx' && body.buy_rate) {
+      // if (body?.segment.toLowerCase() == 'mcx' && body.buy_rate) {
       //   if (body.lots) {
       //     intradayMCXmarging = (body.buy_rate * body.lots * body.lot_size) / user.intradayExposureMarginMCX;
       //   } else {
       //     intradayMCXmarging = (body.buy_rate * body.units * body.lot_size) / user.intradayExposureMarginMCX;
       //   }
-      // } else if (body?.segment == 'mcx' && body.sell_rate) {
+      // } else if (body?.segment.toLowerCase() == 'mcx' && body.sell_rate) {
       //   if (body.lots) {
       //     intradayMCXmarging = (body.buy_rate * body.lots * body.lot_size) / user.intradayExposureMarginMCX;
       //   } else if (body.units) {
@@ -583,13 +583,13 @@ const create = async (body, res) => {
       // }
 
       // var intradayEQmarging = 0;
-      // if (body?.segment == 'eq' && body.buy_rate) {
+      // if (body?.segment.toLowerCase() == 'eq' && body.buy_rate) {
       //   if (body.lots) {
       //     intradayEQmarging = (body.buy_rate * body.lots * body.lot_size) / user.intradayExposureMarginEQ;
       //   } else {
       //     intradayEQmarging = (body.buy_rate * body.units * body.lot_size) / user.intradayExposureMarginEQ;
       //   }
-      // } else if (body?.segment == 'eq' && body.sell_rate) {
+      // } else if (body?.segment.toLowerCase() == 'eq' && body.sell_rate) {
       //   if (body.lots) {
       //     intradayEQmarging = (body.buy_rate * body.lots * body.lot_size) / user.intradayExposureMarginEQ;
       //   } else if (body.units) {
@@ -605,7 +605,7 @@ const create = async (body, res) => {
       // console.log(intradayEQmarging, 'suraj12');
 
       // var holdingMCXmarging = 0;
-      // if (body?.segment == 'mcx' && body.buy_rate) {
+      // if (body?.segment.toLowerCase() == 'mcx' && body.buy_rate) {
       //   if (body.lots) {
       //     holdingMCXmarging =
       //       (body.buy_rate * body.lots * body.lot_size) /
@@ -616,7 +616,7 @@ const create = async (body, res) => {
       //       (body.buy_rate * body.units * body.lot_size) /
       //       user.holdingExposureMarginMCX;
       //   }
-      // } else if (body?.segment == 'mcx' && body.sell_rate) {
+      // } else if (body?.segment.toLowerCase() == 'mcx' && body.sell_rate) {
       //   if (body.lots) {
       //     holdingMCXmarging =
       //       (body.sell_rate * body.lots * body.lot_size) /
@@ -636,7 +636,7 @@ const create = async (body, res) => {
       // }
 
       // var holdingEQmarging = 0;
-      // if (body?.segment == 'eq' && body.buy_rate) {
+      // if (body?.segment.toLowerCase() == 'eq' && body.buy_rate) {
       //   if (body.lots) {
       //     holdingEQmarging =
       //       (body.buy_rate * body.lots * body.lot_size) /
@@ -646,7 +646,7 @@ const create = async (body, res) => {
       //       (body.buy_rate * body.units * body.lot_size) /
       //       user.holdingExposureMarginEQ;
       //   }
-      // } else if (body?.segment == 'eq' && body.sell_rate) {
+      // } else if (body?.segment.toLowerCase() == 'eq' && body.sell_rate) {
       //   if (body.lots) {
       //     holdingEQmarging =
       //       (body.buy_rate * body.lots * body.lot_size) /
@@ -719,7 +719,7 @@ const update = async (id, body) => {
   try {
     var thisTrade = await TradesModel.findById(id);
     console.log(body, 'this close Trade');
-    console.log(await create().user_name, 'suraj');
+    // console.log(await create().user_name, 'suraj');
     var user = await AuthBusiness.me(body?.user_id);
     //console.log(body);
     var amount = body?.purchaseType == 'buy' ? body?.buy_rate : body?.sell_rate;
@@ -733,6 +733,7 @@ const update = async (id, body) => {
       if (body?.buy_rate && body?.sell_rate) {
         if (thisTrade?.purchaseType == 'sell') {
           if (body?.sell_rate > body?.buy_rate) {
+            if(body?.segment.toLowerCase() == 'eq'){
             if(user?.equityTradeType == 'lots'){
               body.profit =
               (body?.sell_rate - body?.buy_rate) *
@@ -747,31 +748,43 @@ const update = async (id, body) => {
                 message: 'Equity Trade Type (Unit or Lots) is not added to your account, please contact admin.'
               };
             }
-            
+          }else{
+            body.profit =
+              (body?.sell_rate - body?.buy_rate) *
+              body?.lots *
+              thisTrade.lot_size;
+          }
             isProfit = true;
           }
           if (body?.sell_rate < body?.buy_rate) {
            
-
-              if(user?.equityTradeType == 'lots'){
-                body.loss =
-                (body?.buy_rate - body?.sell_rate) *
-                body?.lots *
-                thisTrade.lot_size;
-              } else if(user?.equityTradeType == 'units'){
-                body.loss =
-                (body?.buy_rate - body?.sell_rate) *
-                body?.units;
-              }else{
-                return {
-                  message: 'Equity Trade Type (Unit or Lots) is not added to your account, please contact admin.'
-                };
-              }
+if(body?.segment.toLowerCase() == 'eq'){
+  if(user?.equityTradeType == 'lots'){
+    body.loss =
+    (body?.buy_rate - body?.sell_rate) *
+    body?.lots *
+    thisTrade.lot_size;
+  } else if(user?.equityTradeType == 'units'){
+    body.loss =
+    (body?.buy_rate - body?.sell_rate) *
+    body?.units;
+  }else{
+    return {
+      message: 'Equity Trade Type (Unit or Lots) is not added to your account, please contact admin.'
+    };
+  }
+}else{
+  body.loss =
+    (body?.buy_rate - body?.sell_rate) *
+    body?.lots *
+    thisTrade.lot_size;
+}
+             
           }
         } else {
           if (body?.sell_rate > body?.buy_rate) {
             
-
+            if(body?.segment.toLowerCase() == 'eq'){
               if(user?.equityTradeType == 'lots'){
                 body.profit =
                 (body?.sell_rate - body?.buy_rate) *
@@ -786,12 +799,19 @@ const update = async (id, body) => {
                   message: 'Equity Trade Type (Unit or Lots) is not added to your account, please contact admin.'
                 };
               }
+            }else{
+              body.profit =
+                (body?.sell_rate - body?.buy_rate) *
+                body?.lots *
+                thisTrade.lot_size;
+            }
             isProfit = true;
           }
           if (body?.sell_rate < body?.buy_rate) {
            
-
+            if(body?.segment.toLowerCase() == 'eq'){
               if(user?.equityTradeType == 'lots'){
+                console.log("--------------------------------------------------00009998877",body?.buy_rate,body?.sell_rate,body?.lots,thisTrade.lot_size)
                 body.loss =
               (body?.buy_rate - body?.sell_rate) *
               body?.lots *
@@ -805,6 +825,12 @@ const update = async (id, body) => {
                   message: 'Equity Trade Type (Unit or Lots) is not added to your account, please contact admin.'
                 };
               }
+            }
+            else{
+              (body?.buy_rate - body?.sell_rate) *
+              body?.lots *
+              thisTrade.lot_size;
+            }
           }
         }
       }
@@ -814,7 +840,7 @@ const update = async (id, body) => {
       console.log(buyamount, 'buyamount');
       var buybrokerage = thisTrade?.buybrokerage ? thisTrade?.buybrokerage : 0;
 
-      if (body?.segment == 'mcx') {
+      if (body?.segment.toLowerCase() == 'mcx') {
         if (body.lots) {
           buyamount = body?.lots * buyamount;
         } else {
@@ -834,7 +860,7 @@ const update = async (id, body) => {
         buybrokerage =
           buybrokerage + getBrokarage(buyamount, user?.mcxBrokeragePerCrore);
       }
-      if (body?.segment == 'eq') {
+      if (body?.segment.toLowerCase() == 'eq') {
         
         if (user?.equityTradeType == 'lots' && body.lots) {
           buyamount = body?.lots * buyamount;
@@ -845,16 +871,17 @@ const update = async (id, body) => {
           buybrokerage + getBrokarage(buyamount, user?.EQBrokragePerCrore);
       }
       console.log(buybrokerage, 'buybrokerage');
-
+      console.log(id, 'id');
+      console.log(body, 'body');
       const trade = await TradesModel.findByIdAndUpdate(id, body, {
         new: true
       });
 
-      // console.log("thisTrade",thisTrade);
+      console.log("trade",trade);
       var brokerage = thisTrade?.brokerage ? thisTrade?.brokerage : 0;
       console.log('broker');
       console.log('brokerage', brokerage);
-      if (body?.segment == 'mcx') {
+      if (body?.segment.toLowerCase() == 'mcx') {
         if (body.lots) {
           amount = body?.lots * amount * thisTrade?.lot_size;
         } else {
@@ -865,7 +892,7 @@ const update = async (id, body) => {
         brokerage =
           brokerage + getBrokarage(amount, user?.mcxBrokeragePerCrore);
       }
-      if (body?.segment == 'eq') {
+      if (body?.segment.toLowerCase() == 'eq') {
         if (user?.equityTradeType == 'lots' && body.lots) {
           amount = body?.lots * amount * thisTrade?.lot_size;
         } else if (user?.equityTradeType == 'units' && body.units) {
@@ -942,7 +969,7 @@ const update = async (id, body) => {
       brokerage = thisTrade?.brokerage ? thisTrade?.brokerage : 0;
       console.log('broker');
       console.log('brokerage', brokerage);
-      if (body?.segment == 'mcx') {
+      if (body?.segment.toLowerCase() == 'mcx') {
         if (body.lots) {
           amount = body?.lots * amount;
         } else {
@@ -953,7 +980,7 @@ const update = async (id, body) => {
         brokerage =
           brokerage + getBrokarage(amount, user?.mcxBrokeragePerCrore);
       }
-      if (body?.segment == 'eq') {
+      if (body?.segment.toLowerCase() == 'eq') {
         if (user?.equityTradeType == 'lots' && body.lots) {
           amount = body?.lots * amount;
         } else if (user?.equityTradeType == 'units' && body.units) {
@@ -1009,7 +1036,7 @@ const update = async (id, body) => {
       );
 
       if (current_percentage_funds) {
-        if (body?.segment == 'mcx') {
+        if (body?.segment.toLowerCase() == 'mcx') {
           if (body.lots) {
             amount = body?.lots * amount;
           } else {
@@ -1018,7 +1045,7 @@ const update = async (id, body) => {
             };
           }
           brokerage = getBrokarage(amount, user?.mcxBrokeragePerCrore);
-        } else if (body?.segment == 'eq') {
+        } else if (body?.segment.toLowerCase() == 'eq') {
           if (user?.equityTradeType == 'lots' && body.lots) {
             amount = body?.lots * amount;
           } else if (user?.equityTradeType == 'units' && body.units) {
@@ -1033,7 +1060,7 @@ const update = async (id, body) => {
         }
 
         var intradayMCXmarging = 0;
-        if (body?.segment == 'mcx' && amount) {
+        if (body?.segment.toLowerCase() == 'mcx' && amount) {
           if (body.lots) {
             intradayMCXmarging =
               (amount * thisTrade.lot_size) / user.intradayExposureMarginMCX;
@@ -1041,7 +1068,7 @@ const update = async (id, body) => {
             intradayMCXmarging =
               (amount * body.units) / user.intradayExposureMarginMCX;
           }
-        } else if (body?.segment == 'mcx' && body.sell_rate) {
+        } else if (body?.segment.toLowerCase() == 'mcx' && body.sell_rate) {
           if (body.lots) {
             intradayMCXmarging =
               (amount * thisTrade.lot_size) / user.intradayExposureMarginMCX;
@@ -1058,7 +1085,7 @@ const update = async (id, body) => {
         // console.log(intradayMCXmarging, 'suraj1');
 
         var intradayEQmarging = 0;
-        if (body?.segment == 'eq' && amount) {
+        if (body?.segment.toLowerCase() == 'eq' && amount) {
           if (user?.equityTradeType == 'lots' && body.lots) {
             intradayEQmarging =
               (amount * thisTrade.lot_size) / user.intradayExposureMarginEQ;
@@ -1066,7 +1093,7 @@ const update = async (id, body) => {
             intradayEQmarging =
               (amount * body.units) / user.intradayExposureMarginEQ;
           }
-        } else if (body?.segment == 'eq' && body.sell_rate) {
+        } else if (body?.segment.toLowerCase() == 'eq' && body.sell_rate) {
           if (user?.equityTradeType == 'lots' && body.lots) {
             intradayEQmarging =
               (amount * thisTrade.lot_size) / user.intradayExposureMarginEQ;
@@ -1084,13 +1111,13 @@ const update = async (id, body) => {
         // console.log(intradayEQmarging, 'suraj12');
 
         // var holdingMCXmarging = 0;
-        // if (body?.segment == 'mcx' && body.buy_rate) {
+        // if (body?.segment.toLowerCase() == 'mcx' && body.buy_rate) {
         //   if (body.lots) {
         //     holdingMCXmarging = (body.buy_rate * body.lots) / 60;
         //   } else {
         //     holdingMCXmarging = (body.buy_rate * body.units) / 60;
         //   }
-        // } else if (body?.segment == 'mcx' && body.sell_rate) {
+        // } else if (body?.segment.toLowerCase() == 'mcx' && body.sell_rate) {
         //   if (body.lots) {
         //     holdingMCXmarging = (body.buy_rate * body.lots) / 60;
         //   } else if (body.units) {
@@ -1106,13 +1133,13 @@ const update = async (id, body) => {
         // // console.log(holdingMCXmarging, 'suraj123');
 
         // var holdingEQmarging = 0;
-        // if (body?.segment == 'eq' && body.buy_rate) {
+        // if (body?.segment.toLowerCase() == 'eq' && body.buy_rate) {
         //   if (body.lots) {
         //     holdingEQmarging = (body.buy_rate * body.lots) / 60;
         //   } else {
         //     holdingEQmarging = (body.buy_rate * body.units) / 60;
         //   }
-        // } else if (body?.segment == 'eq' && body.sell_rate) {
+        // } else if (body?.segment.toLowerCase() == 'eq' && body.sell_rate) {
         //   if (body.lots) {
         //     holdingEQmarging = (body.buy_rate * body.lots) / 60;
         //   } else if (body.units) {
@@ -1203,7 +1230,7 @@ async function clossTodaysTrades(data) {
   for (var body of active_trades) {
     amount = body?.purchaseType == 'buy' ? body?.buy_rate : body?.sell_rate;
     var holdingMCXmarging = 0;
-    if (body?.segment == 'mcx' && amount) {
+    if (body?.segment.toLowerCase() == 'mcx' && amount) {
       if (body.lots) {
         holdingMCXmarging =
           (amount * body.lots) / user.holdingExposureMarginMCX;
@@ -1211,7 +1238,7 @@ async function clossTodaysTrades(data) {
         holdingMCXmarging =
           (amount * body.units) / user.holdingExposureMarginMCX;
       }
-    } else if (body?.segment == 'mcx' && body.sell_rate) {
+    } else if (body?.segment.toLowerCase() == 'mcx' && body.sell_rate) {
       if (body.lots) {
         holdingMCXmarging =
           (amount * body.lots) / user.holdingExposureMarginMCX;
@@ -1229,13 +1256,13 @@ async function clossTodaysTrades(data) {
     // console.log(holdingMCXmarging, 'suraj123');
 
     var holdingEQmarging = 0;
-    if (body?.segment == 'eq' && amount) {
+    if (body?.segment.toLowerCase() == 'eq' && amount) {
       if (user?.equityTradeType == 'lots' && body.lots) {
         holdingEQmarging = (amount * body.lots) / user.holdingExposureMarginEQ;
       } else {
         holdingEQmarging = (amount * body.units) / user.holdingExposureMarginEQ;
       }
-    } else if (body?.segment == 'eq' && body.sell_rate) {
+    } else if (body?.segment.toLowerCase() == 'eq' && body.sell_rate) {
       if (user?.equityTradeType == 'lots' && body.lots) {
         holdingEQmarging = (amount * body.lots) / user.holdingExposureMarginEQ;
       } else if (body.units) {
@@ -1246,7 +1273,7 @@ async function clossTodaysTrades(data) {
     var availbleholdingmargingEQ = user?.funds - holdingEQmarging;
 
     var availableHoldingMargin =
-      body?.segment == 'eq'
+      body?.segment.toLowerCase() == 'eq'
         ? availbleholdingmargingEQ
         : availbleholdingmargingmcx;
     if (availableHoldingMargin < 0) {
@@ -1337,7 +1364,7 @@ async function clossTodaysTrades(data) {
       // console.log("user",user);
       var brokerage = body?.brokerage ? body?.brokerage : 0;
       console.log('brok', brokerage);
-      if (body?.segment == 'mcx') {
+      if (body?.segment.toLowerCase() == 'mcx') {
         if (body.lots) {
           amount = body?.lots * amount;
         } else {
@@ -1348,7 +1375,7 @@ async function clossTodaysTrades(data) {
         brokerage =
           brokerage + getBrokarage(amount, user?.mcxBrokeragePerCrore);
       }
-      if (body?.segment == 'eq') {
+      if (body?.segment.toLowerCase() == 'eq') {
         if (user?.equityTradeType == 'lots' && body.lots) {
           amount = body?.lots * amount;
         } else if (body.units) {
@@ -1447,7 +1474,7 @@ const testTrade = async () => {
 //   // console.log("user",user);
 //   var brokerage = body?.brokerage ? body?.brokerage : 0;
 //   console.log('brok', brokerage);
-//   if (body?.segment == 'mcx') {
+//   if (body?.segment.toLowerCase() == 'mcx') {
 //     if (body.lots) {
 //       amount = body?.lots * amount;
 //     } else {
@@ -1457,7 +1484,7 @@ const testTrade = async () => {
 //     }
 //     brokerage = brokerage + getBrokarage(amount, user?.mcxBrokeragePerCrore);
 //   }
-//   if (body?.segment == 'eq') {
+//   if (body?.segment.toLowerCase() == 'eq') {
 //     if (body.lots) {
 //       amount = body?.lots * amount;
 //     } else if (body.units) {
