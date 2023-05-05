@@ -13,10 +13,13 @@ const getAll = async () => {
   return await userNotificationModel.find({ deleted_at: null });
 };
 
-
-
+const deletuserfcmtokem = async (fcm_tokens) => {
+  const result = await userNotificationModel.deleteMany({ fcm_token: fcm_tokens });
+  return result;
+};
 
 export default {
   create,
-  getAll
+  getAll,
+  deletuserfcmtokem
 };
