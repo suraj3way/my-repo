@@ -766,7 +766,8 @@ const create = async (body, res) => {
         //  return selectedTrade;
         return {
           name: user.name,
-          buy_rate: trade.buy_rate
+          buy_rate: trade.buy_rate,
+          sell_rate:trade.sell_rate
         };
       } else {
         return {

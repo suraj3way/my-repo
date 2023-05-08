@@ -192,8 +192,8 @@ const createTrade = async (req, res) => {
   try {
     req.body.user_id = req.user.id;
     if (
-      (req.body?.purchaseType == 'buy' && req.body?.buy_rate) ||
-      (req.body?.purchaseType == 'sell' && req.body?.sell_rate)
+      (req.body?.purchaseType == 'buy' || req.body?.buy_rate) ||
+      (req.body?.purchaseType == 'sell' || req.body?.sell_rate)
     ) {
       const payload = {
         notification: {
