@@ -76,6 +76,22 @@ const schema = new Schema({
     type: Boolean,
     required: true
   },
+  demoAccount: {
+    type: Boolean,
+    required: false
+  },
+  allowOrderAtCurrentBidAsk: {
+    type: Boolean,
+    required: false
+  },
+  allowFreshAboveHighBelowLow: {
+    type: Boolean,
+    required: false
+  },
+  allowOrderBetweenHighLow: {
+    type: Boolean,
+    required: false
+  },
   autoClosePercentageBalance: {
     type: Number,
     required: true
