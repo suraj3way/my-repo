@@ -28,6 +28,10 @@ const schema = new Schema({
     trim: true,
     required: true
   },
+  username: {
+    type: String,
+    required: true
+  },
   last_name: {
     type: String,
     uppercase: true,
@@ -47,185 +51,185 @@ const schema = new Schema({
     type: String,
     default: null
   },
-  creditLimit:{
+  creditLimit: {
     type: Number,
     required: true
   },
-  funds:{
+  funds: {
     type: Number,
-    default:0
+    default: 0
   },
-  type:{
+  type: {
     type: String,
-    enum : ['Broker'],
+    enum: ['Broker'],
     required: true
   },
   broker_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Broker'
   },
-  maxTradesAllowed:{
+  maxTradesAllowed: {
     type: Number,
     required: true
   },
-  accountStatus:{
+  accountStatus: {
     type: Boolean,
     required: true
   },
-  autoClosePercentageBalance:{
+  autoClosePercentageBalance: {
     type: Number,
     required: true
   },
-  notifyPercentageBalance:{
+  notifyPercentageBalance: {
     type: Number,
     required: true
   },
-  profitLossShareToBroker:{
+  profitLossShareToBroker: {
     type: Number,
     required: true
   },
-  mcxTrading:{
+  mcxTrading: {
     type: Boolean,
     required: true
   },
-  maxLotSizeRequiredPerSingleTradeMCX:{
+  maxLotSizeRequiredPerSingleTradeMCX: {
     type: Number,
     required: true
   },
-  maxLotSizeAllowedPerSingleTradeMCX:{
+  maxLotSizeAllowedPerSingleTradeMCX: {
     type: Number,
     required: true
   },
-  maxLotSizeAllowedPerScriptActivelyOpenMCX:{
+  maxLotSizeAllowedPerScriptActivelyOpenMCX: {
     type: Number,
     required: true
   },
-  maxLotSizeAllowedOverallActivelyOpenMCX:{
+  maxLotSizeAllowedOverallActivelyOpenMCX: {
     type: Number,
     required: true
   },
-  mcxBrokerageType:{
+  mcxBrokerageType: {
     type: String,
-    enum : ['Per Crore Basis'],
+    enum: ['Per Crore Basis'],
     required: true
   },
-  mcxBrokeragePerCrore:{
+  mcxBrokeragePerCrore: {
     type: Number,
     required: true
   },
-  intradayExposureMarginMCX:{
+  intradayExposureMarginMCX: {
     type: Number,
     required: true
   },
-  holdingExposureMarginMCX:{
+  holdingExposureMarginMCX: {
     type: Number,
     required: true
   },
-  MGOLD_intraday:{
+  MGOLD_intraday: {
     type: Number,
     required: true
   },
-  MGOLD_holding:{
+  MGOLD_holding: {
     type: Number,
     required: true
   },
-  MSILVER_intraday:{
+  MSILVER_intraday: {
     type: Number,
     required: true
   },
-  MSILVER_holding:{
+  MSILVER_holding: {
     type: Number,
     required: true
   },
-  BULLDEX_intraday:{
+  BULLDEX_intraday: {
     type: Number,
     required: true
   },
-  BULLDEX_holding:{
+  BULLDEX_holding: {
     type: Number,
     required: true
   },
-  GOLD_intraday:{
+  GOLD_intraday: {
     type: Number,
     required: true
   },
-  GOLD_holding:{
+  GOLD_holding: {
     type: Number,
     required: true
   },
-  SILVER_intraday:{
+  SILVER_intraday: {
     type: Number,
     required: true
   },
-  SILVER_holding:{
+  SILVER_holding: {
     type: Number,
     required: true
   },
-  CRUDEOIL_intraday:{
+  CRUDEOIL_intraday: {
     type: Number,
     required: true
   },
-  CRUDEOIL_holding:{
+  CRUDEOIL_holding: {
     type: Number,
     required: true
   },
-  COPPER_intraday:{
+  COPPER_intraday: {
     type: Number,
     required: true
   },
-  COPPER_holding:{
+  COPPER_holding: {
     type: Number,
     required: true
   },
-  EQTrading:{
+  EQTrading: {
     type: Boolean,
     required: true
   },
-  EQBrokragePerCrore:{
+  EQBrokragePerCrore: {
     type: Number,
     required: true
   },
-  intradayExposureMarginEQ:{
+  intradayExposureMarginEQ: {
     type: Number,
     required: true
   },
-  holdingExposureMarginEQ:{
+  holdingExposureMarginEQ: {
     type: Number,
     required: true
   },
-  EQOrderAwayByPercentFromCurrentPrice:{
+  EQOrderAwayByPercentFromCurrentPrice: {
     type: Number,
     required: true
   },
-  minLotSizeRequiredPerSingleTradeEQFUT:{
+  minLotSizeRequiredPerSingleTradeEQFUT: {
     type: Number,
     required: true
   },
-  minLotSizeRequiredPerSingleTradeEQFUTINDEX:{
+  minLotSizeRequiredPerSingleTradeEQFUTINDEX: {
     type: Number,
     required: true
   },
-  maxLotSizeAllowedPerScriptActivelyOpenEQ:{
+  maxLotSizeAllowedPerScriptActivelyOpenEQ: {
     type: Number,
     required: true
   },
-  maxLotSizeAllowedOverallActivelyOpenEQ:{
+  maxLotSizeAllowedOverallActivelyOpenEQ: {
     type: Number,
     required: true
   },
-  maxLotSizeRequiredPerSingleTradeEQFUT:{
+  maxLotSizeRequiredPerSingleTradeEQFUT: {
     type: Number,
     required: true
   },
-  maxLotSizeRequiredPerSingleTradeEQFUTINDEX:{
+  maxLotSizeRequiredPerSingleTradeEQFUTINDEX: {
     type: Number,
     required: true
   },
-  maxLotSizeAllowedPerScriptActivelyOpenEQINDEX:{
+  maxLotSizeAllowedPerScriptActivelyOpenEQINDEX: {
     type: Number,
     required: true
   },
-  maxLotSizeAllowedOverallActivelyOpenEQINDEX:{
+  maxLotSizeAllowedOverallActivelyOpenEQINDEX: {
     type: Number,
     required: true
   },
@@ -245,14 +249,14 @@ const schema = new Schema({
     type: Boolean,
     default: true
   },
-  notes:{
-    type: String,
+  notes: {
+    type: String
   },
-  equityTradeType:{
+  equityTradeType: {
     type: String,
-    enum : ['units','lots'],
+    enum: ['units', 'lots'],
     required: true
-  },
+  }
 });
 
 // Plugins

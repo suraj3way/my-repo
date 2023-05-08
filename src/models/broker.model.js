@@ -30,6 +30,15 @@ const brokerSchema = new Schema({
       enum: ['active', 'inactive'],
       default: 'active'
     },
+    type: {
+      type: String,
+      enum: ['brokrage', 'profit sharing'],
+      required: true
+    },
+    profitLossPercentage: {
+      type: Number,
+      required: false
+    },
     created_by: {
       type: Schema.Types.ObjectId,
       ref: 'Admin',
