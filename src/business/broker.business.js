@@ -401,6 +401,12 @@ const getbrokerageByStatus = async (brokerId, status) => {
   return mcxtrades;
 };
 
+
+const findbroker = async (broker_id) => {
+  return await BrokersModel.findOne({ _id: broker_id});
+};
+
+
 export default {
   getAll,
   getAllLogged,
@@ -417,5 +423,6 @@ export default {
   activebuybroker,
   activesellbroker,
   Brokerage,
-  getbrokerageByStatus
+  getbrokerageByStatus,
+  findbroker
 };

@@ -24,6 +24,7 @@ router.get('/api/activebuybroker',mw(['broker']), BrokersController.activebuybro
 router.get('/api/activesellbroker',mw(['broker']), BrokersController.activesellbroker);
 router.get('/api/Brokerage',mw(['broker']), BrokersController.Brokerage);
 router.get('/api/brokersId/:status',mw(['broker']), BrokersController.getbrokerageByStatus);
+router.get('/api/findbroker', mw(['broker']), BrokersController.findbroker);
 
 export default router;
 
