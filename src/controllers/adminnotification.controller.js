@@ -39,9 +39,20 @@ const getAllnotification = async (req, res) => {
   }
 };
 
+const deletadminfcmtokem = async (req, res) => {
+  try {
+    let data1 = req.body.fcm_token
+    const data = await adminNotificationBusiness.deletadminfcmtokem(data1);
+    // let updated = '_id' in data || 'n' in data;
+    return success(res, 201, data);
+  } catch (err) {
+    error(res, err);
+  }
+};
 
 
 export default {
   createnotification,
-  getAllnotification
+  getAllnotification,
+  deletadminfcmtokem
 };

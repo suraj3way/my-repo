@@ -13,10 +13,15 @@ const getAll = async () => {
   return await AdminNotificationModel.find({});
 };
 
+const deletadminfcmtokem = async (fcm_tokens) => {
+  const result = await AdminNotificationModel.deleteMany({ fcm_token: fcm_tokens });
+  return result;
+};
 
 
 
 export default {
   create,
-  getAll
+  getAll,
+  deletadminfcmtokem
 };
