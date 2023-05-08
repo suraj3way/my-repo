@@ -29,6 +29,7 @@ async function clossTodaysTrades(data) {
       console.log('4');
       if (body.lots) {
         holdingMCXmarging = (user.funds * body.lot_size) / user.holdingExposureMarginMCX;
+        console.log('holdingMCXmarging',holdingMCXmarging);
       } else {
         holdingMCXmarging = (user.funds * body.units) / user.holdingExposureMarginMCX;
       }
@@ -140,7 +141,7 @@ async function clossTodaysTrades(data) {
       var ledger = {
         trade_id: body._id,
         user_id: body?.user_id,
-        broker_id: user?.broker_id,
+        broker_id: body?.broker_id,
         amount: body?.sell_rate,
         brokerage: brokerage,
         type: body?.purchaseType ? body?.purchaseType : 'buy'
@@ -206,20 +207,21 @@ async function clossTodaysTrades(data) {
 //   timezone: 'Asia/Kolkata'
 // });
 
-// cron.schedule('*/1 * * * *', () => {
-//     // Call the runCronToCloseTrades() function here
-//     console.log("running crone--------------------------------------------------------------------------",new Date())
-//     runCronToCloseTrades();
-//   });
+cron.schedule('*/1 * * * *', () => {
+    // Call the runCronToCloseTrades() function here
+    console.log("running crone--------------------------------------------------------------------------",new Date())
+    runCronToCloseTrades();
+  });
 
 
 
 // Schedule a task to run every day at 11:15pm to 11:30pm
-
+ 
 async function runCronToCloseTrades() {
+  console.log('crone');
   const now = new Date();
   const startTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 15, 0); // set start time to 11:15 pm
-  const endTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 30, 0); // set end time to 11:30 pm
+  const endTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(),23, 30, 0); // set end time to 11:30 pm
 
   if (now >= startTime && now <= endTime) { // check if the current time is between the start and end times
     console.log('0.1');
@@ -229,6 +231,7 @@ async function runCronToCloseTrades() {
     );
     var id;
     var mcx_scripts = ['ALUMINIUM_28APR2023', 'COPPER_28APR2023'];
+    // var mcx_scripts = body.script;
     var done_scripts = [];
     const socket = io('ws://5.22.221.190:8000', {
       transports: ['websocket']

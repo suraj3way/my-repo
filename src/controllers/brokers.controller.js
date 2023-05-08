@@ -419,6 +419,43 @@ const getbrokerageByStatus = async (req, res) => {
   }
 };
 
+/**
+ * me
+ *
+ * @param {*} req
+ * @param {*} res
+ * @returns
+ */
+const findbroker = async (req, res) => {
+  try {
+    const broker_id = req.user.id;
+
+    if (validator.isEmpty(broker_id)) {
+      throw {
+        code: 'ERROR_AUTH_3',
+        message: 'The broker id cannot be empty'
+      };
+    }
+
+    if (!validator.isMongoId(broker_id)) {
+      throw {
+        code: 'ERROR_AUTH_4',
+        message: 'Invalid auth broker id...'
+      };
+    }
+
+    if (broker_id) {
+      let data = await BrokersBusiness.me(broker_id);
+      return data ? success(res, data) : unauthorized(res);
+    } else {
+      return unauthorized(res);
+    }
+  } catch (err) {
+    error(res, err);
+  }
+};
+
+
 export default {
   getAll,
   getAllLogged,
@@ -435,5 +472,6 @@ export default {
   activebuybroker,
   activesellbroker,
   Brokerage,
-  getbrokerageByStatus
+  getbrokerageByStatus,
+  findbroker
 };
