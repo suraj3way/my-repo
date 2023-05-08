@@ -1795,7 +1795,9 @@ const ActiveTradesbyuser = async () => {
       name: user.name,
       ledgerbalance: user.funds,
       user_name: user.user_id,
-      trades: userTrades
+      trades: userTrades,
+      intradayExposureMarginMCX:user.intradayExposureMarginMCX,
+      intradayExposureMarginEQ:user.intradayExposureMarginEQ
     };
     newdata = newdata.filter((item) => item.user_name !== user.user_id);
     newdata.push(updatedUser);
