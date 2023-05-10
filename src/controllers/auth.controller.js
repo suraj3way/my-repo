@@ -337,6 +337,17 @@ const updateUser = async (req, res) => {
   }
 };
 
+
+const updateadmin = async (req, res) => {
+  try {
+    const data = await AuthBusiness.updateadmin(req.body);
+    return res.send({ msg: 'Successfully update admin...', data });
+  } catch (err) {
+    error(res, err);
+  }
+};
+
+
 const updateFund = async (req, res) => {
   try {
     req.body.updated_by = req.user.id;
@@ -570,5 +581,6 @@ export default {
   createamount,
   findamount,
   findAllamount,
-  changePassword
+  changePassword,
+  updateadmin
 };

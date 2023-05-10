@@ -374,13 +374,13 @@ function checkBalanceInPercentage(fund, total) {
     return false;
   }
 }
-async function closeAllTradesPL(user_id,profit,loss) {
+async function closeAllTradesPL(user_id,profit,loss,sell) {
   var active_trades = await TradesModel.updateMany(
     {
       user_id: user_id,
       status: 'active'
     },
-    { $set: { status: 'closed', profit: profit , loss: loss} }
+    { $set: { status: 'closed',sell_rate:sell , profit: profit , loss: loss} }
   );
   console.log(loss,'loss');
 }
@@ -904,26 +904,27 @@ const create = async (body, res) => {
 
               if (trade.purchaseType == 'sell') {
                 if (body?.sell_rate > data.ask) {
-                  body.profit = body?.sell_rate - data.ask;
+                  body.profit = (body?.sell_rate - data.ask) * body.lot_size * body.lots;
                   isProfit = true;
                 }
                 if (body?.sell_rate < data.ask) {
-                  body.loss = data.ask - body?.sell_rate;
+                  body.loss = (data.ask - body?.sell_rate) * body.lot_size * body.lots;
                 }
               } else {
                 if (data.bid > body?.buy_rate) {
-                  body.profit = data.bid - body?.buy_rate;
+                  body.profit = (data.bid - body?.buy_rate) * body.lot_size * body.lots;
                   isProfit = true;
                 }
                 if (data.bid < body?.buy_rate) {
-                  body.loss = body?.buy_rate - data.bid;
+                  body.loss = (body?.buy_rate - data.bid) * body.lot_size * body.lots;
                 }
               }
 
               let amount = body.profit - body.loss;
+              console.log(amount,'profit');
 
               let remainingFund = user.funds + amount - brokerage;
-              await closeAllTradesPL(body.user_id,body.profit,body.loss);
+              await closeAllTradesPL(body.user_id,body.profit,body.loss ,trade.purchaseType === "buy" ? data.bid : data.ask);
               await AuthBusiness.updateFund(body?.user_id, remainingFund);
               var ledger = {
                 trade_id: trade._id,

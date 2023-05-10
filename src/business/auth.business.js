@@ -363,6 +363,19 @@ const getAll = async () => {
   return await UserModel.find({});
 };
 
+// const updateadmin = async (body) => {
+//   const updatedTrade = await AdminModel.updateMany({...body}, {
+//     new: true
+//   });
+//   return updatedTrade;
+// };
+
+const updateadmin = async (body) => {
+  const updatedTrade = await AdminModel.updateMany({}, {...body}, {
+    new: true
+  });
+  return updatedTrade;
+};
 
 
 // const update = async (id, body) => {
@@ -489,4 +502,5 @@ export default {
   createamount,
   findamount,
   findAllamount,
+  updateadmin
 };
