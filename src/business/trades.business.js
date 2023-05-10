@@ -15,6 +15,9 @@ import { isCancel } from 'apisauce';
 const ObjectId = require('mongodb').ObjectId;
 
 const io = require('socket.io-client');
+// const socket = io('ws://5.22.221.190:8000', {
+//         transports: ['websocket']
+// });
 
 const getAllBuyRates = async () => {
   const mcxtrades = await TradesModel.find({ segment: 'mcx' });
@@ -354,9 +357,6 @@ const getAllLogged = async (user_id) => {
 
 function profit_sharing(total, profitLossPercentage) {
   var amaount = (total * profitLossPercentage) / 100;
-  console.log(total, 'total');
-  console.log(profitLossPercentage, 'profitLossPercentage');
-  console.log(amaount, 'ama');
   return amaount;
 }
 
@@ -374,7 +374,18 @@ function checkBalanceInPercentage(fund, total) {
     return false;
   }
 }
+async function closeAllTradesPL(user_id,profit,loss) {
+  var active_trades = await TradesModel.updateMany(
+    {
+      user_id: user_id,
+      status: 'active'
+    },
+    { $set: { status: 'closed', profit: profit , loss: loss} }
+  );
+  console.log(loss,'loss');
+}
 
+// { $set: { status: 'closed', loss: loss } }
 async function closeAllTrades(user_id) {
   var active_trades = await TradesModel.updateMany(
     {
@@ -548,41 +559,7 @@ const create = async (body, res) => {
           }
         }
         var availbleIntradaymargingMCX = user?.funds - intradayMCXmarging;
-        if (availbleIntradaymargingMCX < 0.7 * user?.funds) {
-          const payload = {
-            notification: {
-              title: 'New Notification',
-              body: `User Used 70% blance availble blance ${availbleIntradaymargingMCX} by STOPLOSS(762)`
-            }
-          };
-          await NotificationBusiness.create({
-            notification: payload.notification.body
-          });
 
-          const adminnotification = await adminNotificationBusiness.getAll();
-          const admintokens = adminnotification.map((user) => user.fcm_token);
-
-          const usernotification = await userNotificationBusiness.getAll();
-          const usertokens = usernotification.map((user) => user.fcm_token);
-
-          const tokens = admintokens || usertokens;
-
-          const multicastMessage = {
-            tokens: tokens,
-            webpush: {
-              notification: payload.notification
-            }
-          };
-          admin
-            .messaging()
-            .sendMulticast(multicastMessage)
-            .then((response) => {
-              console.log('Notification sent successfully:', response);
-            })
-            .catch((error) => {
-              console.log('Error sending notification');
-            });
-        }
         if (availbleIntradaymargingMCX < 0) {
           return { message: 'intradayMCXmarging not availble' };
         }
@@ -610,41 +587,7 @@ const create = async (body, res) => {
         }
       });
       var availbleIntradaymargingEQ = user?.funds - intradayEQmarging;
-      if (availbleIntradaymargingEQ < 0.7 * user?.funds) {
-        const payload = {
-          notification: {
-            title: 'New Notification',
-            body: `User Used 70% blance availble blance ${availbleIntradaymargingEQ} by STOPLOSS(762)`
-          }
-        };
-        await NotificationBusiness.create({
-          notification: payload.notification.body
-        });
 
-        const adminnotification = await adminNotificationBusiness.getAll();
-        const admintokens = adminnotification.map((user) => user.fcm_token);
-
-        const usernotification = await userNotificationBusiness.getAll();
-        const usertokens = usernotification.map((user) => user.fcm_token);
-
-        const tokens = admintokens || usertokens;
-
-        const multicastMessage = {
-          tokens: tokens,
-          webpush: {
-            notification: payload.notification
-          }
-        };
-        admin
-          .messaging()
-          .sendMulticast(multicastMessage)
-          .then((response) => {
-            console.log('Notification sent successfully:', response);
-          })
-          .catch((error) => {
-            console.log('Error sending notification');
-          });
-      }
       if (availbleIntradaymargingEQ < 0) {
         return { message: 'intradayEQmarging not availble' };
       }
@@ -751,34 +694,6 @@ const create = async (body, res) => {
       // }
       // console.log(availbleholdingmargingEQ, 'suraj1234');
       // console.log(holdingEQmarging, 'suraj1234');
-      const currentTime = new Date();
-      const marketOpenTime = new Date(
-        currentTime.getFullYear(),
-        currentTime.getMonth(),
-        currentTime.getDate(),
-        9,
-        15
-      );
-      const marketCloseTime = body.segment === "eq" ? new Date(
-        currentTime.getFullYear(),
-        currentTime.getMonth(),
-        currentTime.getDate(),
-        15,
-        30
-      ) : new Date(
-        currentTime.getFullYear(),
-        currentTime.getMonth(),
-        currentTime.getDate(),
-        11,
-        10
-      );
-
-      if (currentTime < marketOpenTime || currentTime > marketCloseTime) {
-        return {
-          message: 'Out of market hours. Cannot execute the trade.'
-        };
-      }
-
       if (user?.funds > 0) {
         if (body?.isDirect) {
           body.status = 'active';
@@ -804,6 +719,227 @@ const create = async (body, res) => {
         // });
         // const selectedTrade = await TradesModel.findOne({ _id: trade._id }).populate('user_id', 'name').select({ buy_rate: 1, _id:0  });
         //  return selectedTrade;
+        var all_active_trade = await getActivetrades(body?.user_id);
+        var script = all_active_trade.map((trade) => trade.script);
+        var mcx_scripts = script;
+        var done_scripts = [];
+
+        let totalResult = 0;
+
+        var socket = io('ws://5.22.221.190:8000', {
+          transports: ['websocket']
+        });
+        for (const script of mcx_scripts) {
+          socket.emit('join', script);
+        }
+
+        var buyRate = 0;
+        for (const body of all_active_trade) {
+          buyRate += body.buy_rate * body.lot_size * body.lots;
+        }
+        let lotunit = body.lots > 0 ? body.lots : body.units;
+        var totalAsk = 0;
+        var remainingblance = 0;
+        var seventy = false;
+        socket.on('stock', async (data) => {
+          for (const script of mcx_scripts) {
+            let result = 0;
+            if (data.ask < body.buy_rate) {
+              result = (body.buy_rate - data.ask) * lotunit * body.lot_size;
+              totalResult += result;
+            } else if (data.bid > body.sell_rate) {
+              result = (data.bid - body.sell_rate) * lotunit * body.lot_size;
+            }
+            totalResult += result;
+          }
+          remainingblance = user.funds - totalResult;
+
+          if (0.7 * user?.funds <= totalResult && seventy == false) {
+            seventy = true;
+            console.log('70%');
+            const payload = {
+              notification: {
+                title: 'New Notification',
+                body: `User Used 70% blance availble blance ${remainingblance} by STOPLOSS(762)`
+              }
+            };
+            await NotificationBusiness.create({
+              notification: payload.notification.body
+            });
+
+            const adminnotification = await adminNotificationBusiness.getAll();
+            const admintokens = adminnotification.map((user) => user.fcm_token);
+
+            const usernotification = await userNotificationBusiness.getAll();
+            const usertokens = usernotification.map((user) => user.fcm_token);
+
+            const tokens = admintokens || usertokens;
+
+            const multicastMessage = {
+              tokens: tokens,
+              webpush: {
+                notification: payload.notification
+              }
+            };
+            admin
+              .messaging()
+              .sendMulticast(multicastMessage)
+              .then((response) => {
+                // socket.disconnect();
+                // console.log('Notification sent successfully:', response);
+              })
+              .catch((error) => {
+                console.log('Error sending notification');
+              });
+          }
+        });
+
+        socket = io('ws://5.22.221.190:8000', {
+          transports: ['websocket']
+        });
+        // Emit 'join' event for each script to the WebSocket server
+        for (const script of mcx_scripts) {
+          socket.emit('join', script);
+        }
+
+        for (const body of all_active_trade) {
+          buyRate += body.buy_rate * body.lot_size * body.lots;
+        }
+        let lotunits = body.lots > 0 ? body.lots : body.units;
+        let totalResults = 0;
+        var ninty = false;
+        socket.on('stock', async (data) => {
+          for (const script of mcx_scripts) {
+            let results = 0;
+            if (data.ask < body.buy_rate) {
+              results = (body.buy_rate - data.ask) * lotunits * body.lot_size;
+              totalResults += results;
+            } else if (data.bid > body.sell_rate) {
+              results = (data.bid - body.sell_rate) * lotunits * body.lot_size;
+            }
+
+            totalResults += results;
+          }
+          var remainingblances = user.funds - totalResults;
+
+          if (0.9 * user?.funds <= totalResult && ninty == false) {
+            ninty = true;
+            console.log('90%');
+            const payload = {
+              notification: {
+                title: 'New Notification',
+                body: `User Used 90% blance availble blance ${remainingblances} by STOPLOSS(762)`
+              }
+            };
+            await NotificationBusiness.create({
+              notification: payload.notification.body
+            });
+
+            const adminnotification = await adminNotificationBusiness.getAll();
+            const admintokens = adminnotification.map((user) => user.fcm_token);
+
+            const usernotification = await userNotificationBusiness.getAll();
+            const usertokens = usernotification.map((user) => user.fcm_token);
+
+            const tokens = admintokens || usertokens;
+
+            const multicastMessage = {
+              tokens: tokens,
+              webpush: {
+                notification: payload.notification
+              }
+            };
+            admin
+              .messaging()
+              .sendMulticast(multicastMessage)
+              .then((response) => {
+                console.log('Notification sent successfully:', response);
+              })
+              .catch((error) => {
+                console.log('Error sending notification');
+              });
+
+            var brokerage = 0;
+            var amount =
+              body?.purchaseType == 'buy' ? body?.buy_rate : body?.sell_rate;
+            if (body?.segment.toLowerCase() == 'mcx') {
+              if (body.lots) {
+                amount = body?.lots * body?.lot_size * amount;
+              } else {
+                return {
+                  message: 'Lots must not be empty'
+                };
+              }
+              if (broker.type == 'profit sharing') {
+                brokerage = profit_sharing(
+                  amount,
+                  broker?.profitLossPercentage
+                );
+              } else {
+                brokerage = getBrokarage(amount, user?.mcxBrokeragePerCrore);
+              }
+            } else if (body?.segment.toLowerCase() == 'eq') {
+              if (user?.equityTradeType == 'lots' && body.lots) {
+                amount = body?.lots * body?.lot_size  * amount;
+              } else if (user?.equityTradeType == 'units' && body.units) {
+                amount = body?.units * amount;
+              } else {
+                return {
+                  message: 'Lots or Units must not be empty'
+                };
+              }
+              if (broker.type == 'profit sharing') {
+                brokerage = profit_sharing(
+                  amount,
+                  broker?.profitLossPercentage
+                );
+              } else {
+                brokerage = getBrokarage(amount, user?.mcxBrokeragePerCrore);
+              }
+            } 
+
+            // // await closeAllTrades(body.user_id);
+            all_active_trade.map(async (trade) => {
+              var isProfit = false;
+
+              if (trade.purchaseType == 'sell') {
+                if (body?.sell_rate > data.ask) {
+                  body.profit = body?.sell_rate - data.ask;
+                  isProfit = true;
+                }
+                if (body?.sell_rate < data.ask) {
+                  body.loss = data.ask - body?.sell_rate;
+                }
+              } else {
+                if (data.bid > body?.buy_rate) {
+                  body.profit = data.bid - body?.buy_rate;
+                  isProfit = true;
+                }
+                if (data.bid < body?.buy_rate) {
+                  body.loss = body?.buy_rate - data.bid;
+                }
+              }
+
+              let amount = body.profit - body.loss;
+
+              let remainingFund = user.funds + amount - brokerage;
+              await closeAllTradesPL(body.user_id,body.profit,body.loss);
+              await AuthBusiness.updateFund(body?.user_id, remainingFund);
+              var ledger = {
+                trade_id: trade._id,
+                user_id: body?.user_id,
+                broker_id: body.broker_id,
+                amount: amount,
+                brokerage: brokerage,
+                type: body?.purchaseType ? body?.purchaseType : 'buy'
+              };
+              await LedgersModel.create({
+                ...ledger
+              });
+            });
+          }
+        });
+
         return {
           name: user.name,
           buy_rate: trade.buy_rate,
