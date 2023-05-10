@@ -59,11 +59,11 @@ const schema = new Schema({
     type: Number,
     default: 0
   },
-  type: {
-    type: String,
-    enum: ['Broker'],
-    required: true
-  },
+  // type: {
+  //   type: String,
+  //   enum: ['Broker'],
+  //   required: true
+  // },
   broker_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Broker'

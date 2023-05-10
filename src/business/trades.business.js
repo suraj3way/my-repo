@@ -352,14 +352,13 @@ const getAllLogged = async (user_id) => {
   return await TradesModel.find({ user_id });
 };
 
-function profit_sharing(total, profitLossPercentage){
-  var amaount = (total * profitLossPercentage ) /100;
-  console.log(total,'total');
-  console.log(profitLossPercentage,'profitLossPercentage');
-  console.log(amaount,'ama');
+function profit_sharing(total, profitLossPercentage) {
+  var amaount = (total * profitLossPercentage) / 100;
+  console.log(total, 'total');
+  console.log(profitLossPercentage, 'profitLossPercentage');
+  console.log(amaount, 'ama');
   return amaount;
 }
-
 
 function getBrokarage(total, BrokeragePerCrore) {
   var broker_per = parseInt(BrokeragePerCrore) / 100000;
@@ -456,10 +455,9 @@ const create = async (body, res) => {
             message: 'Lots must not be empty'
           };
         }
-        if(broker.type=='profit sharing'){
+        if (broker.type == 'profit sharing') {
           brokerage = profit_sharing(amount, broker?.profitLossPercentage);
-        }
-        else{
+        } else {
           brokerage = getBrokarage(amount, user?.mcxBrokeragePerCrore);
         }
       } else if (body?.segment.toLowerCase() == 'eq') {
@@ -472,10 +470,9 @@ const create = async (body, res) => {
             message: 'Lots or Units must not be empty'
           };
         }
-        if(broker.type=='profit sharing'){
+        if (broker.type == 'profit sharing') {
           brokerage = profit_sharing(amount, broker?.profitLossPercentage);
-        }
-        else{
+        } else {
           brokerage = getBrokarage(amount, user?.mcxBrokeragePerCrore);
         }
       } else {
@@ -552,7 +549,6 @@ const create = async (body, res) => {
         }
         var availbleIntradaymargingMCX = user?.funds - intradayMCXmarging;
         if (availbleIntradaymargingMCX < 0.7 * user?.funds) {
-
           const payload = {
             notification: {
               title: 'New Notification',
@@ -648,7 +644,7 @@ const create = async (body, res) => {
           .catch((error) => {
             console.log('Error sending notification');
           });
-      } 
+      }
       if (availbleIntradaymargingEQ < 0) {
         return { message: 'intradayEQmarging not availble' };
       }
@@ -755,6 +751,34 @@ const create = async (body, res) => {
       // }
       // console.log(availbleholdingmargingEQ, 'suraj1234');
       // console.log(holdingEQmarging, 'suraj1234');
+      const currentTime = new Date();
+      const marketOpenTime = new Date(
+        currentTime.getFullYear(),
+        currentTime.getMonth(),
+        currentTime.getDate(),
+        9,
+        15
+      );
+      const marketCloseTime = body.segment === "eq" ? new Date(
+        currentTime.getFullYear(),
+        currentTime.getMonth(),
+        currentTime.getDate(),
+        15,
+        30
+      ) : new Date(
+        currentTime.getFullYear(),
+        currentTime.getMonth(),
+        currentTime.getDate(),
+        11,
+        10
+      );
+
+      if (currentTime < marketOpenTime || currentTime > marketCloseTime) {
+        return {
+          message: 'Out of market hours. Cannot execute the trade.'
+        };
+      }
+
       if (user?.funds > 0) {
         if (body?.isDirect) {
           body.status = 'active';
@@ -783,7 +807,7 @@ const create = async (body, res) => {
         return {
           name: user.name,
           buy_rate: trade.buy_rate,
-          sell_rate:trade.sell_rate
+          sell_rate: trade.sell_rate
         };
       } else {
         return {
@@ -819,8 +843,7 @@ const update = async (id, body) => {
         new: true
       });
       return tradePending;
-    } 
-    else if (body?.status == 'closed') {
+    } else if (body?.status == 'closed') {
       if (body?.buy_rate && body?.sell_rate) {
         if (thisTrade?.purchaseType == 'sell') {
           if (body?.sell_rate > body?.buy_rate) {
@@ -895,7 +918,6 @@ const update = async (id, body) => {
           if (body?.sell_rate < body?.buy_rate) {
             if (body?.segment.toLowerCase() == 'eq') {
               if (user?.equityTradeType == 'lots') {
-                
                 body.loss =
                   (body?.buy_rate - body?.sell_rate) *
                   body?.lots *
@@ -929,13 +951,15 @@ const update = async (id, body) => {
             message: 'Lots must not be empty'
           };
         }
-        
-        if(broker.type =='profit sharing'){
-          buybrokerage = buybrokerage +  profit_sharing(buyamount, broker?.profitLossPercentage);
-          console.log(buybrokerage,'buybrokerage');
-        }
-        else{
-          buybrokerage = buybrokerage + getBrokarage(buyamount, user?.mcxBrokeragePerCrore);
+
+        if (broker.type == 'profit sharing') {
+          buybrokerage =
+            buybrokerage +
+            profit_sharing(buyamount, broker?.profitLossPercentage);
+          console.log(buybrokerage, 'buybrokerage');
+        } else {
+          buybrokerage =
+            buybrokerage + getBrokarage(buyamount, user?.mcxBrokeragePerCrore);
         }
 
         // buybrokerage =
@@ -947,11 +971,13 @@ const update = async (id, body) => {
         } else if (user?.equityTradeType == 'units' && body.units) {
           buyamount = body?.units * buyamount;
         }
-        if(broker.type=='profit sharing'){
-          buybrokerage = buybrokerage +  profit_sharing(buyamount, broker?.profitLossPercentage);
-        }
-        else{
-          buybrokerage = buybrokerage + getBrokarage(buyamount, user?.mcxBrokeragePerCrore);
+        if (broker.type == 'profit sharing') {
+          buybrokerage =
+            buybrokerage +
+            profit_sharing(buyamount, broker?.profitLossPercentage);
+        } else {
+          buybrokerage =
+            buybrokerage + getBrokarage(buyamount, user?.mcxBrokeragePerCrore);
         }
       }
       const trade = await TradesModel.findByIdAndUpdate(id, body, {
@@ -967,11 +993,12 @@ const update = async (id, body) => {
             message: 'Lots must not be empty'
           };
         }
-        if(broker.type=='profit sharing'){
-          brokerage = brokerage + profit_sharing(amount, broker?.profitLossPercentage);
-        }
-        else{
-          brokerage =brokerage + getBrokarage(amount, user?.mcxBrokeragePerCrore);
+        if (broker.type == 'profit sharing') {
+          brokerage =
+            brokerage + profit_sharing(amount, broker?.profitLossPercentage);
+        } else {
+          brokerage =
+            brokerage + getBrokarage(amount, user?.mcxBrokeragePerCrore);
         }
         // brokerage =
         //   brokerage + getBrokarage(amount, user?.mcxBrokeragePerCrore);
@@ -982,11 +1009,12 @@ const update = async (id, body) => {
         } else if (user?.equityTradeType == 'units' && body.units) {
           amount = body?.units * amount;
         }
-        if(broker.type=='profit sharing'){
-          brokerage = brokerage + profit_sharing(amount, broker?.profitLossPercentage);
-        }
-        else{
-          brokerage =brokerage + getBrokarage(amount, user?.mcxBrokeragePerCrore);
+        if (broker.type == 'profit sharing') {
+          brokerage =
+            brokerage + profit_sharing(amount, broker?.profitLossPercentage);
+        } else {
+          brokerage =
+            brokerage + getBrokarage(amount, user?.mcxBrokeragePerCrore);
         }
       }
       var ledger = {
@@ -1005,7 +1033,7 @@ const update = async (id, body) => {
       let Amount = body.profit - body.loss;
       let remainingFund =
         user.funds + Amount - parseFloat(brokerage + buybrokerage);
-      console.log(remainingFund,'remain');
+      console.log(remainingFund, 'remain');
       await AuthBusiness.updateFund(body?.user_id, remainingFund);
     } else if (body?.status == 'pending' && body.isCancel) {
       const tradePending = TradesModel.findByIdAndUpdate(
@@ -1065,12 +1093,13 @@ const update = async (id, body) => {
             message: 'Lots must not be empty'
           };
         }
-        if(broker.type=='profit sharing'){
-          brokerage = brokerage + profit_sharing(amount, broker?.profitLossPercentage);
-          console.log(brokerage,'brokerage');
-        }
-        else{
-          brokerage =brokerage + getBrokarage(amount, user?.mcxBrokeragePerCrore);
+        if (broker.type == 'profit sharing') {
+          brokerage =
+            brokerage + profit_sharing(amount, broker?.profitLossPercentage);
+          console.log(brokerage, 'brokerage');
+        } else {
+          brokerage =
+            brokerage + getBrokarage(amount, user?.mcxBrokeragePerCrore);
         }
       }
       if (body?.segment.toLowerCase() == 'eq') {
@@ -1079,12 +1108,13 @@ const update = async (id, body) => {
         } else if (user?.equityTradeType == 'units' && body.units) {
           amount = body?.units * amount;
         }
-        if(broker.type=='profit sharing'){
-          brokerage = brokerage + profit_sharing(amount, broker?.profitLossPercentage);
-          console.log(brokerage,'brokerage');
-        }
-        else{
-          brokerage =brokerage + getBrokarage(amount, user?.mcxBrokeragePerCrore);
+        if (broker.type == 'profit sharing') {
+          brokerage =
+            brokerage + profit_sharing(amount, broker?.profitLossPercentage);
+          console.log(brokerage, 'brokerage');
+        } else {
+          brokerage =
+            brokerage + getBrokarage(amount, user?.mcxBrokeragePerCrore);
         }
       }
     }
@@ -1143,11 +1173,10 @@ const update = async (id, body) => {
               message: 'Lots must not be empty'
             };
           }
-          if(broker.type=='profit sharing'){
+          if (broker.type == 'profit sharing') {
             brokerage = profit_sharing(amount, broker?.profitLossPercentage);
-            console.log(brokerage,'brokerage');
-          }
-          else{
+            console.log(brokerage, 'brokerage');
+          } else {
             brokerage = getBrokarage(amount, user?.mcxBrokeragePerCrore);
           }
         } else if (body?.segment.toLowerCase() == 'eq') {
@@ -1156,10 +1185,9 @@ const update = async (id, body) => {
           } else if (user?.equityTradeType == 'units' && body.units) {
             amount = body?.units * amount;
           }
-          if(broker.type=='profit sharing'){
+          if (broker.type == 'profit sharing') {
             brokerage = profit_sharing(amount, broker?.profitLossPercentage);
-          }
-          else{
+          } else {
             brokerage = getBrokarage(amount, user?.mcxBrokeragePerCrore);
           }
         } else {
@@ -1796,8 +1824,8 @@ const ActiveTradesbyuser = async () => {
       ledgerbalance: user.funds,
       user_name: user.user_id,
       trades: userTrades,
-      intradayExposureMarginMCX:user.intradayExposureMarginMCX,
-      intradayExposureMarginEQ:user.intradayExposureMarginEQ
+      intradayExposureMarginMCX: user.intradayExposureMarginMCX,
+      intradayExposureMarginEQ: user.intradayExposureMarginEQ
     };
     newdata = newdata.filter((item) => item.user_name !== user.user_id);
     newdata.push(updatedUser);
