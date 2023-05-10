@@ -207,13 +207,16 @@ async function clossTodaysTrades(data) {
 //   timezone: 'Asia/Kolkata'
 // });
 
-cron.schedule('*/1 * * * *', () => {
-    // Call the runCronToCloseTrades() function here
-    console.log("running crone--------------------------------------------------------------------------",new Date())
-    runCronToCloseTrades();
-  });
+// cron.schedule('*/1 * * * *', () => {
+//     // Call the runCronToCloseTrades() function here
+//     console.log("running crone--------------------------------------------------------------------------",new Date())
+//     runCronToCloseTrades();
+//   });
 
-
+cron.schedule('20-30 23 * * *', () => {
+  console.log("running cron -------------------------------------------------------------------------", new Date())
+  runCronToCloseTrades();
+});
 
 // Schedule a task to run every day at 11:15pm to 11:30pm
  

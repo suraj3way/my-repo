@@ -738,7 +738,6 @@ const create = async (body, res) => {
           buyRate += body.buy_rate * body.lot_size * body.lots;
         }
         let lotunit = body.lots > 0 ? body.lots : body.units;
-        console.log(lotunit, 'lotunit');
         var totalAsk = 0;
         var remainingblance = 0;
         var seventy = false;
@@ -1255,7 +1254,6 @@ const update = async (id, body) => {
         }
       }
     }
-    
 
     var availbleIntradaymargingMCX = user?.funds - intradayMCXmarging;
     // console.log(availbleIntradaymargingMCX, 'suraj1');

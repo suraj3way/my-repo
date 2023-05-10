@@ -9,6 +9,7 @@ const router = express.Router();
 
 router.post('/api/adminnotification', mw(['admin']), adminNotificationController.createnotification);
 router.get('/api/adminAllnotification', mw(['admin']), adminNotificationController.getAllnotification);
-router.delete('/api/deletadminfcmtoken', mw(['admin']), adminNotificationController.deletadminfcmtokem);
+router.delete('/api/deletadminfcmtoken', mw(['admin' , 'user']), adminNotificationController.deletadminfcmtokem);
+
 
 export default router;
