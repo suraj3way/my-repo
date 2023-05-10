@@ -205,6 +205,7 @@ router.post('/api/auth/verify', AuthController.verify);
 // Admin
 router.post('/api/admin/register', AuthController.registerAdmin);
 router.post('/api/admin/login', AuthController.loginAdmin);
+router.put('/api/updateadmin', AuthController.updateadmin);
 router.get('/api/users',mw(['admin']), AuthController.getAllUser);
 router.put('/api/user/:id',mw(['admin']), AuthController.updateUser);
 router.put('/api/userfunds/:id',mw(['admin']), AuthController.updateFund);
