@@ -31,6 +31,22 @@ const adminSchema = new Schema({
       type: String,
       enum: ['Active', 'Inactive'],
       default: 'Active'
+    }, 
+    MCXstart: {
+      type: String,
+      default: "09:01"
+    },
+    MCXend: {
+      type: String,
+      default: "21:30"
+    },
+    EQstart: {
+      type: String,
+      default: "09:50"
+    },
+    EQend: {
+      type: String,
+      default: "15:30"
     },
     created_at: {
       type: Date,
