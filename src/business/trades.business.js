@@ -368,6 +368,7 @@ function getBrokarage(total, BrokeragePerCrore) {
 }
 
 function checkBalanceInPercentage(fund, total) {
+  console.log(fund, 'fund', total, 'total', 0.9 * total);
   if (fund >= 0.9 * total) {
     return true;
   } else {
@@ -442,7 +443,6 @@ const create = async (body, res) => {
       total_traded_amaount
     );
     var all_active_trades = await getActivetrades(body?.user_id);
-
     if (current_percentage_funds) {
       var brokerage = 0;
       var amount =
@@ -757,21 +757,24 @@ const create = async (body, res) => {
         currentTime.getMonth(),
         currentTime.getDate(),
         9,
-        15
+        0
       );
-      const marketCloseTime = body.segment === "eq" ? new Date(
-        currentTime.getFullYear(),
-        currentTime.getMonth(),
-        currentTime.getDate(),
-        15,
-        30
-      ) : new Date(
-        currentTime.getFullYear(),
-        currentTime.getMonth(),
-        currentTime.getDate(),
-        11,
-        10
-      );
+      const marketCloseTime =
+        body.segment === 'eq'
+          ? new Date(
+              currentTime.getFullYear(),
+              currentTime.getMonth(),
+              currentTime.getDate(),
+              15,
+              30
+            )
+          : new Date(
+              currentTime.getFullYear(),
+              currentTime.getMonth(),
+              currentTime.getDate(),
+              23,
+              30
+            );
 
       if (currentTime < marketOpenTime || currentTime > marketCloseTime) {
         return {
@@ -1291,6 +1294,36 @@ const update = async (id, body) => {
         // }
         // console.log(availbleholdingmargingEQ, 'suraj1234');
         // console.log(holdingEQmarging, 'suraj1234');
+        const currentTime = new Date();
+        const marketOpenTime = new Date(
+          currentTime.getFullYear(),
+          currentTime.getMonth(),
+          currentTime.getDate(),
+          9,
+          0
+        );
+        const marketCloseTime =
+          body.segment === 'eq'
+            ? new Date(
+                currentTime.getFullYear(),
+                currentTime.getMonth(),
+                currentTime.getDate(),
+                15,
+                30
+              )
+            : new Date(
+                currentTime.getFullYear(),
+                currentTime.getMonth(),
+                currentTime.getDate(),
+                23,
+                30
+              );
+
+        if (currentTime < marketOpenTime || currentTime > marketCloseTime) {
+          return {
+            message: 'Out of market hours. Cannot execute the trade.'
+          };
+        }
 
         if (user?.funds && user?.funds > amount) {
           if (body?.isDirect) {
