@@ -375,16 +375,37 @@ function checkBalanceInPercentage(fund, total) {
     return false;
   }
 }
-async function closeAllTradesPL(user_id,profit,loss,sell) {
+// async function closeAllTradesPL(user_id, profit, loss, sell) {
+//   var active_trades = await TradesModel.updateMany(
+//     {
+//       user_id: user_id,
+//       status: 'active'
+//     },
+//     { $set: { status: 'closed', sell_rate: sell, profit: profit, loss: loss } }
+//   );
+// }
+async function closeAllTradesPL(user_id, profit, loss, rate, purchaseType) {
+  var updateFields = {
+    status: 'closed',
+    profit: profit,
+    loss: loss
+  };
+  
+  if (purchaseType === "buy") {
+    updateFields.buy_rate = rate;
+  } else if (purchaseType === "sell") {
+    updateFields.sell_rate = rate;
+  }
+
   var active_trades = await TradesModel.updateMany(
     {
       user_id: user_id,
       status: 'active'
     },
-    { $set: { status: 'closed',sell_rate:sell , profit: profit , loss: loss} }
+    { $set: updateFields }
   );
-  console.log(loss,'loss');
 }
+
 
 // { $set: { status: 'closed', loss: loss } }
 async function closeAllTrades(user_id) {
@@ -415,24 +436,24 @@ async function getActivetradeAmount(user_id) {
     user_id: user_id,
     status: 'active'
   });
-  var pendin_trades = await TradesModel.find({
-    user_id: user_id,
-    status: 'pending'
-  });
+  // var pendin_trades = await TradesModel.find({
+  //   user_id: user_id,
+  //   status: 'pending'
+  // });
   var active_amount = 0;
-  var pending_amaount = 0;
+  // var pending_amaount = 0;
   active_trades.forEach((body) => {
     active_amount =
       active_amount +
       parseInt(body?.purchaseType == 'buy' ? body?.buy_rate : body?.sell_rate);
   });
-  pendin_trades.forEach((body) => {
-    pending_amaount =
-      pending_amaount +
-      parseInt(body?.purchaseType == 'buy' ? body?.buy_rate : body?.sell_rate);
-  });
+  // pendin_trades.forEach((body) => {
+  //   pending_amaount =
+  //     pending_amaount +
+  //     parseInt(body?.purchaseType == 'buy' ? body?.buy_rate : body?.sell_rate);
+  // });
 
-  return active_amount + pending_amaount;
+  return active_amount;
 }
 
 async function getActivetrades(user_id) {
@@ -755,6 +776,96 @@ const create = async (body, res) => {
         var mcx_scripts = script;
         var done_scripts = [];
 
+        var intradayMCXmargings = 0;
+        if (body?.segment.toLowerCase() == 'mcx' && amount) {
+          if (body.lots) {
+            intradayMCXmargings =
+              (amount * body.lot_size) / user.intradayExposureMarginMCX;
+          }
+          else {
+            intradayMCXmargings =
+              (amount * body.units) / user.intradayExposureMarginMCX;
+          }
+        } else if (body?.segment.toLowerCase() == 'mcx' && body.sell_rate) {
+          if (body.lots) {
+            intradayMCXmargings =
+              (amount * body.lot_size) / user.intradayExposureMarginMCX;
+          }
+          else if (body.units) {
+            intradayMCXmargings =
+              (amount * body.units) / user.intradayExposureMarginMCX;
+          }
+        }
+        // var availbleIntradaymargingMCX = user?.funds - intradayMCXmargings;
+
+        var intradayEQmargings = 0;
+        if (body?.segment.toLowerCase() == 'eq' && amount) {
+          if (body.lots) {
+            intradayEQmargings =
+              (amount * body.lot_size) / user.intradayExposureMarginEQ;
+          } else {
+            intradayEQmargings =
+              (amount * body.units) / user.intradayExposureMarginEQ;
+          }
+        } else if (body?.segment.toLowerCase() == 'eq' && body.sell_rate) {
+          if (body.lots) {
+            intradayEQmargings =
+              (amount * body.lot_size) / user.intradayExposureMarginEQ;
+          } else if (body.units) {
+            intradayEQmargings =
+              (amount * body.units) / user.intradayExposureMarginEQ;
+          }
+        }
+        all_active_trades.forEach(async (body) => {
+          if (body?.segment.toLowerCase() == 'mcx' && amount) {
+            if (body.lots) {
+              intradayMCXmargings =
+                intradayMCXmargings +
+                (amount * body.lot_size) / user.intradayExposureMarginMCX;
+            } else {
+              intradayMCXmargings =
+                intradayMCXmargings +
+                (amount * body.units) / user.intradayExposureMarginMCX;
+            }
+          } else if (body?.segment.toLowerCase() == 'mcx' && body.sell_rate) {
+            if (body.lots) {
+              intradayMCXmargings =
+                intradayMCXmargings +
+                (amount * body.lot_size) / user.intradayExposureMarginMCX;
+            } else if (body.units) {
+              intradayMCXmargings =
+                intradayMCXmargings +
+                (amount * body.units) / user.intradayExposureMarginMCX;
+            }
+          }
+
+          if (body?.segment.toLowerCase() == 'eq' && amount) {
+            if (body.lots) {
+              intradayEQmargings =
+                intradayEQmargings +
+                (amount * body.lot_size) / user.intradayExposureMarginEQ;
+            } else {
+              intradayEQmargings =
+                intradayEQmargings +
+                (amount * body.units) / user.intradayExposureMarginEQ;
+            }
+          } else if (body?.segment.toLowerCase() == 'eq' && body.sell_rate) {
+            if (body.lots) {
+              intradayEQmargings =
+                intradayEQmargings +
+                (amount * body.lot_size) / user.intradayExposureMarginEQ;
+            } else if (body.units) {
+              intradayEQmargings =
+                intradayEQmargings +
+                (amount * body.units) / user.intradayExposureMarginEQ;
+            }
+          }
+        });
+        var availbleIntradaymargingMCXs = user?.funds - intradayMCXmargings;
+        var availbleIntradaymargingEQs = user?.funds - intradayEQmargings;
+
+        let mcx_eq=body.segment== 'mcx' ? availbleIntradaymargingMCXs : availbleIntradaymargingEQs
+
         let totalResult = 0;
 
         var socket = io('ws://5.22.221.190:8000', {
@@ -783,9 +894,10 @@ const create = async (body, res) => {
             }
             totalResult += result;
           }
-          remainingblance = user.funds - totalResult;
+          // remainingblance = user.funds - totalResult;
+          remainingblance = mcx_eq - totalResult;
 
-          if (0.7 * user?.funds <= totalResult && seventy == false) {
+          if (0.7 * mcx_eq <= totalResult && seventy == false) {
             seventy = true;
             console.log('70%');
             const payload = {
@@ -851,9 +963,10 @@ const create = async (body, res) => {
 
             totalResults += results;
           }
-          var remainingblances = user.funds - totalResults;
+          // var remainingblances = user.funds - totalResults;
+          var remainingblances = mcx_eq - totalResults;
 
-          if (0.9 * user?.funds <= totalResult && ninty == false) {
+          if (0.9 * mcx_eq <= totalResult && ninty == false) {
             ninty = true;
             console.log('90%');
             const payload = {
@@ -911,7 +1024,7 @@ const create = async (body, res) => {
               }
             } else if (body?.segment.toLowerCase() == 'eq') {
               if (user?.equityTradeType == 'lots' && body.lots) {
-                amount = body?.lots * body?.lot_size  * amount;
+                amount = body?.lots * body?.lot_size * amount;
               } else if (user?.equityTradeType == 'units' && body.units) {
                 amount = body?.units * amount;
               } else {
@@ -927,7 +1040,7 @@ const create = async (body, res) => {
               } else {
                 brokerage = getBrokarage(amount, user?.mcxBrokeragePerCrore);
               }
-            } 
+            }
 
             // // await closeAllTrades(body.user_id);
             all_active_trade.map(async (trade) => {
@@ -935,27 +1048,36 @@ const create = async (body, res) => {
 
               if (trade.purchaseType == 'sell') {
                 if (body?.sell_rate > data.ask) {
-                  body.profit = (body?.sell_rate - data.ask) * body.lot_size * body.lots;
+                  body.profit =
+                    (body?.sell_rate - data.ask) * body.lot_size * body.lots;
                   isProfit = true;
                 }
                 if (body?.sell_rate < data.ask) {
-                  body.loss = (data.ask - body?.sell_rate) * body.lot_size * body.lots;
+                  body.loss =
+                    (data.ask - body?.sell_rate) * body.lot_size * body.lots;
                 }
               } else {
                 if (data.bid > body?.buy_rate) {
-                  body.profit = (data.bid - body?.buy_rate) * body.lot_size * body.lots;
+                  body.profit =
+                    (data.bid - body?.buy_rate) * body.lot_size * body.lots;
                   isProfit = true;
                 }
                 if (data.bid < body?.buy_rate) {
-                  body.loss = (body?.buy_rate - data.bid) * body.lot_size * body.lots;
+                  body.loss =
+                    (body?.buy_rate - data.bid) * body.lot_size * body.lots;
                 }
               }
 
-              let amount = body.profit || 0 - body.loss || 0;
-              console.log(amount,'profit');
+              let amount = body.profit - body.loss;
+              console.log(amount, 'profit');
 
               let remainingFund = user.funds + amount - brokerage;
-              await closeAllTradesPL(body.user_id,body.profit,body.loss ,trade.purchaseType === "buy" ? data.bid : data.ask);
+              await closeAllTradesPL(
+                body.user_id,
+                body.profit,
+                body.loss,
+                trade.purchaseType === 'buy' ? data.bid : data.ask
+              );
               await AuthBusiness.updateFund(body?.user_id, remainingFund);
               var ledger = {
                 trade_id: trade._id,
