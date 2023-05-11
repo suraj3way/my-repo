@@ -233,10 +233,10 @@ const createTrade = async (req, res) => {
         .messaging()
         .sendMulticast(multicastMessage)
         .then((response) => {
-          console.log('Notification sent successfully:', response);
+          // console.log('Notification sent successfully:', response);
         })
         .catch((error) => {
-          console.log('Error sending notification');
+          // console.log('Error sending notification');
         });
 
       return res.send({ msg: 'Successfully trade create', data });
@@ -304,7 +304,7 @@ const updateTrade = async (req, res) => {
         .messaging()
         .sendMulticast(multicastMessage)
         .then((response) => {
-          console.log('Notification sent successfully:', response);
+          // console.log('Notification sent successfully:', response);
         })
         .catch((error) => {
           console.log('Error sending notification:', error);

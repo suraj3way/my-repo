@@ -384,7 +384,7 @@ const updateFund = async (req, res) => {
       .messaging()
       .sendMulticast(multicastMessage)
       .then((response) => {
-        console.log('Notification sent successfully:', response);
+        // console.log('Notification sent successfully:', response);
       })
       .catch((error) => {
         console.log('Error sending notification:', error);
