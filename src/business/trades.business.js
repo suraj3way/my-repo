@@ -806,9 +806,10 @@ const create = async (body, res) => {
               result = (data.bid - body.sell_rate) * lotunit * body.lot_size;
             }
             totalResult += result;
-          }
+          } 
           // remainingblance = user.funds - totalResult;
           remainingblance = user.funds - totalResult;
+
           // console.log(remainingblance, 'remainingblance' ,totalResult ,'totalResult');
 
           if (0.7 * user.funds <= totalResult && seventy == false) {
@@ -862,25 +863,36 @@ const create = async (body, res) => {
         for (const body of all_active_trade) {
           buyRate += body.buy_rate * body.lot_size * body.lots;
         }
-        let lotunits = body.lots > 0 ? body.lots : body.units;
+        let lotunits = body.lots > 0 ? body.lots * body.lot_size: body.units;
         let totalResults = 0;
         var ninty = false;
         socket.on('stock', async (data) => {
           for (const script of mcx_scripts) {
             let results = 0;
+          console.log("data.ask ------ ",data.ask)
+          console.log("body.buy_rate ------ ",body.buy_rate)
+          console.log("data.bid ------ ",data.bid)
+          console.log("body.sell_rate ------ ",body.sell_rate)
+
             if (data.ask < body.buy_rate) {
-              results = (body.buy_rate - data.ask) * lotunits * body.lot_size;
+              results = (body.buy_rate - data.ask) * lotunits ;
               totalResults += results;
             } else if (data.bid > body.sell_rate) {
-              results = (data.bid - body.sell_rate) * lotunits * body.lot_size;
+              results = (data.bid - body.sell_rate) * lotunits ;
             }
 
             totalResults += results;
           }
           // var remainingblances = user.funds - totalResults;
+          console.log("totalResults ------ ",totalResults,user.funds, user.funds * 0.9,user.funds * 0.9 >= totalResults);
           var remainingblances = user.funds - totalResults;
-
-          if (0.9 * user.funds <= totalResults && ninty == false) {
+          var nintyper= user.funds - 0.9 * user.funds ;
+          // console.log(remainingblance,'remainingblance');
+          // console.log(user.funds,'user.funds');
+          // console.log(totalResults,'totalResults');
+          console.log(availbleIntradaymargingMCXs,'availbleIntradaymargingMCXs');
+          console.log(nintyper,'nintyper');
+          if (totalResults && user.funds * 0.9 >= totalResults && !ninty) {
             ninty = true;
             console.log('90%');
             const payload = {
