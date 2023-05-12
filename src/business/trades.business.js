@@ -261,7 +261,19 @@ const Brokerege = async () => {
 
 const getAll = async () => {
   // Database query
-  return await TradesModel.find({});
+  let data = await TradesModel.find({});
+  const userIds = data.map((trade) => trade.user_id);
+  // Fetch user data and map it with trade data
+  const users = await UserModel.find({ _id: { $in: userIds } });
+  const newData = data.map((trade) => {
+    const user = users.find((user) => user._id.toString() === trade.user_id.toString());
+    return {
+      ...trade.toObject(),
+      name: user ? user.name : null,
+      username: user ? user.username : null,
+    };
+  });
+  return newData;
 };
 
 const getAllLedgers = async () => {
