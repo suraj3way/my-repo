@@ -795,10 +795,10 @@ const create = async (body, res) => {
           for (const script of mcx_scripts) {
             let result = 0;
             if (data.ask < body.buy_rate) {
-              result = (body.buy_rate - data.ask) * lotunit * body.lot_size;
+              result = (body.buy_rate - data.ask) * lotunit;
               totalResult += result;
             } else if (data.bid > body.sell_rate) {
-              result = (data.bid - body.sell_rate) * lotunit * body.lot_size;
+              result = (data.bid - body.sell_rate) * lotunit;
             }
             totalResult += result;
           } 
