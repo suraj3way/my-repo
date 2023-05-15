@@ -472,7 +472,6 @@ async function getActivetrades(user_id) {
     user_id: user_id,
     status: 'active'
   });
-
   return active_trades;
 }
 
