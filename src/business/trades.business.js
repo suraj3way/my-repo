@@ -524,104 +524,104 @@ const create = async (body, res) => {
         };
       }
 
-      var intradayMCXmarging = 0;
-      if (body?.segment.toLowerCase() == 'mcx' && amount) {
-        if (body.lots) {
-          intradayMCXmarging =
-            (amount * body.lot_size) / user.intradayExposureMarginMCX;
-        }
-        // else {
-        //   intradayMCXmarging =
-        //     (amount * body.units) / user.intradayExposureMarginMCX;
-        // }
-      } else if (body?.segment.toLowerCase() == 'mcx' && body.sell_rate) {
-        if (body.lots) {
-          intradayMCXmarging =
-            (amount * body.lot_size) / user.intradayExposureMarginMCX;
-        }
-        // else if (body.units) {
-        //   intradayMCXmarging =
-        //     (amount * body.units) / user.intradayExposureMarginMCX;
-        // }
-      }
-      var availbleIntradaymargingMCX = user?.funds - intradayMCXmarging;
-      if (availbleIntradaymargingMCX < 0) {
-        return { message: 'intradayMCXmarging not availble' };
-      }
+      // var intradayMCXmarging = 0;
+      // if (body?.segment.toLowerCase() == 'mcx' && amount) {
+      //   if (body.lots) {
+      //     intradayMCXmarging =
+      //       (amount * body.lot_size) / user.intradayExposureMarginMCX;
+      //   }
+      //   // else {
+      //   //   intradayMCXmarging =
+      //   //     (amount * body.units) / user.intradayExposureMarginMCX;
+      //   // }
+      // } else if (body?.segment.toLowerCase() == 'mcx' && body.sell_rate) {
+      //   if (body.lots) {
+      //     intradayMCXmarging =
+      //       (amount * body.lot_size) / user.intradayExposureMarginMCX;
+      //   }
+      //   // else if (body.units) {
+      //   //   intradayMCXmarging =
+      //   //     (amount * body.units) / user.intradayExposureMarginMCX;
+      //   // }
+      // }
+      // var availbleIntradaymargingMCX = user?.funds - intradayMCXmarging;
+      // if (availbleIntradaymargingMCX < 0) {
+      //   return { message: 'intradayMCXmarging not availble' };
+      // }
 
-      var intradayEQmarging = 0;
-      if (body?.segment.toLowerCase() == 'eq' && amount) {
-        if (body.lots) {
-          intradayEQmarging =
-            (amount * body.lot_size) / user.intradayExposureMarginEQ;
-        } else {
-          intradayEQmarging =
-            (amount * body.units) / user.intradayExposureMarginEQ;
-        }
-      } else if (body?.segment.toLowerCase() == 'eq' && body.sell_rate) {
-        if (body.lots) {
-          intradayEQmarging =
-            (amount * body.lot_size) / user.intradayExposureMarginEQ;
-        } else if (body.units) {
-          intradayEQmarging =
-            (amount * body.units) / user.intradayExposureMarginEQ;
-        }
-      }
-      all_active_trades.forEach(async (body) => {
-        if (body?.segment.toLowerCase() == 'mcx' && amount) {
-          if (body.lots) {
-            intradayMCXmarging =
-              intradayMCXmarging +
-              (amount * body.lot_size) / user.intradayExposureMarginMCX;
-          } else {
-            intradayMCXmarging =
-              intradayMCXmarging +
-              (amount * body.units) / user.intradayExposureMarginMCX;
-          }
-        } else if (body?.segment.toLowerCase() == 'mcx' && body.sell_rate) {
-          if (body.lots) {
-            intradayMCXmarging =
-              intradayMCXmarging +
-              (amount * body.lot_size) / user.intradayExposureMarginMCX;
-          } else if (body.units) {
-            intradayMCXmarging =
-              intradayMCXmarging +
-              (amount * body.units) / user.intradayExposureMarginMCX;
-          }
-        }
-        var availbleIntradaymargingMCX = user?.funds - intradayMCXmarging;
+      // var intradayEQmarging = 0;
+      // if (body?.segment.toLowerCase() == 'eq' && amount) {
+      //   if (body.lots) {
+      //     intradayEQmarging =
+      //       (amount * body.lot_size) / user.intradayExposureMarginEQ;
+      //   } else {
+      //     intradayEQmarging =
+      //       (amount * body.units) / user.intradayExposureMarginEQ;
+      //   }
+      // } else if (body?.segment.toLowerCase() == 'eq' && body.sell_rate) {
+      //   if (body.lots) {
+      //     intradayEQmarging =
+      //       (amount * body.lot_size) / user.intradayExposureMarginEQ;
+      //   } else if (body.units) {
+      //     intradayEQmarging =
+      //       (amount * body.units) / user.intradayExposureMarginEQ;
+      //   }
+      // }
+      // all_active_trades.forEach(async (body) => {
+      //   if (body?.segment.toLowerCase() == 'mcx' && amount) {
+      //     if (body.lots) {
+      //       intradayMCXmarging =
+      //         intradayMCXmarging +
+      //         (amount * body.lot_size) / user.intradayExposureMarginMCX;
+      //     } else {
+      //       intradayMCXmarging =
+      //         intradayMCXmarging +
+      //         (amount * body.units) / user.intradayExposureMarginMCX;
+      //     }
+      //   } else if (body?.segment.toLowerCase() == 'mcx' && body.sell_rate) {
+      //     if (body.lots) {
+      //       intradayMCXmarging =
+      //         intradayMCXmarging +
+      //         (amount * body.lot_size) / user.intradayExposureMarginMCX;
+      //     } else if (body.units) {
+      //       intradayMCXmarging =
+      //         intradayMCXmarging +
+      //         (amount * body.units) / user.intradayExposureMarginMCX;
+      //     }
+      //   }
+      //   var availbleIntradaymargingMCX = user?.funds - intradayMCXmarging;
 
-        if (availbleIntradaymargingMCX < 0) {
-          return { message: 'intradayMCXmarging not availble' };
-        }
+      //   if (availbleIntradaymargingMCX < 0) {
+      //     return { message: 'intradayMCXmarging not availble' };
+      //   }
 
-        if (body?.segment.toLowerCase() == 'eq' && amount) {
-          if (body.lots) {
-            intradayEQmarging =
-              intradayEQmarging +
-              (amount * body.lot_size) / user.intradayExposureMarginEQ;
-          } else {
-            intradayEQmarging =
-              intradayEQmarging +
-              (amount * body.units) / user.intradayExposureMarginEQ;
-          }
-        } else if (body?.segment.toLowerCase() == 'eq' && body.sell_rate) {
-          if (body.lots) {
-            intradayEQmarging =
-              intradayEQmarging +
-              (amount * body.lot_size) / user.intradayExposureMarginEQ;
-          } else if (body.units) {
-            intradayEQmarging =
-              intradayEQmarging +
-              (amount * body.units) / user.intradayExposureMarginEQ;
-          }
-        }
-      });
-      var availbleIntradaymargingEQ = user?.funds - intradayEQmarging;
+      //   if (body?.segment.toLowerCase() == 'eq' && amount) {
+      //     if (body.lots) {
+      //       intradayEQmarging =
+      //         intradayEQmarging +
+      //         (amount * body.lot_size) / user.intradayExposureMarginEQ;
+      //     } else {
+      //       intradayEQmarging =
+      //         intradayEQmarging +
+      //         (amount * body.units) / user.intradayExposureMarginEQ;
+      //     }
+      //   } else if (body?.segment.toLowerCase() == 'eq' && body.sell_rate) {
+      //     if (body.lots) {
+      //       intradayEQmarging =
+      //         intradayEQmarging +
+      //         (amount * body.lot_size) / user.intradayExposureMarginEQ;
+      //     } else if (body.units) {
+      //       intradayEQmarging =
+      //         intradayEQmarging +
+      //         (amount * body.units) / user.intradayExposureMarginEQ;
+      //     }
+      //   }
+      // });
+      // var availbleIntradaymargingEQ = user?.funds - intradayEQmarging;
 
-      if (availbleIntradaymargingEQ < 0) {
-        return { message: 'intradayEQmarging not availble' };
-      }
+      // if (availbleIntradaymargingEQ < 0) {
+      //   return { message: 'intradayEQmarging not availble' };
+      // }
 
       const currentTime = new Date();
       const marketOpenTime = new Date(
@@ -683,7 +683,6 @@ const create = async (body, res) => {
         var script = all_active_trade.map((trade) => trade.script);
         var mcx_scripts = script;
         var done_scripts = [];
-
         var intradayMCXmargings = 0;
         if (body?.segment.toLowerCase() == 'mcx' && amount) {
           if (body.lots) {
@@ -794,17 +793,17 @@ const create = async (body, res) => {
         socket.on('stock', async (data) => {
           for (const script of mcx_scripts) {
             let result = 0;
-            if (data.ask < body.buy_rate) {
-              result = (body.buy_rate - data.ask) * lotunit;
+            if (body.purchaseType == 'buy') {
+              result = (data.ask - body.buy_rate) * lotunit;
               totalResult += result;
-            } else if (data.bid > body.sell_rate) {
-              result = (data.bid - body.sell_rate) * lotunit;
+            } else{
+              result = (body.sell_rate - data.bid) * lotunit;
+              totalResult += result;
             }
-            totalResult += result;
           } 
           var remainingblance = user.funds - totalResult;
 
-          if (user.funds - 0.7 * user.funds >= mcx_eq - totalResult && seventy == false) {
+          if (0.3 * user.funds >= mcx_eq + totalResult && seventy == false) {
             seventy = true;
             console.log('70%');
             const payload = {
@@ -861,17 +860,17 @@ const create = async (body, res) => {
         socket.on('stock', async (data) => {
           for (const script of mcx_scripts) {
             let results = 0;
-            if (data.ask < body.buy_rate) {
-              results = (body.buy_rate - data.ask) * lotunits ;
+            if (body.purchaseType == 'buy') {
+              results = (data.ask - body.buy_rate) * lotunits ;
               totalResults += results;
-            } else if (data.bid > body.sell_rate) {
+            } else{
               results = (data.bid - body.sell_rate) * lotunits ;
+              totalResults += results;
             }
-            totalResults += results;
           }
           var remainingblances = user.funds - totalResults;
 
-          if (user.funds - 0.9 * user.funds >= mcx_eq - totalResults && !ninty) {
+          if (0.1 * user.funds >= mcx_eq + totalResults && !ninty) {
             ninty = true;
             console.log('90%');
             const payload = {
