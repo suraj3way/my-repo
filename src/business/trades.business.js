@@ -768,11 +768,8 @@ const create = async (body, res) => {
             }
           }
         });
-        console.log(intradayMCXmargings,'intradayMCXmargings');
         var availbleIntradaymargingMCXs = user?.funds - intradayMCXmargings;
         var availbleIntradaymargingEQs = user?.funds - intradayEQmargings;
-
-        console.log(availbleIntradaymargingMCXs, 'availbleIntradaymargingMCXs');
 
         let mcx_eq =
           body.segment == 'mcx'
@@ -792,8 +789,7 @@ const create = async (body, res) => {
         for (const body of all_active_trade) {
           buyRate += body.buy_rate * body.lot_size * body.lots;
         }
-        let lotunit = body.lots > 0 ? body.lots : body.units;
-        var totalAsk = 0;
+        let lotunit = body.lots > 0 ? body.lots * body.lot_size: body.units;
         var remainingblance = 0;
         var seventy = false;
         socket.on('stock', async (data) => {
@@ -807,12 +803,9 @@ const create = async (body, res) => {
             }
             totalResult += result;
           } 
-          // remainingblance = user.funds - totalResult;
-          remainingblance = user.funds - totalResult;
+          var remainingblance = user.funds - totalResult;
 
-          // console.log(remainingblance, 'remainingblance' ,totalResult ,'totalResult');
-
-          if (0.7 * user.funds <= totalResult && seventy == false) {
+          if (user.funds - 0.7 * user.funds >= mcx_eq - totalResult && seventy == false) {
             seventy = true;
             console.log('70%');
             const payload = {
@@ -869,30 +862,17 @@ const create = async (body, res) => {
         socket.on('stock', async (data) => {
           for (const script of mcx_scripts) {
             let results = 0;
-          console.log("data.ask ------ ",data.ask)
-          console.log("body.buy_rate ------ ",body.buy_rate)
-          console.log("data.bid ------ ",data.bid)
-          console.log("body.sell_rate ------ ",body.sell_rate)
-
             if (data.ask < body.buy_rate) {
               results = (body.buy_rate - data.ask) * lotunits ;
               totalResults += results;
             } else if (data.bid > body.sell_rate) {
               results = (data.bid - body.sell_rate) * lotunits ;
             }
-
             totalResults += results;
           }
-          // var remainingblances = user.funds - totalResults;
-          console.log("totalResults ------ ",totalResults,user.funds, user.funds * 0.9,user.funds * 0.9 >= totalResults);
           var remainingblances = user.funds - totalResults;
-          var nintyper= user.funds - 0.9 * user.funds ;
-          // console.log(remainingblance,'remainingblance');
-          // console.log(user.funds,'user.funds');
-          // console.log(totalResults,'totalResults');
-          console.log(availbleIntradaymargingMCXs,'availbleIntradaymargingMCXs');
-          console.log(nintyper,'nintyper');
-          if (totalResults && user.funds * 0.9 >= totalResults && !ninty) {
+
+          if (user.funds - 0.9 * user.funds >= mcx_eq - totalResults && !ninty) {
             ninty = true;
             console.log('90%');
             const payload = {
@@ -994,10 +974,9 @@ const create = async (body, res) => {
                 }
               }
 
-              let amount = body.profit - body.loss;
-              console.log(amount, 'profit');
+              let p_l = body.profit - body.loss;
 
-              let remainingFund = user.funds + amount - brokerage;
+              let remainingFund = user.funds + p_l - brokerage;
               await closeAllTradesPL(
                 body.user_id,
                 body.profit,
@@ -1148,7 +1127,7 @@ const update = async (id, body) => {
                 };
               }
             } else {
-              (body?.buy_rate - body?.sell_rate) *
+              body.loss = (body?.buy_rate - body?.sell_rate) *
                 body?.lots *
                 thisTrade.lot_size;
             }
