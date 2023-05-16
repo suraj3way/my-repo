@@ -746,7 +746,7 @@ const create = async (body, res) => {
               }
             };
             admin
-              .messaging()
+              .messaging() 
               .sendMulticast(multicastMessage)
               .then((response) => {
                 // socket.disconnect();
