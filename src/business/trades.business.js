@@ -267,11 +267,13 @@ const getAll = async () => {
   // Fetch user data and map it with trade data
   const users = await UserModel.find({ _id: { $in: userIds } });
   const newData = data.map((trade) => {
-    const user = users.find((user) => user._id.toString() === trade.user_id.toString());
+    const user = users.find(
+      (user) => user._id.toString() === trade.user_id.toString()
+    );
     return {
       ...trade.toObject(),
       name: user ? user.name : null,
-      username: user ? user.username : null,
+      username: user ? user.username : null
     };
   });
   return newData;
@@ -476,12 +478,20 @@ async function getActivetrades(user_id) {
   return active_trades;
 }
 
-async function getAllactivetrade(tradeId){
+async function getpendingtrades(user_id) {
+  var pending_trades = await TradesModel.find({
+    user_id: user_id,
+    status: 'pending'
+  });
+  return pending_trades;
+}
+
+async function getAllactivetrade(tradeId) {
   var active_trades = await TradesModel.find({
-    trade_id:tradeId,
+    trade_id: tradeId,
     status: 'active'
   });
-  return active_trades
+  return active_trades;
 }
 
 const create = async (body, res) => {
@@ -688,10 +698,11 @@ const create = async (body, res) => {
         // });
         // const selectedTrade = await TradesModel.findOne({ _id: trade._id }).populate('user_id', 'name').select({ buy_rate: 1, _id:0  });
         //  return selectedTrade;
-        var all_active_trade = await getActivetrades(body?.user_id);
-        var script = all_active_trade.map((trade) => trade.script);
-        var tradeid = all_active_trade.map((trade) => trade.lots);
-        var lotsdata= await getAllactivetrade(tradeid)
+        // var all_active_trade = await getActivetrades(body?.user_id);
+        // var script = all_active_trade.map((trade) => trade.script);
+        // var tradeid = all_active_trade.map((trade) => trade.lots);
+        // var lotsdata = await getAllactivetrade(tradeid);
+        // console.log(lotsdata,'lotsdata');
 
         // const data = await TradesBusiness.ActiveTrades(body?.user_id);
         // var lots = data.map((trade) => trade.lots);
@@ -701,10 +712,11 @@ const create = async (body, res) => {
         // );
         // console.log(alllots,'697');
         // console.log(lotsdata,'lotsdta..........');
-
+        var all_active_trade = await getActivetrades(body?.user_id);
+        var script = all_active_trade.map((trade) => trade.script);
         var mcx_scripts = script;
         var done_scripts = [];
-         
+
         let mcx_eq =
           body.segment == 'mcx'
             ? availbleIntradaymargingMCX
@@ -720,24 +732,27 @@ const create = async (body, res) => {
         }
 
         var buyRate = 0;
-        for (const body of all_active_trade) {
-          buyRate += body.buy_rate * body.lot_size * body.lots;
-        }
-        var lotunit = body.lots > 0 ? body.lots * body.lot_size: body.units;
+        // for (const body of all_active_trade) {
+        //   buyRate += body.buy_rate * body.lot_size * body.lots;
+        // }
+        var lotunit = body.lots > 0 ? body.lots * body.lot_size : body.units;
         var seventy = false;
         socket.on('stock', async (data) => {
+          console.log(data.ask,'ask.....');
           for (const script of mcx_scripts) {
             var result = 0;
+            all_active_trade = await getActivetrades(body?.user_id);
+            var alllot = all_active_trade.map((trade) => trade.lots);
             if (body.purchaseType == 'buy') {
               result = (data.ask - body.buy_rate) * lotunit;
               // totalResult += result;
-            } else{
+            } else {
               result = (body.sell_rate - data.bid) * lotunit;
               // totalResult += result;
             }
-          } 
+          }
           var remainingblance = user.funds - result;
-          let finalmarign= mcx_eq + result
+          let finalmarign = mcx_eq * alllot + result;
           if (0.3 * user.funds >= finalmarign && seventy == false) {
             seventy = true;
             console.log('70%');
@@ -766,7 +781,7 @@ const create = async (body, res) => {
               }
             };
             admin
-              .messaging() 
+              .messaging()
               .sendMulticast(multicastMessage)
               .then((response) => {
                 // socket.disconnect();
@@ -789,24 +804,26 @@ const create = async (body, res) => {
         for (const body of all_active_trade) {
           buyRate += body.buy_rate * body.lot_size * body.lots;
         }
-        let lotunits = body.lots > 0 ? body.lots * body.lot_size: body.units;
+        let lotunits = body.lots > 0 ? body.lots * body.lot_size : body.units;
         let totalResults = 0;
         var ninty = false;
         socket.on('stock', async (data) => {
           for (const script of mcx_scripts) {
             var results = 0;
+            all_active_trade = await getActivetrades(body?.user_id);
+            var alllots = all_active_trade.map((trade) => trade.lots);
             if (body.purchaseType == 'buy') {
-              results = (data.ask - body.buy_rate) * lotunits ;
+              results = (data.ask - body.buy_rate) * lotunits;
               // totalResults += results;
-            } else{
-              results = (data.bid - body.sell_rate) * lotunits ;
+            } else {
+              results = (data.bid - body.sell_rate) * lotunits;
               // totalResults += results;
             }
           }
-         
+
           // console.log(all_active_trade.lots,'lots......');
           var remainingblances = user.funds - results;
-          let finalmarigns=mcx_eq + results
+          let finalmarigns = mcx_eq * alllots + results;
 
           if (0.1 * user.funds >= finalmarigns && !ninty) {
             ninty = true;
@@ -886,7 +903,7 @@ const create = async (body, res) => {
 
             // // await closeAllTrades(body.user_id);
             all_active_trade.map(async (trade) => {
-              console.log(trade,'tradse............');
+              console.log(trade, 'tradse............');
               var isProfit = false;
 
               if (trade.purchaseType == 'sell') {
@@ -918,7 +935,7 @@ const create = async (body, res) => {
                 body.user_id,
                 body.profit,
                 body.loss,
-                (trade.purchaseType === 'buy' ? data.bid : data.ask),
+                trade.purchaseType === 'buy' ? data.bid : data.ask,
                 trade.purchaseType
               );
               await AuthBusiness.updateFund(body?.user_id, remainingFund);
@@ -957,6 +974,42 @@ const create = async (body, res) => {
     const pendingtrade = await TradesModel.create({
       ...body
     });
+    // let pendingdata = await getpendingtrades(body?.user_id);
+    // var buyrate = pendingdata.map((trade) => trade.buy_rate);
+    // var pendimcx_scripts = [body?.script];
+    // // var done_scripts = [];
+    // const socket = io('ws://5.22.221.190:8000', {
+    //   transports: ['websocket']
+    // });
+
+    // for (const script of pendimcx_scripts) {
+    //   socket.emit('join', script);
+    // }
+
+    // socket.on('stock', async (data) => {
+    //   console.log(data.ask, 'data.ask');
+    //   console.log(buyrate, 'buyrate');
+    //   if (data.ask >= buyrate) {
+    //     console.log('sura...');
+    //     await TradesModel.findByIdAndUpdate(
+    //       body?.user_id,
+    //       { status: 'active' },
+    //       {
+    //         new: true
+    //       }
+    //     );
+    //   } else if (data.bid <= body.sell_rate) {
+    //     await TradesModel.findByIdAndUpdate(
+    //       body?.user_id,
+    //       body?.user_id,
+    //       { status: 'active' },
+    //       {
+    //         new: true
+    //       }
+    //     );
+    //   }
+    // });
+    // console.log(buyrate, 'buyrate');
     return {
       name: user.name,
       buy_rate: pendingtrade.buy_rate
@@ -1064,7 +1117,8 @@ const update = async (id, body) => {
                 };
               }
             } else {
-              body.loss = (body?.buy_rate - body?.sell_rate) *
+              body.loss =
+                (body?.buy_rate - body?.sell_rate) *
                 body?.lots *
                 thisTrade.lot_size;
             }
@@ -1190,8 +1244,8 @@ const update = async (id, body) => {
       }
 
       socket.on('stock', async (data) => {
-        console.log(data.ask,'data.ask');
-        console.log(body.buy_rate,'body.buy_rate');
+        console.log(data.ask, 'data.ask');
+        console.log(body.buy_rate, 'body.buy_rate');
         if (data.ask <= body.buy_rate) {
           await TradesModel.findByIdAndUpdate(
             id,
