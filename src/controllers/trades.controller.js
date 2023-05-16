@@ -260,8 +260,6 @@ const createTrade = async (req, res) => {
  */
 const updateTrade = async (req, res) => {
   try {
-    console.log(req.body.buy_rate,typeof req.body.buy_rate, "sell body");
-    console.log(req.body.sell_rate,typeof req.body.sell_rate, "sell body");
 
     req.body.user_id = req.user.id;
     if (
@@ -286,7 +284,6 @@ const updateTrade = async (req, res) => {
       const tokens = admintokens || usertokens;
 
     const data = await TradesBusiness.update(req.params.id, req.body);
-    console.log(data, data);
       if (data?.message) {
         return success(res, data);
       }

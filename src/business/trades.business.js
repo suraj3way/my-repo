@@ -6,6 +6,7 @@ import BrokersBusiness from '@/business/broker.business';
 import adminNotificationBusiness from '@/business/adminnotification.bussiness';
 import userNotificationBusiness from '@/business/usernotification.bussiness';
 import NotificationBusiness from '@/business/notification.bussiness';
+import TradesBusiness from '@/business/trades.business';
 
 import admin from '@/firebase/firebase';
 
@@ -475,6 +476,14 @@ async function getActivetrades(user_id) {
   return active_trades;
 }
 
+async function getAllactivetrade(tradeId){
+  var active_trades = await TradesModel.find({
+    trade_id:tradeId,
+    status: 'active'
+  });
+  return active_trades
+}
+
 const create = async (body, res) => {
   var user = await AuthBusiness.me(body?.user_id);
   var broker = await BrokersBusiness.findbroker(body.broker_id);
@@ -681,9 +690,21 @@ const create = async (body, res) => {
         //  return selectedTrade;
         var all_active_trade = await getActivetrades(body?.user_id);
         var script = all_active_trade.map((trade) => trade.script);
+        var tradeid = all_active_trade.map((trade) => trade.lots);
+        var lotsdata= await getAllactivetrade(tradeid)
+
+        // const data = await TradesBusiness.ActiveTrades(body?.user_id);
+        // var lots = data.map((trade) => trade.lots);
+        // const alllots = lots.reduce(
+        //    (accumulator, currentValue) => accumulator + currentValue,
+        //   0
+        // );
+        // console.log(alllots,'697');
+        // console.log(lotsdata,'lotsdta..........');
+
         var mcx_scripts = script;
         var done_scripts = [];
-        
+         
         let mcx_eq =
           body.segment == 'mcx'
             ? availbleIntradaymargingMCX
@@ -702,8 +723,7 @@ const create = async (body, res) => {
         for (const body of all_active_trade) {
           buyRate += body.buy_rate * body.lot_size * body.lots;
         }
-        let lotunit = body.lots > 0 ? body.lots * body.lot_size: body.units;
-        var remainingblance = 0;
+        var lotunit = body.lots > 0 ? body.lots * body.lot_size: body.units;
         var seventy = false;
         socket.on('stock', async (data) => {
           for (const script of mcx_scripts) {
@@ -783,8 +803,11 @@ const create = async (body, res) => {
               // totalResults += results;
             }
           }
+         
+          // console.log(all_active_trade.lots,'lots......');
           var remainingblances = user.funds - results;
           let finalmarigns=mcx_eq + results
+
           if (0.1 * user.funds >= finalmarigns && !ninty) {
             ninty = true;
             console.log('90%');
@@ -863,6 +886,7 @@ const create = async (body, res) => {
 
             // // await closeAllTrades(body.user_id);
             all_active_trade.map(async (trade) => {
+              console.log(trade,'tradse............');
               var isProfit = false;
 
               if (trade.purchaseType == 'sell') {
