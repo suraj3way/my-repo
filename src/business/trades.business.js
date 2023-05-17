@@ -881,7 +881,7 @@ const create = async (body, res) => {
           var remainingblance = user?.funds - result;
           let finalmarign = mcx_eq + result;
 
-          if (0.3 * user?.funds >= finalmarign && seventy) {
+          if (0.3 * user?.funds >= finalmarign && !seventy) {
             seventy = true;
             console.log('70%');
             const payload = {
@@ -1036,7 +1036,7 @@ const create = async (body, res) => {
                 }
               }
               availbleIntradaymargingMCX = user?.funds - intradayMCXmarging;
-
+              console.log(intradayMCXmarging,'intradayMCXmarging');
               if (availbleIntradaymargingMCX < 0) {
                 return { message: 'intradayMCXmarging not availble' };
               }
@@ -1091,8 +1091,8 @@ const create = async (body, res) => {
 
           var remainingblances = user?.funds - results;
           let finalmarigns = mcx_eqs + results;
-
-          if (0.1 * user?.funds >= finalmarigns && ninty) {
+          console.log(finalmarigns,'ava..marging');
+          if (0.1 * user?.funds >= finalmarigns && !ninty) {
             ninty = true;
             console.log('90%');
             const payload = {
