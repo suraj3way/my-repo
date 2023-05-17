@@ -564,8 +564,7 @@ const create = async (body, res) => {
         // }
       }
       var availbleIntradaymargingMCX = user?.funds - intradayMCXmarging;
-      console.log(user.funds,'userfunds');
-      console.log(intradayMCXmarging,'intradayMCXmarging');
+      console.log(intradayMCXmarging,'margin userd');
       if (availbleIntradaymargingMCX < 0) {
         return { message: 'intradayMCXmarging not availble' };
       }
@@ -906,7 +905,6 @@ const create = async (body, res) => {
         var ninty = false;
         socket.on('stock', async (data) => {
           for (const script of mcx_scripts) {
-            console.log(script,'script');
             var results = 0;
             all_active_trade = await getActivetrades(body?.user_id);
             // var alllots = all_active_trade.map((trade) => trade.lots);
@@ -915,29 +913,27 @@ const create = async (body, res) => {
             var user=await UserModel.find({_id:current_trade?.user_id})
             user = user[0]
             // console.log(user?.funds,'user2');
-            console.log(current_trade?.lots,'urrent_trade.lots');
             var amount =current_trade?.purchaseType == 'buy' ? current_trade?.buy_rate : current_trade?.sell_rate;
-            console.log(amount,'amount');
             let lotunits = current_trade?.lots > 0 ? current_trade?.lots * current_trade?.lot_size : current_trade?.units;
             // console.log(current_trade,'buy_rate');
             if (body?.segment.toLowerCase() == 'mcx' && amount) {
               if (current_trade?.lots) {
                 intradayMCXmarging =
-                  (amount * current_trade?.lot_size) / user?.intradayExposureMarginMCX;
+                  (amount * current_trade?.lot_size* current_trade?.lots) / user?.intradayExposureMarginMCX;
               }
-              // else {
-              //   intradayMCXmarging =
-              //     (amount * body.units) / user?.intradayExposureMarginMCX;
-              // }
+              else {
+                intradayMCXmarging =
+                  (amount * body.units) / user?.intradayExposureMarginMCX;
+              }
             } else if (body?.segment.toLowerCase() == 'mcx' && current_trade?.sell_rate) {
               if (current_trade?.lots) {
                 intradayMCXmarging =
-                  (amount * current_trade?.lot_size) / user?.intradayExposureMarginMCX;
+                  (amount * current_trade?.lot_size* current_trade?.lots) / user?.intradayExposureMarginMCX;
               }
-              // else if (body.units) {
-              //   intradayMCXmarging =
-              //     (amount * body.units) / user?.intradayExposureMarginMCX;
-              // }
+              else if (body.units) {
+                intradayMCXmarging =
+                  (amount * body.units) / user?.intradayExposureMarginMCX;
+              }
             }
           
             availbleIntradaymargingMCX = user?.funds - intradayMCXmarging;
@@ -967,7 +963,7 @@ const create = async (body, res) => {
                 if (current_trade?.lots) {
                   intradayMCXmarging =
                     intradayMCXmarging +
-                    (amount * current_trade?.lot_size) / user?.intradayExposureMarginMCX;
+                    (amount * current_trade?.lot_size * current_trade?.lots) / user?.intradayExposureMarginMCX;
                 } else {
                   intradayMCXmarging =
                     intradayMCXmarging +
@@ -977,7 +973,7 @@ const create = async (body, res) => {
                 if (current_trade?.lots) {
                   intradayMCXmarging =
                     intradayMCXmarging +
-                    (amount * current_trade?.lot_size) / user?.intradayExposureMarginMCX;
+                    (amount * current_trade?.lot_size* current_trade?.lots) / user?.intradayExposureMarginMCX;
                 } else if (current_trade?.units) {
                   intradayMCXmarging =
                     intradayMCXmarging +
@@ -1035,8 +1031,8 @@ const create = async (body, res) => {
           var remainingblances = user?.funds - results;
           let finalmarigns = mcx_eqs + results;
           console.log(finalmarigns,'finalmarigns');
-          console.log(mcx_eqs,'mcx_eqs');
-          console.log(results,'results');
+          console.log(0.1 * user?.funds,'0.1 * user?.funds');
+          console.log(user?.funds,'funds');
 
           if (0.1 * user?.funds >= finalmarigns && !ninty) {
             ninty = true;
