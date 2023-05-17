@@ -268,12 +268,12 @@ const getAll = async () => {
   const users = await UserModel.find({ _id: { $in: userIds } });
   const newData = data.map((trade) => {
     const user = users.find(
-      (user) => user._id.toString() === trade.user_id.toString()
+      (user) => user?._id.toString() === trade.user_id.toString()
     );
     return {
       ...trade.toObject(),
-      name: user ? user.name : null,
-      username: user ? user.username : null
+      name: user ? user?.name : null,
+      username: user ? user?.username : null
     };
   });
   return newData;
@@ -312,7 +312,7 @@ const getAllByStatus = async (status) => {
   // Map user IDs to user names
   const userIdToNameMap = {};
   users.forEach((user) => {
-    userIdToNameMap[user._id.toString()] = user.user_id;
+    userIdToNameMap[user._id.toString()] = user?.user_id;
   });
 
   // Fetch ledger information
@@ -547,23 +547,25 @@ const create = async (body, res) => {
       if (body?.segment.toLowerCase() == 'mcx' && amount) {
         if (body.lots) {
           intradayMCXmarging =
-            (amount * body.lot_size) / user.intradayExposureMarginMCX;
+            (amount * body.lot_size) / user?.intradayExposureMarginMCX;
         }
         // else {
         //   intradayMCXmarging =
-        //     (amount * body.units) / user.intradayExposureMarginMCX;
+        //     (amount * body.units) / user?.intradayExposureMarginMCX;
         // }
       } else if (body?.segment.toLowerCase() == 'mcx' && body.sell_rate) {
         if (body.lots) {
           intradayMCXmarging =
-            (amount * body.lot_size) / user.intradayExposureMarginMCX;
+            (amount * body.lot_size) / user?.intradayExposureMarginMCX;
         }
         // else if (body.units) {
         //   intradayMCXmarging =
-        //     (amount * body.units) / user.intradayExposureMarginMCX;
+        //     (amount * body.units) / user?.intradayExposureMarginMCX;
         // }
       }
       var availbleIntradaymargingMCX = user?.funds - intradayMCXmarging;
+      console.log(user.funds,'userfunds');
+      console.log(intradayMCXmarging,'intradayMCXmarging');
       if (availbleIntradaymargingMCX < 0) {
         return { message: 'intradayMCXmarging not availble' };
       }
@@ -572,18 +574,18 @@ const create = async (body, res) => {
       if (body?.segment.toLowerCase() == 'eq' && amount) {
         if (body.lots) {
           intradayEQmarging =
-            (amount * body.lot_size) / user.intradayExposureMarginEQ;
+            (amount * body.lot_size) / user?.intradayExposureMarginEQ;
         } else {
           intradayEQmarging =
-            (amount * body.units) / user.intradayExposureMarginEQ;
+            (amount * body.units) / user?.intradayExposureMarginEQ;
         }
       } else if (body?.segment.toLowerCase() == 'eq' && body.sell_rate) {
         if (body.lots) {
           intradayEQmarging =
-            (amount * body.lot_size) / user.intradayExposureMarginEQ;
+            (amount * body.lot_size) / user?.intradayExposureMarginEQ;
         } else if (body.units) {
           intradayEQmarging =
-            (amount * body.units) / user.intradayExposureMarginEQ;
+            (amount * body.units) / user?.intradayExposureMarginEQ;
         }
       }
       all_active_trades.forEach(async (body) => {
@@ -591,21 +593,21 @@ const create = async (body, res) => {
           if (body.lots) {
             intradayMCXmarging =
               intradayMCXmarging +
-              (amount * body.lot_size) / user.intradayExposureMarginMCX;
+              (amount * body.lot_size) / user?.intradayExposureMarginMCX;
           } else {
             intradayMCXmarging =
               intradayMCXmarging +
-              (amount * body.units) / user.intradayExposureMarginMCX;
+              (amount * body.units) / user?.intradayExposureMarginMCX;
           }
         } else if (body?.segment.toLowerCase() == 'mcx' && body.sell_rate) {
           if (body.lots) {
             intradayMCXmarging =
               intradayMCXmarging +
-              (amount * body.lot_size) / user.intradayExposureMarginMCX;
+              (amount * body.lot_size) / user?.intradayExposureMarginMCX;
           } else if (body.units) {
             intradayMCXmarging =
               intradayMCXmarging +
-              (amount * body.units) / user.intradayExposureMarginMCX;
+              (amount * body.units) / user?.intradayExposureMarginMCX;
           }
         }
         var availbleIntradaymargingMCX = user?.funds - intradayMCXmarging;
@@ -618,21 +620,21 @@ const create = async (body, res) => {
           if (body.lots) {
             intradayEQmarging =
               intradayEQmarging +
-              (amount * body.lot_size) / user.intradayExposureMarginEQ;
+              (amount * body.lot_size) / user?.intradayExposureMarginEQ;
           } else {
             intradayEQmarging =
               intradayEQmarging +
-              (amount * body.units) / user.intradayExposureMarginEQ;
+              (amount * body.units) / user?.intradayExposureMarginEQ;
           }
         } else if (body?.segment.toLowerCase() == 'eq' && body.sell_rate) {
           if (body.lots) {
             intradayEQmarging =
               intradayEQmarging +
-              (amount * body.lot_size) / user.intradayExposureMarginEQ;
+              (amount * body.lot_size) / user?.intradayExposureMarginEQ;
           } else if (body.units) {
             intradayEQmarging =
               intradayEQmarging +
-              (amount * body.units) / user.intradayExposureMarginEQ;
+              (amount * body.units) / user?.intradayExposureMarginEQ;
           }
         }
       });
@@ -737,61 +739,156 @@ const create = async (body, res) => {
         // }
         var lotunit = body.lots > 0 ? body.lots * body.lot_size : body.units;
         var seventy = false;
-        socket.on('stock', async (data) => {
-          console.log(data.ask,'ask.....');
-          for (const script of mcx_scripts) {
-            var result = 0;
-            all_active_trade = await getActivetrades(body?.user_id);
-            var alllot = all_active_trade.map((trade) => trade.lots);
-            if (body.purchaseType == 'buy') {
-              result = (data.ask - body.buy_rate) * lotunit;
-              // totalResult += result;
-            } else {
-              result = (body.sell_rate - data.bid) * lotunit;
-              // totalResult += result;
-            }
-          }
-          var remainingblance = user.funds - result;
-          let finalmarign = mcx_eq * alllot + result;
-          if (0.3 * user.funds >= finalmarign && seventy == false) {
-            seventy = true;
-            console.log('70%');
-            const payload = {
-              notification: {
-                title: 'New Notification',
-                body: `User Used 70% blance availble blance ${remainingblance} by STOPLOSS(762)`
-              }
-            };
-            await NotificationBusiness.create({
-              notification: payload.notification.body
-            });
+        // socket.on('stock', async (data) => {
+        //   for (const script of mcx_scripts) {
+        //     var result = 0;
+        //     all_active_trade = await getActivetrades(body?.user_id);
+        //     var alllot = all_active_trade.map((trade) => trade.lots);
+        //     if (body?.segment.toLowerCase() == 'mcx' && amount) {
+        //       if (body.lots) {
+        //         intradayMCXmarging =
+        //           (amount * body.lot_size) / user?.intradayExposureMarginMCX;
+        //       }
+        //       // else {
+        //       //   intradayMCXmarging =
+        //       //     (amount * body.units) / user?.intradayExposureMarginMCX;
+        //       // }
+        //     } else if (body?.segment.toLowerCase() == 'mcx' && body.sell_rate) {
+        //       if (body.lots) {
+        //         intradayMCXmarging =
+        //           (amount * body.lot_size) / user?.intradayExposureMarginMCX;
+        //       }
+        //       // else if (body.units) {
+        //       //   intradayMCXmarging =
+        //       //     (amount * body.units) / user?.intradayExposureMarginMCX;
+        //       // }
+        //     }
+        //     availbleIntradaymargingMCX = user?.funds - intradayMCXmarging;
+        //     if (availbleIntradaymargingMCX < 0) {
+        //       return { message: 'intradayMCXmarging not availble' };
+        //     }
+      
+        //     if (body?.segment.toLowerCase() == 'eq' && amount) {
+        //       if (body.lots) {
+        //         intradayEQmarging =
+        //           (amount * body.lot_size) / user?.intradayExposureMarginEQ;
+        //       } else {
+        //         intradayEQmarging =
+        //           (amount * body.units) / user?.intradayExposureMarginEQ;
+        //       }
+        //     } else if (body?.segment.toLowerCase() == 'eq' && body.sell_rate) {
+        //       if (body.lots) {
+        //         intradayEQmarging =
+        //           (amount * body.lot_size) / user?.intradayExposureMarginEQ;
+        //       } else if (body.units) {
+        //         intradayEQmarging =
+        //           (amount * body.units) / user?.intradayExposureMarginEQ;
+        //       }
+        //     }
+        //     all_active_trades.forEach(async (body) => {
+        //       if (body?.segment.toLowerCase() == 'mcx' && amount) {
+        //         if (body.lots) {
+        //           intradayMCXmarging =
+        //             intradayMCXmarging +
+        //             (amount * body.lot_size) / user?.intradayExposureMarginMCX;
+        //         } else {
+        //           intradayMCXmarging =
+        //             intradayMCXmarging +
+        //             (amount * body.units) / user?.intradayExposureMarginMCX;
+        //         }
+        //       } else if (body?.segment.toLowerCase() == 'mcx' && body.sell_rate) {
+        //         if (body.lots) {
+        //           intradayMCXmarging =
+        //             intradayMCXmarging +
+        //             (amount * body.lot_size) / user?.intradayExposureMarginMCX;
+        //         } else if (body.units) {
+        //           intradayMCXmarging =
+        //             intradayMCXmarging +
+        //             (amount * body.units) / user?.intradayExposureMarginMCX;
+        //         }
+        //       }
+        //       availbleIntradaymargingMCX = user?.funds - intradayMCXmarging;
+      
+        //       if (availbleIntradaymargingMCX < 0) {
+        //         return { message: 'intradayMCXmarging not availble' };
+        //       }
+      
+        //       if (body?.segment.toLowerCase() == 'eq' && amount) {
+        //         if (body.lots) {
+        //           intradayEQmarging =
+        //             intradayEQmarging +
+        //             (amount * body.lot_size) / user?.intradayExposureMarginEQ;
+        //         } else {
+        //           intradayEQmarging =
+        //             intradayEQmarging +
+        //             (amount * body.units) / user?.intradayExposureMarginEQ;
+        //         }
+        //       } else if (body?.segment.toLowerCase() == 'eq' && body.sell_rate) {
+        //         if (body.lots) {
+        //           intradayEQmarging =
+        //             intradayEQmarging +
+        //             (amount * body.lot_size) / user?.intradayExposureMarginEQ;
+        //         } else if (body.units) {
+        //           intradayEQmarging =
+        //             intradayEQmarging +
+        //             (amount * body.units) / user?.intradayExposureMarginEQ;
+        //         }
+        //       }
+        //     });
+        //    availbleIntradaymargingEQ = user?.funds - intradayEQmarging;
+      
+        //     if (availbleIntradaymargingEQ < 0) {
+        //       return { message: 'intradayEQmarging not availble' };
+        //     }
+        //     if (body.purchaseType == 'buy') {
+        //       result = (data.ask - body.buy_rate) * lotunit;
+        //       // totalResult += result;
+        //     } else {
+        //       result = (body.sell_rate - data.bid) * lotunit;
+        //       // totalResult += result;
+        //     }
+        //   }
+        //   var remainingblance = user?.funds - result;
+        //   let finalmarign = mcx_eq  + result;
+        //   if (0.3 * user?.funds >= finalmarign && seventy == false) {
+        //     seventy = true;
+        //     console.log('70%');
+        //     const payload = {
+        //       notification: {
+        //         title: 'New Notification',
+        //         body: `User Used 70% blance availble blance ${remainingblance} by STOPLOSS(762)`
+        //       }
+        //     };
+        //     await NotificationBusiness.create({
+        //       notification: payload.notification.body
+        //     });
 
-            const adminnotification = await adminNotificationBusiness.getAll();
-            const admintokens = adminnotification.map((user) => user.fcm_token);
+        //     const adminnotification = await adminNotificationBusiness.getAll();
+        //     const admintokens = adminnotification.map((user) => user?.fcm_token);
 
-            const usernotification = await userNotificationBusiness.getAll();
-            const usertokens = usernotification.map((user) => user.fcm_token);
+        //     const usernotification = await userNotificationBusiness.getAll();
+        //     const usertokens = usernotification.map((user) => user?.fcm_token);
 
-            const tokens = admintokens || usertokens;
+        //     const tokens = admintokens || usertokens;
 
-            const multicastMessage = {
-              tokens: tokens,
-              webpush: {
-                notification: payload.notification
-              }
-            };
-            admin
-              .messaging()
-              .sendMulticast(multicastMessage)
-              .then((response) => {
-                // socket.disconnect();
-                // console.log('Notification sent successfully:', response);
-              })
-              .catch((error) => {
-                console.log('Error sending notification');
-              });
-          }
-        });
+        //     const multicastMessage = {
+        //       tokens: tokens,
+        //       webpush: {
+        //         notification: payload.notification
+        //       }
+        //     };
+        //     admin
+        //       .messaging()
+        //       .sendMulticast(multicastMessage)
+        //       .then((response) => {
+        //         // socket.disconnect();
+        //         // console.log('Notification sent successfully:', response);
+        //       })
+        //       .catch((error) => {
+        //         console.log('Error sending notification');
+        //       });
+        //   }
+        // });
 
         socket = io('ws://5.22.221.190:8000', {
           transports: ['websocket']
@@ -804,28 +901,144 @@ const create = async (body, res) => {
         for (const body of all_active_trade) {
           buyRate += body.buy_rate * body.lot_size * body.lots;
         }
-        let lotunits = body.lots > 0 ? body.lots * body.lot_size : body.units;
+        
         let totalResults = 0;
         var ninty = false;
         socket.on('stock', async (data) => {
           for (const script of mcx_scripts) {
+            console.log(script,'script');
             var results = 0;
             all_active_trade = await getActivetrades(body?.user_id);
-            var alllots = all_active_trade.map((trade) => trade.lots);
+            // var alllots = all_active_trade.map((trade) => trade.lots);
+            var current_trade =all_active_trade.filter((trade) => trade.script== script);
+            current_trade = current_trade[0]
+            var user=await UserModel.find({_id:current_trade?.user_id})
+            user = user[0]
+            // console.log(user?.funds,'user2');
+            console.log(current_trade?.lots,'urrent_trade.lots');
+            var amount =current_trade?.purchaseType == 'buy' ? current_trade?.buy_rate : current_trade?.sell_rate;
+            console.log(amount,'amount');
+            let lotunits = current_trade?.lots > 0 ? current_trade?.lots * current_trade?.lot_size : current_trade?.units;
+            // console.log(current_trade,'buy_rate');
+            if (body?.segment.toLowerCase() == 'mcx' && amount) {
+              if (current_trade?.lots) {
+                intradayMCXmarging =
+                  (amount * current_trade?.lot_size) / user?.intradayExposureMarginMCX;
+              }
+              // else {
+              //   intradayMCXmarging =
+              //     (amount * body.units) / user?.intradayExposureMarginMCX;
+              // }
+            } else if (body?.segment.toLowerCase() == 'mcx' && current_trade?.sell_rate) {
+              if (current_trade?.lots) {
+                intradayMCXmarging =
+                  (amount * current_trade?.lot_size) / user?.intradayExposureMarginMCX;
+              }
+              // else if (body.units) {
+              //   intradayMCXmarging =
+              //     (amount * body.units) / user?.intradayExposureMarginMCX;
+              // }
+            }
+          
+            availbleIntradaymargingMCX = user?.funds - intradayMCXmarging;
+            if (availbleIntradaymargingMCX < 0) {
+              return { message: 'intradayMCXmarging not availble' };
+            }
+      
+            if (body?.segment.toLowerCase() == 'eq' && amount) {
+              if (current_trade?.lots) {
+                intradayEQmarging =
+                  (amount * current_trade?.lot_size) / user?.intradayExposureMarginEQ;
+              } else {
+                intradayEQmarging =
+                  (amount * current_trade?.units) / user?.intradayExposureMarginEQ;
+              }
+            } else if (body?.segment.toLowerCase() == 'eq' && current_trade?.sell_rate) {
+              if (current_trade?.lots) {
+                intradayEQmarging =
+                  (amount * current_trade?.lot_size) / user?.intradayExposureMarginEQ;
+              } else if (current_trade?.units) {
+                intradayEQmarging =
+                  (amount * current_trade?.units) / user?.intradayExposureMarginEQ;
+              }
+            }
+            all_active_trades.forEach(async (current_trade) => {
+              if (current_trade?.segment.toLowerCase() == 'mcx' && amount) {
+                if (current_trade?.lots) {
+                  intradayMCXmarging =
+                    intradayMCXmarging +
+                    (amount * current_trade?.lot_size) / user?.intradayExposureMarginMCX;
+                } else {
+                  intradayMCXmarging =
+                    intradayMCXmarging +
+                    (amount * current_trade?.units) / user?.intradayExposureMarginMCX;
+                }
+              } else if (current_trade?.segment.toLowerCase() == 'mcx' && current_trade?.sell_rate) {
+                if (current_trade?.lots) {
+                  intradayMCXmarging =
+                    intradayMCXmarging +
+                    (amount * current_trade?.lot_size) / user?.intradayExposureMarginMCX;
+                } else if (current_trade?.units) {
+                  intradayMCXmarging =
+                    intradayMCXmarging +
+                    (amount * current_trade?.units) / user?.intradayExposureMarginMCX;
+                }
+              }
+              availbleIntradaymargingMCX = user?.funds - intradayMCXmarging;
+      
+              if (availbleIntradaymargingMCX < 0) {
+                return { message: 'intradayMCXmarging not availble' };
+              }
+      
+              if (current_trade?.segment.toLowerCase() == 'eq' && amount) {
+                if (current_trade?.lots) {
+                  intradayEQmarging =
+                    intradayEQmarging +
+                    (amount * current_trade?.lot_size) / user?.intradayExposureMarginEQ;
+                } else {
+                  intradayEQmarging =
+                    intradayEQmarging +
+                    (amount * current_trade?.units) / user?.intradayExposureMarginEQ;
+                }
+              } else if (current_trade?.segment.toLowerCase() == 'eq' && current_trade?.sell_rate) {
+                if (current_trade?.lots) {
+                  intradayEQmarging =
+                    intradayEQmarging +
+                    (amount * current_trade?.lot_size) / user?.intradayExposureMarginEQ;
+                } else if (current_trade?.units) {
+                  intradayEQmarging =
+                    intradayEQmarging +
+                    (amount * current_trade?.units) / user?.intradayExposureMarginEQ;
+                }
+              }
+            });
+           availbleIntradaymargingEQ = user?.funds - intradayEQmarging;
+      
+            if (availbleIntradaymargingEQ < 0) {
+              return { message: 'intradayEQmarging not availble' };
+            }
             if (body.purchaseType == 'buy') {
-              results = (data.ask - body.buy_rate) * lotunits;
+              results = (data.ask - current_trade?.buy_rate) * lotunits;
               // totalResults += results;
             } else {
-              results = (data.bid - body.sell_rate) * lotunits;
+              results = (data.bid - current_trade?.sell_rate) * lotunits;
               // totalResults += results;
             }
           }
 
-          // console.log(all_active_trade.lots,'lots......');
-          var remainingblances = user.funds - results;
-          let finalmarigns = mcx_eq * alllots + results;
+        let mcx_eqs =
+        body.segment == 'mcx'
+          ? availbleIntradaymargingMCX
+          : availbleIntradaymargingEQ;
 
-          if (0.1 * user.funds >= finalmarigns && !ninty) {
+          // console.log(all_active_trade.lots,'lots......');
+          var remainingblances = user?.funds - results;
+          let finalmarigns = mcx_eqs + results;
+          console.log(finalmarigns,'finalmarigns');
+          console.log(mcx_eqs,'mcx_eqs');
+          console.log(results,'results');
+
+          if (0.1 * user?.funds >= finalmarigns && !ninty) {
             ninty = true;
             console.log('90%');
             const payload = {
@@ -839,10 +1052,10 @@ const create = async (body, res) => {
             });
 
             const adminnotification = await adminNotificationBusiness.getAll();
-            const admintokens = adminnotification.map((user) => user.fcm_token);
+            const admintokens = adminnotification.map((user) => user?.fcm_token);
 
             const usernotification = await userNotificationBusiness.getAll();
-            const usertokens = usernotification.map((user) => user.fcm_token);
+            const usertokens = usernotification.map((user) => user?.fcm_token);
 
             const tokens = admintokens || usertokens;
 
@@ -863,10 +1076,10 @@ const create = async (body, res) => {
               });
 
             var brokerage = 0;
-            var amount =
+            amount =
               body?.purchaseType == 'buy' ? body?.buy_rate : body?.sell_rate;
             if (body?.segment.toLowerCase() == 'mcx') {
-              if (body.lots) {
+              if (current_trade?.lots) {
                 amount = body?.lots * body?.lot_size * amount;
               } else {
                 return {
@@ -882,10 +1095,10 @@ const create = async (body, res) => {
                 brokerage = getBrokarage(amount, user?.mcxBrokeragePerCrore);
               }
             } else if (body?.segment.toLowerCase() == 'eq') {
-              if (user?.equityTradeType == 'lots' && body.lots) {
-                amount = body?.lots * body?.lot_size * amount;
-              } else if (user?.equityTradeType == 'units' && body.units) {
-                amount = body?.units * amount;
+              if (user?.equityTradeType == 'lots' && current_trade?.lots) {
+                amount = current_trade?.lots * current_trade?.lot_size * amount;
+              } else if (user?.equityTradeType == 'units' && current_trade?.units) {
+                amount = current_trade?.units * amount;
               } else {
                 return {
                   message: 'Lots or Units must not be empty'
@@ -907,45 +1120,45 @@ const create = async (body, res) => {
               var isProfit = false;
 
               if (trade.purchaseType == 'sell') {
-                if (body?.sell_rate > data.ask) {
-                  body.profit =
-                    (body?.sell_rate - data.ask) * body.lot_size * body.lots;
+                if (current_trade?.sell_rate > data.ask) {
+                  current_trade.profit =
+                    (current_trade?.sell_rate - data.ask) * current_trade.lot_size * current_trade.lots;
                   isProfit = true;
                 }
-                if (body?.sell_rate < data.ask) {
-                  body.loss =
-                    (data.ask - body?.sell_rate) * body.lot_size * body.lots;
+                if (current_trade?.sell_rate < data.ask) {
+                  current_trade.loss =
+                    (data.ask - current_trade?.sell_rate) * current_trade.lot_size * current_trade.lots;
                 }
               } else {
-                if (data.bid > body?.buy_rate) {
-                  body.profit =
-                    (data.bid - body?.buy_rate) * body.lot_size * body.lots;
+                if (data.bid > current_trade?.buy_rate) {
+                  current_trade.profit =
+                    (data.bid - current_trade?.buy_rate) * current_trade.lot_size * current_trade.lots;
                   isProfit = true;
                 }
-                if (data.bid < body?.buy_rate) {
-                  body.loss =
-                    (body?.buy_rate - data.bid) * body.lot_size * body.lots;
+                if (data.bid < current_trade?.buy_rate) {
+                  current_trade.loss =
+                    (current_trade?.buy_rate - data.bid) * current_trade.lot_size * current_trade.lots;
                 }
               }
 
-              let p_l = body.profit - body.loss;
+              let p_l = current_trade.profit - current_trade.loss;
 
-              let remainingFund = user.funds + p_l - brokerage;
+              let remainingFund = user?.funds + p_l - brokerage;
               await closeAllTradesPL(
-                body.user_id,
-                body.profit,
-                body.loss,
+                current_trade.user_id,
+                current_trade.profit,
+                current_trade.loss,
                 trade.purchaseType === 'buy' ? data.bid : data.ask,
                 trade.purchaseType
               );
-              await AuthBusiness.updateFund(body?.user_id, remainingFund);
+              await AuthBusiness.updateFund(current_trade?.user_id, remainingFund);
               var ledger = {
                 trade_id: trade._id,
-                user_id: body?.user_id,
-                broker_id: body.broker_id,
+                user_id: current_trade?.user_id,
+                broker_id: current_trade.broker_id,
                 amount: amount,
                 brokerage: brokerage,
-                type: body?.purchaseType ? body?.purchaseType : 'buy'
+                type: current_trade?.purchaseType ? current_trade?.purchaseType : 'buy'
               };
               await LedgersModel.create({
                 ...ledger
@@ -955,7 +1168,7 @@ const create = async (body, res) => {
         });
 
         return {
-          name: user.name,
+          name: user?.name,
           buy_rate: trade.buy_rate,
           sell_rate: trade.sell_rate
         };
@@ -1011,7 +1224,7 @@ const create = async (body, res) => {
     // });
     // console.log(buyrate, 'buyrate');
     return {
-      name: user.name,
+      name: user?.name,
       buy_rate: pendingtrade.buy_rate
     };
   }
@@ -1219,7 +1432,7 @@ const update = async (id, body) => {
 
       let Amount = body.profit - body.loss;
       let remainingFund =
-        user.funds + Amount - parseFloat(brokerage + buybrokerage);
+        user?.funds + Amount - parseFloat(brokerage + buybrokerage);
       console.log(remainingFund, 'remain');
       await AuthBusiness.updateFund(body?.user_id, remainingFund);
     } else if (body?.status == 'pending' && body.isCancel) {
@@ -1389,18 +1602,18 @@ const update = async (id, body) => {
         if (body?.segment.toLowerCase() == 'mcx' && amount) {
           if (body.lots) {
             intradayMCXmarging =
-              (amount * thisTrade.lot_size) / user.intradayExposureMarginMCX;
+              (amount * thisTrade.lot_size) / user?.intradayExposureMarginMCX;
           } else {
             intradayMCXmarging =
-              (amount * body.units) / user.intradayExposureMarginMCX;
+              (amount * body.units) / user?.intradayExposureMarginMCX;
           }
         } else if (body?.segment.toLowerCase() == 'mcx' && body.sell_rate) {
           if (body.lots) {
             intradayMCXmarging =
-              (amount * thisTrade.lot_size) / user.intradayExposureMarginMCX;
+              (amount * thisTrade.lot_size) / user?.intradayExposureMarginMCX;
           } else if (body.units) {
             intradayMCXmarging =
-              (amount * body.units) / user.intradayExposureMarginMCX;
+              (amount * body.units) / user?.intradayExposureMarginMCX;
           }
         }
 
@@ -1414,18 +1627,18 @@ const update = async (id, body) => {
         if (body?.segment.toLowerCase() == 'eq' && amount) {
           if (user?.equityTradeType == 'lots' && body.lots) {
             intradayEQmarging =
-              (amount * thisTrade.lot_size) / user.intradayExposureMarginEQ;
+              (amount * thisTrade.lot_size) / user?.intradayExposureMarginEQ;
           } else {
             intradayEQmarging =
-              (amount * body.units) / user.intradayExposureMarginEQ;
+              (amount * body.units) / user?.intradayExposureMarginEQ;
           }
         } else if (body?.segment.toLowerCase() == 'eq' && body.sell_rate) {
           if (user?.equityTradeType == 'lots' && body.lots) {
             intradayEQmarging =
-              (amount * thisTrade.lot_size) / user.intradayExposureMarginEQ;
+              (amount * thisTrade.lot_size) / user?.intradayExposureMarginEQ;
           } else if (user?.equityTradeType == 'units' && body.units) {
             intradayEQmarging =
-              (amount * body.units) / user.intradayExposureMarginEQ;
+              (amount * body.units) / user?.intradayExposureMarginEQ;
           }
         }
 
@@ -1525,7 +1738,7 @@ const update = async (id, body) => {
           var ledgerP = {
             trade_id: tradeP._id,
             user_id: body?.user_id,
-            broker_id: user.broker_id,
+            broker_id: user?.broker_id,
             amount: amount,
             brokerage: brokerage,
             type: body?.purchaseType ? body?.purchaseType : 'buy'
@@ -1537,7 +1750,7 @@ const update = async (id, body) => {
           // const selectedTrade = await TradesModel.findOne({ _id: trade._id }).populate('user_id', 'name').select({ buy_rate: 1, _id:0  });
           //  return selectedTrade;
           return {
-            name: user.name,
+            name: user?.name,
             buy_rate: tradeP.buy_rate
           };
         } else {
@@ -1589,18 +1802,18 @@ async function clossTodaysTrades(data) {
     if (body?.segment.toLowerCase() == 'mcx' && amount) {
       if (body.lots) {
         holdingMCXmarging =
-          (amount * body.lots) / user.holdingExposureMarginMCX;
+          (amount * body.lots) / user?.holdingExposureMarginMCX;
       } else {
         holdingMCXmarging =
-          (amount * body.units) / user.holdingExposureMarginMCX;
+          (amount * body.units) / user?.holdingExposureMarginMCX;
       }
     } else if (body?.segment.toLowerCase() == 'mcx' && body.sell_rate) {
       if (body.lots) {
         holdingMCXmarging =
-          (amount * body.lots) / user.holdingExposureMarginMCX;
+          (amount * body.lots) / user?.holdingExposureMarginMCX;
       } else if (body.units) {
         holdingMCXmarging =
-          (amount * body.units) / user.holdingExposureMarginMCX;
+          (amount * body.units) / user?.holdingExposureMarginMCX;
       }
     }
 
@@ -1614,15 +1827,15 @@ async function clossTodaysTrades(data) {
     var holdingEQmarging = 0;
     if (body?.segment.toLowerCase() == 'eq' && amount) {
       if (user?.equityTradeType == 'lots' && body.lots) {
-        holdingEQmarging = (amount * body.lots) / user.holdingExposureMarginEQ;
+        holdingEQmarging = (amount * body.lots) / user?.holdingExposureMarginEQ;
       } else {
-        holdingEQmarging = (amount * body.units) / user.holdingExposureMarginEQ;
+        holdingEQmarging = (amount * body.units) / user?.holdingExposureMarginEQ;
       }
     } else if (body?.segment.toLowerCase() == 'eq' && body.sell_rate) {
       if (user?.equityTradeType == 'lots' && body.lots) {
-        holdingEQmarging = (amount * body.lots) / user.holdingExposureMarginEQ;
+        holdingEQmarging = (amount * body.lots) / user?.holdingExposureMarginEQ;
       } else if (body.units) {
-        holdingEQmarging = (amount * body.units) / user.holdingExposureMarginEQ;
+        holdingEQmarging = (amount * body.units) / user?.holdingExposureMarginEQ;
       }
     }
 
@@ -1869,8 +2082,8 @@ const ledgerbalance = async (brokerageId) => {
 
 const userledgerbalance = async (userId) => {
   let data = await LedgersModel.find({ user_id: userId });
-  const user = data.map((user) => user.brokerage);
-  const userledger = user.reduce(
+  const user = data.map((user) => user?.brokerage);
+  const userledger = user?.reduce(
     (accumulator, currentValue) => accumulator + currentValue,
     0
   );
@@ -1892,7 +2105,7 @@ const userledgerbalance = async (userId) => {
 
 const findFunds = async (userId) => {
   let data = await TradesModel.find({ user_id: userId });
-  const user = data.map((user) => user.user_id);
+  const user = data.map((user) => user?.user_id);
   const finduser = await UserModel.findById(user);
 
   return {
@@ -2028,24 +2241,24 @@ const ActiveTradesbyuser = async () => {
     // const trade = data[i];
     // const user = await UserModel.findById(trade.user_id);
     // newdata.push({
-    //   name: user.name,
-    //   ledgerbalance: user.funds,
-    //   user_name: user.user_id
+    //   name: user?.name,
+    //   ledgerbalance: user?.funds,
+    //   user_name: user?.user_id
     // });
     const trade = data[i];
     const user = await UserModel.findById(trade.user_id);
     const userTrades =
-      newdata.find((item) => item.user_name === user.user_id)?.trades ?? [];
+      newdata.find((item) => item.user_name === user?.user_id)?.trades ?? [];
     userTrades.push(trade);
     const updatedUser = {
-      name: user.name,
-      ledgerbalance: user.funds,
-      user_name: user.user_id,
+      name: user?.name,
+      ledgerbalance: user?.funds,
+      user_name: user?.user_id,
       trades: userTrades,
-      intradayExposureMarginMCX: user.intradayExposureMarginMCX,
-      intradayExposureMarginEQ: user.intradayExposureMarginEQ
+      intradayExposureMarginMCX: user?.intradayExposureMarginMCX,
+      intradayExposureMarginEQ: user?.intradayExposureMarginEQ
     };
-    newdata = newdata.filter((item) => item.user_name !== user.user_id);
+    newdata = newdata.filter((item) => item.user_name !== user?.user_id);
     newdata.push(updatedUser);
   }
   return newdata;
