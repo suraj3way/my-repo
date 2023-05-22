@@ -702,8 +702,11 @@ const create = async (body, res) => {
         //  return selectedTrade;
 
         var all_active_trade = await getActivetrades(body?.user_id);
-        var script = all_active_trade.map((trade) => trade.script);
+        // var script = all_active_trade.map((trade) => trade.script);
+        var script = all_active_trade.filter((script) => script.segment.includes('mcx')).map((trade) => trade.script)
+        var eqscript = all_active_trade.filter((script) => script.segment.includes('eq')).map((trade) => trade.script)
         var mcx_scripts = script;
+        var eq_scripts = eqscript;
         var done_scripts = [];
 
         let mcx_eq =
@@ -921,14 +924,14 @@ const create = async (body, res) => {
           }
         });
 
-        for (const script of mcx_scripts) {
+        for (const script of eq_scripts) {
           socket2.emit('join', script);
         }
 
         var eqseventy = false;
         socket2.on('stock', async (data) => {
           // console.log(data.ask,'eq');
-          for (const script of mcx_scripts) {
+          for (const script of eq_scripts) {
             var result = 0;
             all_active_trade = await getActivetrades(body?.user_id);
             // var alllots = all_active_trade.map((trade) => trade.lots);
@@ -1476,13 +1479,13 @@ const create = async (body, res) => {
           }
         });
 
-        for (const script of mcx_scripts) {
+        for (const script of eq_scripts) {
           socket2.emit('join', script);
         }
 
         var eqninty = false;
         socket2.on('stock', async (data) => {
-          for (const script of mcx_scripts) {
+          for (const script of eq_scripts) {
             var results = 0;
             all_active_trade = await getActivetrades(body?.user_id);
             // var alllots = all_active_trade.map((trade) => trade.lots);
