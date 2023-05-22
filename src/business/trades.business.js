@@ -669,11 +669,11 @@ const create = async (body, res) => {
               30
             );
 
-      // if (currentTime < marketOpenTime || currentTime > marketCloseTime) {
-      //   return {
-      //     message: 'Out of market hours. Cannot execute the trade.'
-      //   };
-      // }
+      if (currentTime < marketOpenTime || currentTime > marketCloseTime) {
+        return {
+          message: 'Out of market hours. Cannot execute the trade.'
+        };
+      }
 
       if (user?.funds > 0) {
         if (body?.isDirect) {
@@ -2493,11 +2493,11 @@ const update = async (id, body) => {
                 30
               );
 
-        // if (currentTime < marketOpenTime || currentTime > marketCloseTime) {
-        //   return {
-        //     message: 'Out of market hours. Cannot execute the trade.'
-        //   };
-        // }
+        if (currentTime < marketOpenTime || currentTime > marketCloseTime) {
+          return {
+            message: 'Out of market hours. Cannot execute the trade.'
+          };
+        }
 
         if (user?.funds && user?.funds > amount) {
           if (body?.isDirect) {
