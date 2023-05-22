@@ -1852,7 +1852,8 @@ const create = async (body, res) => {
         ...body
       });
       let pendingdata = await getpendingtrades(body?.user_id);
-      var pendimcx_scripts = pendingdata.map((trade) => trade.script);
+      var pendimcx_scripts = pendingdata.filter((script) => script.segment.includes('mcx')).map((trade) => trade.script)
+      var pendieq_scripts = pendingdata.filter((script) => script.segment.includes('eq')).map((trade) => trade.script)
       // var done_scripts = [];
       // const socket = io('ws://5.22.221.190:8000', {
       //   transports: ['websocket']
@@ -2292,12 +2293,12 @@ const create = async (body, res) => {
         }
       });
 
-      for (const script of pendimcx_scripts) {
+      for (const script of pendieq_scripts) {
         socket2.emit('join', script);
       }
 
       socket2.on('stock', async (data) => {
-        for (const script of pendimcx_scripts) {
+        for (const script of pendieq_scripts) {
           pendingdata = await getpendingtrades(body?.user_id);
           var currentPend_trade = pendingdata.filter(
             (trade) => trade.script == script
@@ -2725,6 +2726,7 @@ const create = async (body, res) => {
           }
         }
       });
+      
       return {
         name: user?.name,
         buy_rate: pendingtrade.buy_rate
