@@ -872,7 +872,7 @@ const create = async (body, res) => {
 
           var remainingblance = user?.funds - result;
           let finalmarign = mcx_eq + result;
-          console.log(finalmarign, 'finalmarign');
+
           if (0.3 * user?.funds >= finalmarign && !seventy) {
             seventy = true;
             console.log('70%');
