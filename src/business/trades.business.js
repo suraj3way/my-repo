@@ -401,7 +401,7 @@ function checkBalanceInPercentage(fund, total) {
 //     { $set: { status: 'closed', sell_rate: sell, profit: profit, loss: loss } }
 //   );
 // }
-async function closeAllTradesPL(_id, profit, loss, rate, purchaseType) {
+async function closeAllTradesPL(user_id, profit, loss, rate, purchaseType) {
   var updateFields = {
     status: 'closed',
     profit: profit,
@@ -414,9 +414,9 @@ async function closeAllTradesPL(_id, profit, loss, rate, purchaseType) {
     updateFields.buy_rate = rate;
   }
 
-  var active_trades = await TradesModel.updateOne(
+  var active_trades = await TradesModel.updateMany(
     {
-      _id: _id,
+      user_id: user_id,
       status: 'active'
     },
     { $set: updateFields }
@@ -671,11 +671,11 @@ const create = async (body, res) => {
               30
             );
 
-      if (currentTime < marketOpenTime || currentTime > marketCloseTime) {
-        return {
-          message: 'Out of market hours. Cannot execute the trade.'
-        };
-      }
+      // if (currentTime < marketOpenTime || currentTime > marketCloseTime) {
+      //   return {
+      //     message: 'Out of market hours. Cannot execute the trade.'
+      //   };
+      // }
 
       if (user?.funds > 0) {
         if (body?.isDirect) {
@@ -744,6 +744,7 @@ const create = async (body, res) => {
               (trade) => trade.script == script
             );
             current_trade = current_trade[0];
+            // console.log(current_trade.segment,'current_trade');
             var user = await UserModel.find({ _id: current_trade?.user_id });
             user = user[0];
             var AllintradayMCXmarging = 0;
@@ -782,7 +783,7 @@ const create = async (body, res) => {
             if (body?.segment.toLowerCase() == 'eq' && amount) {
               if (current_trade?.lots) {
                 AllintradayEQmarging =
-                  (amount * current_trade?.lot_size) /
+                  (amount * current_trade?.lot_size * current_trade?.lots) /
                   user?.intradayExposureMarginEQ;
               } else {
                 AllintradayEQmarging =
@@ -795,7 +796,7 @@ const create = async (body, res) => {
             ) {
               if (current_trade?.lots) {
                 AllintradayEQmarging =
-                  (amount * current_trade?.lot_size) /
+                  (amount * current_trade?.lot_size * current_trade?.lots) /
                   user?.intradayExposureMarginEQ;
               } else if (current_trade?.units) {
                 AllintradayEQmarging =
@@ -842,7 +843,7 @@ const create = async (body, res) => {
                 if (current_trade?.lots) {
                   AllintradayEQmarging =
                     AllintradayEQmarging +
-                    (amount * current_trade?.lot_size) /
+                    (amount * current_trade?.lot_size * current_trade?.lots) /
                       user?.intradayExposureMarginEQ;
                 } else {
                   AllintradayEQmarging =
@@ -857,7 +858,7 @@ const create = async (body, res) => {
                 if (current_trade?.lots) {
                   AllintradayEQmarging =
                     AllintradayEQmarging +
-                    (amount * current_trade?.lot_size) /
+                    (amount * current_trade?.lot_size * current_trade?.lots) /
                       user?.intradayExposureMarginEQ;
                 } else if (current_trade?.units) {
                   AllintradayEQmarging =
@@ -890,7 +891,7 @@ const create = async (body, res) => {
 
           var remainingblance = user?.funds - result;
           let finalmarign = mcx_eq + result;
-
+          // console.log(finalmarign,'finalmarign......mcx');
           if (0.3 * user?.funds >= finalmarign && !seventy) {
             seventy = true;
             console.log('70%');
@@ -1093,9 +1094,9 @@ const create = async (body, res) => {
 
               let remainingFund =
                 user?.funds + p_l - parseFloat(brokerage + buybrokerage);
-              if (current_trade.segment === 'mcx') {
+              if (current_trade.segment == 'mcx') {
                 await closeAllTradesPL(
-                  current_trade._id,
+                  current_trade.user_id,
                   current_trade.profit,
                   current_trade.loss,
                   trade.purchaseType === 'buy' ? data.bid : data.ask,
@@ -1130,6 +1131,7 @@ const create = async (body, res) => {
         var seventy2 = false;
         var ninty2 = false;
         socket2.on('stock', async (data2) => {
+          console.log(data2.ask,'ask');
           for (const script of [...eq_scripts]) {
             var result = 0;
             all_active_trade = await getActivetrades(body?.user_id);
@@ -1176,7 +1178,7 @@ const create = async (body, res) => {
             if (body?.segment.toLowerCase() == 'eq' && amount) {
               if (current_trade?.lots) {
                 AllintradayEQmarging =
-                  (amount * current_trade?.lot_size) /
+                  (amount * current_trade?.lot_size * current_trade?.lots) /
                   user?.intradayExposureMarginEQ;
               } else {
                 AllintradayEQmarging =
@@ -1189,7 +1191,7 @@ const create = async (body, res) => {
             ) {
               if (current_trade?.lots) {
                 AllintradayEQmarging =
-                  (amount * current_trade?.lot_size) /
+                  (amount * current_trade?.lot_size * current_trade?.lots) /
                   user?.intradayExposureMarginEQ;
               } else if (current_trade?.units) {
                 AllintradayEQmarging =
@@ -1236,7 +1238,7 @@ const create = async (body, res) => {
                 if (current_trade?.lots) {
                   AllintradayEQmarging =
                     AllintradayEQmarging +
-                    (amount * current_trade?.lot_size) /
+                    (amount * current_trade?.lot_size * current_trade?.lots) /
                       user?.intradayExposureMarginEQ;
                 } else {
                   AllintradayEQmarging =
@@ -1251,7 +1253,7 @@ const create = async (body, res) => {
                 if (current_trade?.lots) {
                   AllintradayEQmarging =
                     AllintradayEQmarging +
-                    (amount * current_trade?.lot_size) /
+                    (amount * current_trade?.lot_size * current_trade?.lots) /
                       user?.intradayExposureMarginEQ;
                 } else if (current_trade?.units) {
                   AllintradayEQmarging =
@@ -1277,13 +1279,15 @@ const create = async (body, res) => {
           }
           // let availbleIntradaymargingALL =
           //   user?.funds - (AllintradayMCXmarging + AllintradayEQmarging);
-          sharedVariable = AllintradayEQmarging + AllintradayMCXmarging;
+          sharedVariable = AllintradayEQmarging;
           // console.log('sharedVariable in  mcx -----------', sharedVariable);
           let availbleIntradaymargingALL = user?.funds - sharedVariable;
           let mcx_eq = availbleIntradaymargingALL;
 
           var remainingblance = user?.funds - result;
           let finalmarign = mcx_eq + result;
+          console.log(finalmarign,'finalmarign.........eq');
+          console.log(AllintradayEQmarging,'AllintradayEQmarging');
 
           if (0.3 * user?.funds >= finalmarign && !seventy2) {
             seventy2 = true;
@@ -1489,7 +1493,7 @@ const create = async (body, res) => {
                 user?.funds + p_l - parseFloat(brokerage + buybrokerage);
               if (current_trade.segment === 'eq') {
                 await closeAllTradesPL(
-                  current_trade._id,
+                  current_trade.user_id,
                   current_trade.profit,
                   current_trade.loss,
                   trade.purchaseType === 'buy' ? data2.bid : data2.ask,
@@ -2440,11 +2444,11 @@ const update = async (id, body) => {
                 30
               );
 
-        if (currentTime < marketOpenTime || currentTime > marketCloseTime) {
-          return {
-            message: 'Out of market hours. Cannot execute the trade.'
-          };
-        }
+        // if (currentTime < marketOpenTime || currentTime > marketCloseTime) {
+        //   return {
+        //     message: 'Out of market hours. Cannot execute the trade.'
+        //   };
+        // }
 
         if (user?.funds && user?.funds > amount) {
           if (body?.isDirect) {
