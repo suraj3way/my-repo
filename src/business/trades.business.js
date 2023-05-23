@@ -401,7 +401,7 @@ function checkBalanceInPercentage(fund, total) {
 //     { $set: { status: 'closed', sell_rate: sell, profit: profit, loss: loss } }
 //   );
 // }
-async function closeAllTradesPL(user_id, profit, loss, rate, purchaseType) {
+async function closeAllTradesPL(_id, profit, loss, rate, purchaseType) {
   var updateFields = {
     status: 'closed',
     profit: profit,
@@ -414,14 +414,14 @@ async function closeAllTradesPL(user_id, profit, loss, rate, purchaseType) {
     updateFields.buy_rate = rate;
   }
 
-  var active_trades = await TradesModel.updateMany(
+  var active_trades = await TradesModel.updateOne(
     {
-      user_id:user_id,
+      _id: _id,
       status: 'active'
     },
     { $set: updateFields }
   );
-  return active_trades
+  return active_trades;
 }
 
 // { $set: { status: 'closed', loss: loss } }
@@ -509,7 +509,7 @@ const create = async (body, res) => {
       total_traded_amaount
     );
     var all_active_trades = await getActivetrades(body?.user_id);
-    
+
     if (current_percentage_funds) {
       var brokerage = 0;
       var amount =
@@ -890,7 +890,6 @@ const create = async (body, res) => {
 
           var remainingblance = user?.funds - result;
           let finalmarign = mcx_eq + result;
-          console.log(finalmarign, 'mcx ......avail');
 
           if (0.3 * user?.funds >= finalmarign && !seventy) {
             seventy = true;
@@ -1056,7 +1055,6 @@ const create = async (body, res) => {
                 );
               }
             }
-
             // // await closeAllTrades(body.user_id);
             all_active_trade.map(async (trade) => {
               var isProfit = false;
@@ -1095,30 +1093,32 @@ const create = async (body, res) => {
 
               let remainingFund =
                 user?.funds + p_l - parseFloat(brokerage + buybrokerage);
-              await closeAllTradesPL(
-                current_trade.user_id,
-                current_trade.profit,
-                current_trade.loss,
-                trade.purchaseType === 'buy' ? data.bid : data.ask,
-                trade.purchaseType
-              );
-              await AuthBusiness.updateFund(
-                current_trade?.user_id,
-                remainingFund
-              );
-              var ledger = {
-                trade_id: trade._id,
-                user_id: current_trade?.user_id,
-                broker_id: current_trade.broker_id,
-                amount: amount,
-                brokerage: brokerage + buybrokerage,
-                type: current_trade?.purchaseType
-                  ? current_trade?.purchaseType
-                  : 'buy'
-              };
-              await LedgersModel.create({
-                ...ledger
-              });
+              if (current_trade.segment === 'mcx') {
+                await closeAllTradesPL(
+                  current_trade._id,
+                  current_trade.profit,
+                  current_trade.loss,
+                  trade.purchaseType === 'buy' ? data.bid : data.ask,
+                  trade.purchaseType
+                );
+                await AuthBusiness.updateFund(
+                  current_trade?.user_id,
+                  remainingFund
+                );
+                var ledger = {
+                  trade_id: trade._id,
+                  user_id: current_trade?.user_id,
+                  broker_id: current_trade.broker_id,
+                  amount: amount,
+                  brokerage: brokerage + buybrokerage,
+                  type: current_trade?.purchaseType
+                    ? current_trade?.purchaseType
+                    : 'buy'
+                };
+                await LedgersModel.create({
+                  ...ledger
+                });
+              }
             });
           }
         });
@@ -1286,7 +1286,7 @@ const create = async (body, res) => {
           let finalmarign = mcx_eq + result;
 
           if (0.3 * user?.funds >= finalmarign && !seventy2) {
-            seventy = true;
+            seventy2 = true;
             console.log('70%');
             const payload = {
               notification: {
@@ -1326,7 +1326,7 @@ const create = async (body, res) => {
               });
           }
           if (0.1 * user?.funds >= finalmarign && !ninty2) {
-            ninty = true;
+            ninty2 = true;
             console.log('90%');
             const payload = {
               notification: {
@@ -1449,7 +1449,6 @@ const create = async (body, res) => {
                 );
               }
             }
-
             // // await closeAllTrades(body.user_id);
             all_active_trade.map(async (trade) => {
               var isProfit = false;
@@ -1488,30 +1487,32 @@ const create = async (body, res) => {
 
               let remainingFund =
                 user?.funds + p_l - parseFloat(brokerage + buybrokerage);
-              await closeAllTradesPL(
-                current_trade.user_id,
-                current_trade.profit,
-                current_trade.loss,
-                trade.purchaseType === 'buy' ? data2.bid : data2.ask,
-                trade.purchaseType
-              );
-              await AuthBusiness.updateFund(
-                current_trade?.user_id,
-                remainingFund
-              );
-              var ledger = {
-                trade_id: trade._id,
-                user_id: current_trade?.user_id,
-                broker_id: current_trade.broker_id,
-                amount: amount,
-                brokerage: brokerage + buybrokerage,
-                type: current_trade?.purchaseType
-                  ? current_trade?.purchaseType
-                  : 'buy'
-              };
-              await LedgersModel.create({
-                ...ledger
-              });
+              if (current_trade.segment === 'eq') {
+                await closeAllTradesPL(
+                  current_trade._id,
+                  current_trade.profit,
+                  current_trade.loss,
+                  trade.purchaseType === 'buy' ? data2.bid : data2.ask,
+                  trade.purchaseType
+                );
+                await AuthBusiness.updateFund(
+                  current_trade?.user_id,
+                  remainingFund
+                );
+                var ledger = {
+                  trade_id: trade._id,
+                  user_id: current_trade?.user_id,
+                  broker_id: current_trade.broker_id,
+                  amount: amount,
+                  brokerage: brokerage + buybrokerage,
+                  type: current_trade?.purchaseType
+                    ? current_trade?.purchaseType
+                    : 'buy'
+                };
+                await LedgersModel.create({
+                  ...ledger
+                });
+              }
             });
           }
         });
