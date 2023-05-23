@@ -416,11 +416,12 @@ async function closeAllTradesPL(user_id, profit, loss, rate, purchaseType) {
 
   var active_trades = await TradesModel.updateMany(
     {
-      user_id: user_id,
+      user_id:user_id,
       status: 'active'
     },
     { $set: updateFields }
   );
+  return active_trades
 }
 
 // { $set: { status: 'closed', loss: loss } }
@@ -508,6 +509,7 @@ const create = async (body, res) => {
       total_traded_amaount
     );
     var all_active_trades = await getActivetrades(body?.user_id);
+    
     if (current_percentage_funds) {
       var brokerage = 0;
       var amount =
@@ -881,8 +883,8 @@ const create = async (body, res) => {
           }
           // let availbleIntradaymargingALL =
           //   user?.funds - (AllintradayMCXmarging + AllintradayEQmarging);
-          sharedVariable = AllintradayMCXmarging;
-          console.log('sharedVariable in  mcx -----------', sharedVariable);
+          sharedVariable = AllintradayMCXmarging + AllintradayEQmarging;
+          // console.log('sharedVariable in  mcx -----------', sharedVariable);
           let availbleIntradaymargingALL = user?.funds - sharedVariable;
           let mcx_eq = availbleIntradaymargingALL;
 
@@ -1125,9 +1127,9 @@ const create = async (body, res) => {
           socket2.emit('join', script);
         }
 
-        seventy = false;
-        ninty = false;
-        socket2.on('stock', async (data) => {
+        var seventy2 = false;
+        var ninty2 = false;
+        socket2.on('stock', async (data2) => {
           for (const script of [...eq_scripts]) {
             var result = 0;
             all_active_trade = await getActivetrades(body?.user_id);
@@ -1266,26 +1268,24 @@ const create = async (body, res) => {
             });
 
             if (body.purchaseType == 'buy') {
-              result = (data.ask - current_trade?.buy_rate) * lotunit;
+              result = (data2.ask - current_trade?.buy_rate) * lotunit;
               // totalResults += results;
             } else {
-              result = (data.bid - current_trade?.sell_rate) * lotunit;
+              result = (data2.bid - current_trade?.sell_rate) * lotunit;
               // totalResults += results;
             }
           }
-          console.log(AllintradayEQmarging, 'eq....avail');
           // let availbleIntradaymargingALL =
           //   user?.funds - (AllintradayMCXmarging + AllintradayEQmarging);
-          sharedVariable = AllintradayEQmarging;
-          console.log('sharedVariable in  eq -----------', sharedVariable);
+          sharedVariable = AllintradayEQmarging + AllintradayMCXmarging;
+          // console.log('sharedVariable in  mcx -----------', sharedVariable);
           let availbleIntradaymargingALL = user?.funds - sharedVariable;
           let mcx_eq = availbleIntradaymargingALL;
 
           var remainingblance = user?.funds - result;
           let finalmarign = mcx_eq + result;
-          console.log(finalmarign, 'eq ......avail');
 
-          if (0.3 * user?.funds >= finalmarign && !seventy) {
+          if (0.3 * user?.funds >= finalmarign && !seventy2) {
             seventy = true;
             console.log('70%');
             const payload = {
@@ -1325,7 +1325,7 @@ const create = async (body, res) => {
                 console.log('Error sending notification');
               });
           }
-          if (0.1 * user?.funds >= finalmarign && !ninty) {
+          if (0.1 * user?.funds >= finalmarign && !ninty2) {
             ninty = true;
             console.log('90%');
             const payload = {
@@ -1408,7 +1408,7 @@ const create = async (body, res) => {
 
             var buybrokerage = 0;
             var buyamount =
-              current_trade?.purchaseType == 'buy' ? data.bid : data.ask;
+              current_trade?.purchaseType == 'buy' ? data2.bid : data2.ask;
             if (current_trade?.segment.toLowerCase() == 'mcx') {
               if (current_trade?.lots) {
                 buyamount =
@@ -1455,30 +1455,30 @@ const create = async (body, res) => {
               var isProfit = false;
 
               if (trade.purchaseType == 'sell') {
-                if (current_trade?.sell_rate > data.ask) {
+                if (current_trade?.sell_rate > data2.ask) {
                   current_trade.profit =
-                    (current_trade?.sell_rate - data.ask) *
+                    (current_trade?.sell_rate - data2.ask) *
                     current_trade.lot_size *
                     current_trade.lots;
                   isProfit = true;
                 }
-                if (current_trade?.sell_rate < data.ask) {
+                if (current_trade?.sell_rate < data2.ask) {
                   current_trade.loss =
-                    (data.ask - current_trade?.sell_rate) *
+                    (data2.ask - current_trade?.sell_rate) *
                     current_trade.lot_size *
                     current_trade.lots;
                 }
               } else {
-                if (data.bid > current_trade?.buy_rate) {
+                if (data2.bid > current_trade?.buy_rate) {
                   current_trade.profit =
-                    (data.bid - current_trade?.buy_rate) *
+                    (data2.bid - current_trade?.buy_rate) *
                     current_trade.lot_size *
                     current_trade.lots;
                   isProfit = true;
                 }
-                if (data.bid < current_trade?.buy_rate) {
+                if (data2.bid < current_trade?.buy_rate) {
                   current_trade.loss =
-                    (current_trade?.buy_rate - data.bid) *
+                    (current_trade?.buy_rate - data2.bid) *
                     current_trade.lot_size *
                     current_trade.lots;
                 }
@@ -1492,7 +1492,7 @@ const create = async (body, res) => {
                 current_trade.user_id,
                 current_trade.profit,
                 current_trade.loss,
-                trade.purchaseType === 'buy' ? data.bid : data.ask,
+                trade.purchaseType === 'buy' ? data2.bid : data2.ask,
                 trade.purchaseType
               );
               await AuthBusiness.updateFund(
