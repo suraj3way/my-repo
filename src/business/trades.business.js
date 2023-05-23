@@ -401,7 +401,7 @@ function checkBalanceInPercentage(fund, total) {
 //     { $set: { status: 'closed', sell_rate: sell, profit: profit, loss: loss } }
 //   );
 // }
-async function closeAllTradesPL(user_id, profit, loss, rate, purchaseType) {
+async function closeAllTradesPL(_id, profit, loss, rate, purchaseType) {
   var updateFields = {
     status: 'closed',
     profit: profit,
@@ -414,9 +414,9 @@ async function closeAllTradesPL(user_id, profit, loss, rate, purchaseType) {
     updateFields.buy_rate = rate;
   }
 
-  var active_trades = await TradesModel.updateMany(
+  var active_trades = await TradesModel.updateOne(
     {
-      user_id: user_id,
+      _id: _id,
       status: 'active'
     },
     { $set: updateFields }
@@ -424,7 +424,6 @@ async function closeAllTradesPL(user_id, profit, loss, rate, purchaseType) {
   return active_trades;
 }
 
-// { $set: { status: 'closed', loss: loss } }
 async function closeAllTrades(user_id) {
   var active_trades = await TradesModel.updateMany(
     {
@@ -1096,7 +1095,7 @@ const create = async (body, res) => {
                 user?.funds + p_l - parseFloat(brokerage + buybrokerage);
               if (current_trade.segment == 'mcx') {
                 await closeAllTradesPL(
-                  current_trade.user_id,
+                  current_trade._id,
                   current_trade.profit,
                   current_trade.loss,
                   trade.purchaseType === 'buy' ? data.bid : data.ask,
@@ -1131,7 +1130,6 @@ const create = async (body, res) => {
         var seventy2 = false;
         var ninty2 = false;
         socket2.on('stock', async (data2) => {
-          console.log(data2.ask,'ask');
           for (const script of [...eq_scripts]) {
             var result = 0;
             all_active_trade = await getActivetrades(body?.user_id);
@@ -1279,7 +1277,7 @@ const create = async (body, res) => {
           }
           // let availbleIntradaymargingALL =
           //   user?.funds - (AllintradayMCXmarging + AllintradayEQmarging);
-          sharedVariable = AllintradayEQmarging;
+          sharedVariable = AllintradayEQmarging + AllintradayMCXmarging;
           // console.log('sharedVariable in  mcx -----------', sharedVariable);
           let availbleIntradaymargingALL = user?.funds - sharedVariable;
           let mcx_eq = availbleIntradaymargingALL;
@@ -1287,7 +1285,6 @@ const create = async (body, res) => {
           var remainingblance = user?.funds - result;
           let finalmarign = mcx_eq + result;
           console.log(finalmarign,'finalmarign.........eq');
-          console.log(AllintradayEQmarging,'AllintradayEQmarging');
 
           if (0.3 * user?.funds >= finalmarign && !seventy2) {
             seventy2 = true;
@@ -1493,7 +1490,7 @@ const create = async (body, res) => {
                 user?.funds + p_l - parseFloat(brokerage + buybrokerage);
               if (current_trade.segment === 'eq') {
                 await closeAllTradesPL(
-                  current_trade.user_id,
+                  current_trade._id,
                   current_trade.profit,
                   current_trade.loss,
                   trade.purchaseType === 'buy' ? data2.bid : data2.ask,
@@ -1925,7 +1922,7 @@ const create = async (body, res) => {
             let remainingFund =
               user?.funds + p_l - parseFloat(brokerage + buybrokerage);
             await closeAllTradesPL(
-              current_trade.user_id,
+              current_trade._id,
               current_trade.profit,
               current_trade.loss,
               trade.purchaseType === 'buy' ? data.bid : data.ask,
